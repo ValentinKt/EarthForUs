@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Complete Your Volunteer Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2E7D32",
+              "secondary": "#4FC3F7",
+              "neutral": "#757575",
+              "background-light": "#F5F5F5",
+              "background-dark": "#102216",
+              "accent": "#FFC107"
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col font-display group/design-root overflow-x-hidden">
+<!-- TopAppBar -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="text-neutral dark:text-gray-300 flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</div>
+<h2 class="text-gray-900 dark:text-gray-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Complete Your Profile</h2>
+<div class="flex w-12 items-center justify-end">
+<p class="text-primary dark:text-primary/90 text-base font-bold leading-normal tracking-[0.015em] shrink-0">Save</p>
+</div>
+</div>
+<!-- PageIndicators -->
+<div class="flex w-full flex-row items-center justify-center gap-3 py-4 px-4">
+<div class="h-1.5 flex-1 rounded-full bg-primary/20 dark:bg-primary/30"><div class="h-1.5 w-full rounded-full bg-primary"></div></div>
+<div class="h-1.5 flex-1 rounded-full bg-primary/20 dark:bg-primary/30"><div class="h-1.5 w-full rounded-full bg-primary"></div></div>
+<div class="h-1.5 flex-1 rounded-full bg-primary/20 dark:bg-primary/30"><div class="h-1.5 w-full rounded-full bg-primary"></div></div>
+</div>
+<!-- HeadlineText -->
+<h1 class="text-gray-900 dark:text-gray-100 tracking-tight text-[28px] font-bold leading-tight px-4 text-left pt-2 pb-2">Complete Your Volunteer Profile</h1>
+<!-- BodyText -->
+<p class="text-neutral dark:text-gray-400 text-base font-normal leading-normal pb-6 px-4">Tell us a bit more about you to get matched with the perfect cleanup events!</p>
+<div class="flex flex-col gap-6 px-4">
+<!-- Section 1: Location -->
+<div>
+<label class="flex flex-col w-full">
+<p class="text-gray-900 dark:text-gray-200 text-base font-medium leading-normal pb-2">Your City or ZIP Code</p>
+<div class="flex w-full items-stretch rounded-lg">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-0 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:border-primary h-14 placeholder:text-neutral dark:placeholder:text-gray-500 p-[15px] rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal" placeholder="Enter your location" value=""/>
+<div class="text-primary dark:text-primary/90 flex border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark items-center justify-center px-4 rounded-r-lg border-l-0">
+<span class="material-symbols-outlined">my_location</span>
+</div>
+</div>
+<p class="text-neutral dark:text-gray-500 text-sm pt-2">This helps us find events near you.</p>
+</label>
+</div>
+<!-- Section 2: Cleanup Interests -->
+<div>
+<p class="text-gray-900 dark:text-gray-200 text-base font-medium leading-normal pb-3">What types of cleanups interest you?</p>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full text-white bg-primary font-medium text-sm">Beach</button>
+<button class="px-4 py-2 rounded-full text-secondary dark:text-secondary bg-secondary/20 font-medium text-sm">Park</button>
+<button class="px-4 py-2 rounded-full text-secondary dark:text-secondary bg-secondary/20 font-medium text-sm">Forest</button>
+<button class="px-4 py-2 rounded-full text-secondary dark:text-secondary bg-secondary/20 font-medium text-sm">River</button>
+<button class="px-4 py-2 rounded-full text-secondary dark:text-secondary bg-secondary/20 font-medium text-sm">Urban</button>
+<button class="px-4 py-2 rounded-full text-secondary dark:text-secondary bg-secondary/20 font-medium text-sm">Hiking Trail</button>
+</div>
+</div>
+<!-- Section 3: Availability -->
+<div>
+<p class="text-gray-900 dark:text-gray-200 text-base font-medium leading-normal pb-3">When are you usually free?</p>
+<div class="grid grid-cols-4 gap-2 text-center">
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium"></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium text-sm">Morning</div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium text-sm">Afternoon</div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium text-sm">Evening</div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Mon</div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Tue</div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Wed</div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Thu</div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Fri</div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Sat</div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-transparent text-neutral dark:text-gray-400 font-medium">Sun</div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+<div class="p-3 rounded-lg bg-secondary/20"><span class="material-symbols-outlined text-secondary text-2xl">check</span></div>
+</div>
+</div>
+<!-- Section 4: Special Skills -->
+<div>
+<label class="flex flex-col w-full">
+<p class="text-gray-900 dark:text-gray-200 text-base font-medium leading-normal pb-2">Any special skills? <span class="text-neutral dark:text-gray-400 font-normal">(Optional)</span></p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-gray-100 focus:outline-0 focus:ring-0 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:border-primary h-14 placeholder:text-neutral dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal" placeholder="e.g., First Aid, Heavy Lifting, Photography" value=""/>
+</label>
+</div>
+</div>
+<!-- CTA Section -->
+<div class="flex flex-col items-center gap-4 px-4 py-8 mt-4 sticky bottom-0 bg-background-light dark:bg-background-dark">
+<div class="flex items-center gap-2 text-accent">
+<span class="material-symbols-outlined">star</span>
+<p class="text-sm font-medium">You're one step away from making a difference!</p>
+</div>
+<button class="flex w-full items-center justify-center rounded-xl bg-primary px-6 py-4 text-base font-bold text-white shadow-sm transition-all hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Finish Profile</button>
+</div>
+</div>
+</body></html>

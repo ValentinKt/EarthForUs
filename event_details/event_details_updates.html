@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Event Detail Page</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2A9D8F",
+            "secondary": "#264653",
+            "accent": "#F4A261",
+            "background-light": "#F4F1DE",
+            "background-dark": "#1A1C19",
+            "text-light": "#333333",
+            "text-dark": "#E3E3E3",
+            "border-light": "#E0E0E0",
+            "border-dark": "#3A3C39",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 24px;
+    }
+    .custom-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      height: 1.25rem;
+      width: 1.25rem;
+      border: 2px solid #E0E0E0;
+      border-radius: 0.25rem;
+      display: inline-block;
+      position: relative;
+      vertical-align: middle;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      background-color: transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .dark .custom-checkbox {
+      border-color: #3A3C39;
+    }
+    .custom-checkbox:checked {
+      background-color: #2A9D8F;
+      border-color: #2A9D8F;
+    }
+    .custom-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="sticky top-0 z-10 flex items-center justify-between bg-background-light/80 dark:bg-background-dark/80 p-4 pb-2 backdrop-blur-sm">
+<div class="flex size-10 shrink-0 items-center justify-center text-text-light dark:text-text-dark">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="flex-1 truncate text-center text-lg font-bold leading-tight tracking-[-0.015em]">Event Details</h2>
+<div class="flex size-10 shrink-0 items-center justify-center text-text-light dark:text-text-dark">
+<span class="material-symbols-outlined">more_horiz</span>
+</div>
+</div>
+<div class="flex px-4 py-3">
+<div class="w-full aspect-[4/3] rounded-lg bg-cover bg-center object-cover" data-alt="A map showing the location of Golden Gate Park in San Francisco." data-location="San Francisco" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA-m0pX-3Zn-SfrhqeiBAj8SlPpw-prbno5eU4sE8Mn2Hku17-yjbqslm3Ffofovugrf_PULLPfiS_G22rB_9wd1--0jZz-Aj0VKwnA3KlRUGhLX3RHv0rUCDGewYnvys_SJyfkAiaFvUZT9hwMRGYDwWrJTIC0BBhd9658AwxOtDQywho6fpncMgU_v9RBI78zKZMlbOIl2LeK37LKlePQ_DxT5ulCW2n1XyLnstUst4_zzsBEVfmc7zm5CSBRTysNrqspi1OqsFR3");'></div>
+</div>
+<div class="px-4 pt-4 pb-2">
+<h1 class="text-text-light dark:text-text-dark text-[32px] font-bold leading-tight tracking-tighter">Golden Gate Park Cleanup Day</h1>
+</div>
+<div class="flex gap-3 px-4 pb-4">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/20 pl-4 pr-4">
+<p class="text-primary text-sm font-medium leading-normal">Upcoming</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 px-4 py-2">
+<div class="flex items-center gap-4 min-h-14">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal">Saturday, Oct 26, 9:00 AM - 12:00 PM</p>
+</div>
+<div class="flex items-center gap-4 min-h-14">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<p class="flex-1 text-base font-normal leading-normal">Golden Gate Park, San Francisco, CA</p>
+</div>
+<div class="flex items-center gap-4 min-h-14">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="flex-1 truncate text-base font-normal leading-normal">Organized by Andrea Rossi</p>
+</div>
+</div>
+<div class="px-4 py-4">
+<hr class="border-border-light dark:border-border-dark"/>
+</div>
+<div class="px-4">
+<div class="flex items-center justify-between pb-3">
+<h3 class="text-lg font-bold">Participants (12)</h3>
+<a class="text-sm font-semibold text-primary" href="#">View All</a>
+</div>
+<div class="flex -space-x-2">
+<img class="inline-block size-10 rounded-full ring-2 ring-background-light dark:ring-background-dark" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXabX5JuTdA-pzPf0uSJSw19DeGnnpv2WPIi3zrAVBsQVMu4HchLgNHl5ztNQB9eElf4XpFxzI6atfoPrTVwgVPMo_xJOTj9dssMU-gSqFUXVxelMJstfNF9ZZUMS2v76u-SvpjZdEIGczkmsOhwdDJsBLnWXrJ8JIs6hpcOX9_wa-UjaT6vY5lfFEwk29E9wK2Z_ZTtV-3NqmnK7_fVM25_duW1NpAOWXVQdRxFGy9x_DFzXTdbaXxavW_vrFgKbdObMzGdlcE_rs"/>
+<img class="inline-block size-10 rounded-full ring-2 ring-background-light dark:ring-background-dark" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVvepDfot5AOisd2eDQPYLCi11dTxoz07-LiBXYx0vYTrg9WhduKvweiNK1PJr-j62GyLhihL3SCqYV14-P9EsGwj2RW84r4wODunhcqpDEMeOZFBMscuMe3qrIWOwQRaJePmmy7jGP2nHNtaedaCtXwotKrywhIaw6HD7PK_jjlNddFpw35d3IwuRMYcquYraJwNJIK1Cy0T_P_rSE61Y6vMkli7hCaagBg58pSj4XEl349Fyh4rJiyr6ewcI3E0ytgIX4Zvnisey"/>
+<img class="inline-block size-10 rounded-full ring-2 ring-background-light dark:ring-background-dark" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZdQTHpyZi38YNjWWcUfUOiRrAHUdk7KJign8DTlkAgs9Qmw09crT0yx5YdX1C3eS2qFwQLx5K_Q-D8p3sy-IXFwKZQlLeVe729zEXEj7mJUkLizMjSta1tD0CAxbSspFj2qUkB3J7v8t3lWqPvGMjjdOo7gZZ9-1QIY06RhbF9xB0DvfSe7YO_38VgcBjoKrar4qFKNtetRC6AjPqYl9q-cvtDSXFPfPqx6kw-Z7PLHmmP6VcF3H9BNmqbEU8aKXLBriTjvMtGwb9"/>
+<img class="inline-block size-10 rounded-full ring-2 ring-background-light dark:ring-background-dark" data-alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPruO7TAd4aVk2zEhFOmX8KqI0bOUuV7ZSXVFY94pKInA_l2m00T-7HinCq1Xsh3GQsr67Khakjah5NaWvNya41lJ5VVrNfPo91nc0uxYNHU62kazyuiIlYedwjMdbZ7D-rnwYKNKWuqeRrl-85sSRadgm-6oCSTsKUNhLHlkqfH-ir2UeeEtEuomhgTd8ypz3ElkRpFPnLxHC4Oi1UnrxE4NZiL1YdiomSEFiYTWr5fJHE6ZFeefa1sAfm_PFHw4a5t6JM57ztxFd"/>
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/30 ring-2 ring-background-light dark:ring-background-dark">
+<span class="text-xs font-bold text-primary">+8</span>
+</div>
+</div>
+</div>
+<div class="px-4 py-4">
+<hr class="border-border-light dark:border-border-dark"/>
+</div>
+<div class="flex-1 flex flex-col min-h-0">
+<div class="px-4">
+<div class="flex border-b border-border-light dark:border-border-dark">
+<button class="flex-1 py-3 text-center text-sm font-semibold text-text-light/70 dark:text-text-dark/70">Details</button>
+<button class="flex-1 py-3 text-center text-sm font-semibold border-b-2 border-primary text-primary">Updates</button>
+<button class="flex-1 py-3 text-center text-sm font-semibold text-text-light/70 dark:text-text-dark/70">Chat</button>
+</div>
+</div>
+<div class="flex-1 flex flex-col px-4 pt-6 overflow-y-auto" style="min-height: 0;">
+<div class="flex flex-col space-y-6">
+<div class="flex items-start gap-4">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-lg">edit_square</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-sm font-semibold">Organizer posted an update <span class="text-xs font-normal text-text-light/60 dark:text-text-dark/60">Oct 25, 8:00 AM</span></p>
+<div class="rounded-lg bg-border-light dark:bg-border-dark p-3 text-sm text-text-light dark:text-text-dark">
+<p>Hey everyone! Just a reminder that we'll be meeting at the main entrance near the Japanese Tea Garden. We'll have some snacks and water, but please bring your own reusable water bottle if you can!</p>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-lg">schedule</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-sm font-semibold">Time changed <span class="text-xs font-normal text-text-light/60 dark:text-text-dark/60">Oct 24, 6:00 PM</span></p>
+<div class="rounded-lg bg-border-light dark:bg-border-dark p-3 text-sm text-text-light dark:text-text-dark">
+<p>The event time has been updated from 9:00 AM - 1:00 PM to 9:00 AM - 12:00 PM to allow for more flexibility. See you all there!</p>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-lg">campaign</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-sm font-semibold">New volunteer guidelines <span class="text-xs font-normal text-text-light/60 dark:text-text-dark/60">Oct 23, 2:15 PM</span></p>
+<div class="rounded-lg bg-border-light dark:bg-border-dark p-3 text-sm text-text-light dark:text-text-dark">
+<p>Please review the updated volunteer guidelines for safety and efficiency during the cleanup.</p>
+<img alt="Volunteer guidelines document preview" class="mt-2 w-full max-w-[200px] rounded-md object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT38wNbxJvGOW93hq27eqqBWIlBpNSJADcVMER4-5TRYZJvl8tsdxVUwdz7_3EUDTysER6Ynv9ix2WiO5QJtbKr9iiQOtdqjtLvLjex1xgyVlm6lfD_iDDQLYB_v34Oug0tTMHLJ2pY2AUKMmyi6JxjpCHlZ8GZjMFATKZKdMQQsQTcZdlpUS0TO4dEi38_P-Y-OB0gtjkevOrNn3UXwJ3jiR3kkxvmWTwF9BuzmLReS2VgTxxox0Ap9aZj5Fj_RkMKws5odGm9Mdk"/>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="flex shrink-0 size-10 items-center justify-center rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-lg">event</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-sm font-semibold">Event created <span class="text-xs font-normal text-text-light/60 dark:text-text-dark/60">Oct 20, 10:00 AM</span></p>
+<div class="rounded-lg bg-border-light dark:bg-border-dark p-3 text-sm text-text-light dark:text-text-dark">
+<p>The event "Golden Gate Park Cleanup Day" has been created by Andrea Rossi.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

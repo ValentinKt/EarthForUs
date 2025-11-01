@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Event - Eco Cleanup Crew</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#34A853",
+            "secondary": "#4285F4",
+            "background-light": "#F9F9F9",
+            "background-dark": "#102216",
+            "text-light": "#333333",
+            "text-dark": "#F9F9F9",
+            "text-secondary-light": "#757575",
+            "text-secondary-dark": "#a0aec0",
+            "border-light": "#CCCCCC",
+            "border-dark": "#4a5568",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm p-4 justify-between border-b border-border-light/50 dark:border-border-dark/50">
+<button class="text-text-light dark:text-text-dark flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight tracking-tight flex-1 text-center">Create New Event</h1>
+<div class="size-10"></div>
+</header>
+<main class="flex-1 pb-28">
+<!-- Event Details Section -->
+<section class="px-4 pt-6">
+<h2 class="text-text-light dark:text-text-dark tracking-tight text-2xl font-bold leading-tight pb-4">Event Details</h2>
+<!-- Event Title -->
+<div class="py-3">
+<label class="flex flex-col">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Event Title</p>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-14 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark p-[15px] text-base font-normal leading-normal transition-all" placeholder="e.g., Beach Cleanup at Sunrise Park" value=""/>
+</label>
+</div>
+<!-- Description -->
+<div class="py-3">
+<label class="flex flex-col">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Description</p>
+<textarea class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark min-h-36 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark p-[15px] text-base font-normal leading-normal transition-all" placeholder="Describe the event, what to expect, and any important details."></textarea>
+</label>
+</div>
+</section>
+<!-- Logistics Section -->
+<section class="px-4 pt-6">
+<h2 class="text-text-light dark:text-text-dark tracking-tight text-2xl font-bold leading-tight pb-4">Logistics</h2>
+<!-- Date & Time -->
+<div class="flex flex-col sm:flex-row gap-4 py-3">
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Date</p>
+<div class="relative">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal transition-all appearance-none" type="date" value="2024-08-15"/>
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">calendar_today</span>
+</div>
+</label>
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Time</p>
+<div class="relative">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-14 p-[15px] text-base font-normal leading-normal transition-all appearance-none" type="time" value="09:00"/>
+<span class="material-symbols-outlined text-text-secondary-light dark:text-text-secondary-dark absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">schedule</span>
+</div>
+</label>
+</div>
+<!-- Location -->
+<div class="py-3">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Location</p>
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-border-light dark:border-border-dark">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="An aerial view of a coastline with blue water and green land, representing a map." data-location="California, USA" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtuuJ2FnK4hW_j9FIYsF27vQWC1ZNU1ZkRCGuxdienUI41ykyfySddV6i7jnLTQxlzcS6FlF0cuvBalS-zdvkGKm993f0AvR58FEZL4QNg1QlbMEov-4HnxfF2eE5iGx_zruG245sW3N2zz5zaH2Z4Z2qE--GQ52atTxMbBuV8eby09QHQH8O4Y7RMMHvlYuurPnwVeyb21v6cKLAIQ1_sokI2HG8g9fD5_2ktECY4nj9vfvNiaFgjJr3OykLVa-mLfpgQMgJSvPf7"/>
+<div class="absolute inset-0 bg-black/20"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-white text-5xl drop-shadow-lg" style="font-size: 48px;">location_on</span>
+</div>
+<button class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg hover:bg-secondary/90 transition-colors">
+<span class="material-symbols-outlined text-base">search</span>
+<span>Search or pin on map</span>
+</button>
+</div>
+<div class="flex items-center gap-3 bg-background-light dark:bg-black/20 p-3 mt-3 rounded-lg border border-border-light dark:border-border-dark">
+<span class="material-symbols-outlined text-secondary">location_on</span>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark flex-1">123 Ocean View Drive, Malibu, CA</p>
+</div>
+</div>
+</section>
+<!-- Requirements Section -->
+<section class="px-4 pt-6">
+<h2 class="text-text-light dark:text-text-dark tracking-tight text-2xl font-bold leading-tight pb-4">Requirements</h2>
+<!-- Volunteer Capacity -->
+<div class="py-3">
+<label class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2 block" for="capacity">Volunteer Capacity</label>
+<div class="relative flex items-center">
+<button class="absolute left-0 top-0 h-full px-4 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<input class="form-input w-full rounded-lg text-center text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-14 text-base font-normal leading-normal transition-all" id="capacity" placeholder="e.g., 50" type="number" value="50"/>
+<button class="absolute right-0 top-0 h-full px-4 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Required Tools -->
+<div class="py-3">
+<p class="text-text-light dark:text-text-dark text-base font-medium leading-normal pb-2">Required Tools</p>
+<div class="flex flex-wrap gap-2 mb-3">
+<div class="flex items-center gap-1 bg-primary/20 text-primary dark:bg-primary/30 dark:text-white/90 rounded-full px-3 py-1.5 text-sm font-medium">
+<span>Gloves</span>
+<button class="text-primary/70 dark:text-white/70 hover:text-primary dark:hover:text-white transition-colors"><span class="material-symbols-outlined !text-base">close</span></button>
+</div>
+<div class="flex items-center gap-1 bg-primary/20 text-primary dark:bg-primary/30 dark:text-white/90 rounded-full px-3 py-1.5 text-sm font-medium">
+<span>Trash Bags</span>
+<button class="text-primary/70 dark:text-white/70 hover:text-primary dark:hover:text-white transition-colors"><span class="material-symbols-outlined !text-base">close</span></button>
+</div>
+</div>
+<div class="flex gap-2">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark h-14 placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark p-[15px] text-base font-normal leading-normal transition-all" placeholder="Add a tool..."/>
+<button class="flex-shrink-0 bg-primary text-white rounded-lg px-5 font-semibold hover:bg-primary/90 transition-colors">Add</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Action Area -->
+<footer class="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background-light to-transparent dark:from-background-dark dark:to-transparent">
+<button class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl h-14 text-base flex items-center justify-center shadow-lg shadow-primary/30 hover:bg-primary/90 active:scale-95 transition-all">Create Event</button>
+</footer>
+</div>
+</body></html>
