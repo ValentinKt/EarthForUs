@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ReactNode } from 'react';
 import ErrorBoundary from '../../shared/components/ErrorBoundary';
+import { useAuth } from '../../features/auth/context/AuthContext';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,9 +16,10 @@ const Layout: React.FC<LayoutProps> = ({
   showFooter = true,
   className = '' 
 }) => {
+  const { isAuthenticated, logout } = useAuth();
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen flex flex-col bg-gray-50 ${className}`}>
+      <div className={`min-h-screen flex flex-col bg-brand-50 ${className}`}>
         {showHeader && (
           <header className="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,8 +45,14 @@ const Layout: React.FC<LayoutProps> = ({
 
                 {/* User Actions */}
                 <div className="flex items-center space-x-3">
-                  <a href="/login" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Sign In</a>
-                  <a href="/signup" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition-colors">Get Started</a>
+                  {isAuthenticated ? (
+                    <button onClick={logout} className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Logout</button>
+                  ) : (
+                    <>
+                      <a href="/login" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Sign In</a>
+                      <a href="/signup" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition-colors">Get Started</a>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
