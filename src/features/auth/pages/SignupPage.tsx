@@ -100,7 +100,7 @@ const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+    <div className="min-h-screen bg-brand-50 flex items-center justify-center py-12">
       <div className="max-w-md w-full space-y-8 px-4 sm:px-0">
         <div className="text-center">
           <div className="flex justify-center mb-6">
