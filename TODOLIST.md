@@ -1,17 +1,14 @@
 # EarthForUs Project TODO
 
-[x] Setup Express API server with auth and events endpoints
-[x] Wire Signup and Login pages to call API
-[x] Create Event Creation page and route
-[x] Add Vite dev proxy for /api
-[x] Run DB up and apply initial migration
-[x] Start API and Vite dev servers
-[x] Smoke test auth and events API (signup, login, create/list event)
+[x] Switch Tailwind brand palette to teal
+[x] Update auth pages background to brand-50
+[x] Update .gitignore to ignore .data/ and .env; untrack them
+[x] Commit styling and gitignore changes
 
-[ ] Style auth and events pages with Tailwind teal brand
-[ ] Add event detail page with registrations
-[ ] Implement user session persistence and logout
-[ ] Add protected routes guard with redirect
-[ ] Add Docker Compose service for API (optional)
-[ ] Deploy to Vercel (frontend) and configure env
-[ ] Document local dev setup and troubleshooting
+[x] Create AuthContext with provider and useAuth hook
+[x] Add ProtectedRoute component for authentication guarding
+[x] Wrap protected routes in App with ProtectedRoute
+[x] Update Layout header to show Logout when authenticated
+[x] Change Layout background to brand-50
+[ ] Commit auth guard and layout changes
+[ ] Preview app to validate auth flow and styling
