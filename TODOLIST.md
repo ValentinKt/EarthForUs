@@ -10,5 +10,5 @@
 [x] Wrap protected routes in App with ProtectedRoute
 [x] Update Layout header to show Logout when authenticated
 [x] Change Layout background to brand-50
-[ ] Commit auth guard and layout changes
-[ ] Preview app to validate auth flow and styling
+[x] Commit auth guard and layout changes
+[x] Preview app to validate auth flow and styling
