@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { SignupForm } from '../../../types';
 import Button from '../../../shared/ui/Button';
 
 const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<SignupForm>({
     firstName: '',
     lastName: '',
@@ -74,10 +75,23 @@ const SignupPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Signup attempt:', formData);
-      // Handle successful signup here
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const message = data?.error || 'Failed to create account';
+        setErrors(prev => ({ ...prev, email: message }));
+        return;
+      }
+      navigate('/login');
     } catch (error) {
       console.error('Signup error:', error);
     } finally {

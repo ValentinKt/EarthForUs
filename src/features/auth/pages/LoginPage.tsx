@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { LoginForm } from '../../../types';
 import Button from '../../../shared/ui/Button';
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
@@ -51,10 +52,22 @@ const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login attempt:', formData);
-      // Handle successful login here
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const message = data?.error || 'Invalid credentials';
+        setErrors(prev => ({ ...prev, password: message }));
+        return;
+      }
+      localStorage.setItem('user', JSON.stringify(data.user));
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
     } finally {
