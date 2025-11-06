@@ -62,6 +62,7 @@ interface ButtonProps {
   onClick?: () => void;
   className?: string;
   'aria-label'?: string;
+  form?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
