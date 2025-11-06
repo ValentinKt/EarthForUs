@@ -12,3 +12,9 @@
 [x] Change Layout background to brand-50
 [x] Commit auth guard and layout changes
 [x] Preview app to validate auth flow and styling
+
+[x] Port avatar menu prototype to React and wire auth/logout
+[x] Use AvatarMenuDropdown in header when authenticated
+[x] Redesign CreateEventPage to match prototype style and UX
+[x] Commit avatar/layout and event page changes
+[x] Preview app to verify dropdown and event creation UI
