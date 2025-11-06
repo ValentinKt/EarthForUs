@@ -2,6 +2,7 @@ import React from 'react';
 import type { ReactNode } from 'react';
 import ErrorBoundary from '../../shared/components/ErrorBoundary';
 import { useAuth } from '../../features/auth/context/AuthContext';
+import AvatarMenuDropdown from '../../components/AvatarMenuDropdown/AvatarMenuDropdown';
 
 interface LayoutProps {
   children: ReactNode;
@@ -46,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({
                 {/* User Actions */}
                 <div className="flex items-center space-x-3">
                   {isAuthenticated ? (
-                    <button onClick={logout} className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Logout</button>
+                    <AvatarMenuDropdown />
                   ) : (
                     <>
                       <a href="/login" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Sign In</a>

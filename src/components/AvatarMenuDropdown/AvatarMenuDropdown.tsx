@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { DropdownItem } from '../../types';
+import { useAuth } from '../../features/auth/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface AvatarMenuDropdownProps {
   user?: {
@@ -13,46 +15,21 @@ interface AvatarMenuDropdownProps {
 const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { user: authUser, logout } = useAuth();
 
-  // Mock user data - this will come from auth context
-  const mockUser = user || {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    avatar: undefined
+  const currentUser = authUser || user || {
+    firstName: 'Guest',
+    lastName: '',
+    email: 'guest@example.com',
+    avatar: undefined,
   };
 
   const menuItems: DropdownItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: '🏠',
-      action: () => console.log('Navigate to dashboard')
-    },
-    {
-      id: 'profile',
-      label: 'My Profile',
-      icon: '👤',
-      action: () => console.log('Navigate to profile')
-    },
-    {
-      id: 'events',
-      label: 'My Events',
-      icon: '📅',
-      action: () => console.log('Navigate to events')
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: '⚙️',
-      action: () => console.log('Navigate to settings')
-    },
-    {
-      id: 'logout',
-      label: 'Sign Out',
-      icon: '🚪',
-      action: () => console.log('Logout')
-    }
+    { id: 'profile', label: 'My Profile', icon: '👤', action: () => navigate('/profile') },
+    { id: 'events', label: 'My Registered Events', icon: '📅', action: () => navigate('/events') },
+    { id: 'settings', label: 'Settings', icon: '⚙️', action: () => navigate('/settings') },
+    { id: 'logout', label: 'Log Out', icon: '🚪', action: () => logout() },
   ];
 
   useEffect(() => {
@@ -77,19 +54,19 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
       {/* Avatar Button */}
       <button
         onClick={toggleDropdown}
-        className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-200"
+        className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors duration-200"
         aria-label="User menu"
         aria-expanded={isOpen}
       >
-        <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium text-sm">
-          {mockUser.avatar ? (
+        <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white font-medium text-sm">
+          {currentUser.avatar ? (
             <img
-              src={mockUser.avatar}
-              alt={`${mockUser.firstName} ${mockUser.lastName}`}
+              src={currentUser.avatar}
+              alt={`${currentUser.firstName} ${currentUser.lastName}`}
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            getInitials(mockUser.firstName, mockUser.lastName)
+            getInitials(currentUser.firstName, currentUser.lastName || '')
           )}
         </div>
         <svg
@@ -110,10 +87,10 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
           {/* User Info */}
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {mockUser.firstName} {mockUser.lastName}
+              {currentUser.firstName} {currentUser.lastName}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-              {mockUser.email}
+              {currentUser.email}
             </p>
           </div>
 
