@@ -20,7 +20,7 @@ const EventsPage = () => {
   const [list, setList] = useState<Array<{ id: number; title: string; location: string | null; start_time: string; end_time: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { showError } = useToast();
+  const { error: showError } = useToast();
   const log = logger.withContext('EventsPage');
   const fetchEvents = async () => {
     setIsLoading(true);
