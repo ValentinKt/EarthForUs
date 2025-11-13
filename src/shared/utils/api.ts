@@ -6,7 +6,8 @@ export type ApiError = {
   body?: unknown;
 };
 
-type RequestOptions = RequestInit & {
+type RequestOptions = Omit<RequestInit, 'body'> & {
+  body?: BodyInit | Record<string, unknown> | null;
   json?: boolean; // force JSON parse even if header missing
 };
 
@@ -18,7 +19,7 @@ function buildUrl(path: string) {
   return path;
 }
 
-function normalizeInit(init: RequestInit = {}): RequestInit {
+function normalizeInit(init: RequestOptions = {}): RequestInit {
   const headers = new Headers(init.headers || {});
   headers.set('Accept', 'application/json');
   // If body is plain object and no content-type set, set JSON
@@ -30,7 +31,7 @@ function normalizeInit(init: RequestInit = {}): RequestInit {
       (init as any).body = JSON.stringify(body);
     }
   }
-  return { ...init, headers };
+  return { ...init, headers } as RequestInit;
 }
 
 async function parseBody<T>(res: Response, forceJson = false): Promise<T | undefined> {
@@ -73,7 +74,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
 export const api = {
   get: <T>(path: string, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'GET' }),
-  post: <T>(path: string, body?: unknown, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'POST', body }),
-  put: <T>(path: string, body?: unknown, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'PUT', body }),
+  post: <T>(path: string, body?: BodyInit | Record<string, unknown> | null, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'POST', body }),
+  put: <T>(path: string, body?: BodyInit | Record<string, unknown> | null, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'PUT', body }),
   del: <T>(path: string, init?: RequestOptions) => request<T>(path, { ...(init || {}), method: 'DELETE' }),
 };
