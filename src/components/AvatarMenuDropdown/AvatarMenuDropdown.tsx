@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { DropdownItem } from '../../types';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '../../shared/utils/logger';
 
 interface AvatarMenuDropdownProps {
   user?: {
@@ -17,6 +18,7 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user: authUser, logout } = useAuth();
+  const log = logger.withContext('AvatarMenuDropdown');
 
   const currentUser = authUser || user || {
     firstName: 'Guest',
@@ -35,6 +37,7 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        log.debug('close_on_outside_click');
         setIsOpen(false);
       }
     };
@@ -47,7 +50,10 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => {
+    log.debug('toggle_dropdown', { to: !isOpen });
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -100,6 +106,10 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
               <button
                 key={item.id}
                 onClick={() => {
+                  log.info('menu_click', { id: item.id, label: item.label });
+                  if (item.id === 'logout') {
+                    log.info('logout');
+                  }
                   item.action();
                   setIsOpen(false);
                 }}
