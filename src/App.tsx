@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './app/layout/Layout';
 import LandingPage from './features/landing/pages/LandingPage';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -9,6 +9,7 @@ import ErrorBoundary from './shared/components/ErrorBoundary';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import { ToastProvider } from './shared/components/Toast';
+import { logger } from './shared/utils/logger';
 
 // Placeholder components for routes that haven't been created yet
 const HomePage = () => <div className="content-wrapper"><h1 className="text-2xl font-bold">Home Page</h1></div>;
@@ -71,11 +72,20 @@ const NotFound = () => (
 );
 
 function App() {
+  const RouteLogger = () => {
+    const location = useLocation();
+    const log = logger.withContext('AppRoute');
+    useEffect(() => {
+      log.info('route_change', { path: location.pathname });
+    }, [location.pathname]);
+    return null;
+  };
   return (
     <ErrorBoundary>
       <AuthProvider>
         <ToastProvider>
         <Router>
+        <RouteLogger />
         <div className="App">
           <Routes>
             {/* Public routes without layout */}
