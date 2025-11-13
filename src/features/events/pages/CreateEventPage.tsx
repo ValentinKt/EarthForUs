@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Button from '../../../shared/ui/Button';
+import TextField from '../../../shared/components/TextField';
+import Textarea from '../../../shared/components/Textarea';
+import DateTimeField from '../../../shared/components/DateTimeField';
+import NumberField from '../../../shared/components/NumberField';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '../../../shared/utils/logger';
 
@@ -143,29 +147,21 @@ const CreateEventPage: React.FC = () => {
         <section>
           <h2 className="text-2xl font-bold leading-tight pb-4">Event Details</h2>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="title">Event Title</label>
-              <input
-                id="title"
-                name="title"
-                value={form.title}
-                onChange={onChange}
-                className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="e.g., Coastal Cleanup at Sunrise Beach"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={form.description}
-                onChange={onChange}
-                className="w-full rounded-xl border border-gray-300 bg-white min-h-36 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="Add a short description"
-              />
-            </div>
+            <TextField
+              name="title"
+              label="Event Title"
+              value={form.title}
+              onChange={onChange}
+              placeholder="e.g., Coastal Cleanup at Sunrise Beach"
+              required
+            />
+            <Textarea
+              name="description"
+              label="Description"
+              value={form.description}
+              onChange={onChange}
+              placeholder="Add a short description"
+            />
           </div>
         </section>
 
@@ -173,44 +169,30 @@ const CreateEventPage: React.FC = () => {
         <section>
           <h2 className="text-2xl font-bold leading-tight pb-4">Logistics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="start_time">Start</label>
-              <input
-                id="start_time"
-                name="start_time"
-                type="datetime-local"
-                value={form.start_time}
-                onChange={onChange}
-                aria-invalid={hasValidationError}
-                className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="end_time">End</label>
-              <input
-                id="end_time"
-                name="end_time"
-                type="datetime-local"
-                value={form.end_time}
-                onChange={onChange}
-                aria-invalid={hasValidationError}
-                className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-                required
-              />
-            </div>
+            <DateTimeField
+              name="start_time"
+              label="Start"
+              value={form.start_time}
+              onChange={onChange}
+              required
+              description="Select the starting date and time"
+            />
+            <DateTimeField
+              name="end_time"
+              label="End"
+              value={form.end_time}
+              onChange={onChange}
+              required
+              error={hasValidationError ? 'End time must be after start time.' : undefined}
+              description="Select the ending date and time"
+            />
           </div>
-          {hasValidationError && (
-            <p className="text-sm text-red-600 mt-2" aria-live="polite">End time must be after start time.</p>
-          )}
           <div className="mt-4">
-            <label className="block text-sm font-medium mb-2" htmlFor="location">Location</label>
-            <input
-              id="location"
+            <TextField
               name="location"
+              label="Location"
               value={form.location}
               onChange={onChange}
-              className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
               placeholder="Address or location name"
             />
           </div>
@@ -221,7 +203,7 @@ const CreateEventPage: React.FC = () => {
           <h2 className="text-2xl font-bold leading-tight pb-4">Requirements</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2" htmlFor="capacity">Volunteer Capacity</label>
+              <label className="block text-sm font-medium mb-2">Volunteer Capacity</label>
               <div className="relative flex items-center gap-3">
                 <button
                   type="button"
@@ -231,15 +213,13 @@ const CreateEventPage: React.FC = () => {
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" /></svg>
                 </button>
-                <input
-                  id="capacity"
+                <NumberField
                   name="capacity"
-                  type="number"
-                  min={1}
+                  label=""
                   value={form.capacity}
                   onChange={onChange}
-                  className="flex-1 rounded-xl border border-gray-300 bg-white h-14 px-4 text-base text-center focus:outline-none focus:ring-2 focus:ring-brand-500"
                   required
+                  min={1}
                 />
                 <button
                   type="button"
@@ -255,12 +235,12 @@ const CreateEventPage: React.FC = () => {
             <div>
               <label className="block text-sm font-medium mb-2">Required Tools</label>
               <div className="flex gap-2">
-                <input
+                <TextField
+                  name="toolInput"
+                  label=""
                   value={toolInput}
                   onChange={e => setToolInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAddTool(); } }}
                   placeholder="Add a tool (e.g., gloves)"
-                  className="form-input flex-1 rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
                 <Button
                   type="button"
