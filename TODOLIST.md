@@ -25,3 +25,12 @@
 [x] Preview app to validate logging and UX
 [x] Add logging to AuthProvider and ProtectedRoute
 [x] Unify Add Tool button using shared Button
+[x] Create shared accessible form input components
+[x] Refactor CreateEventPage to use shared inputs and polish layout
+[x] Implement Toast system; wrap App with provider; use in CreateEventPage
+[x] Add route change logging in App
+[x] Add structured logging to events API routes
+[x] Preview app to check UI changes and logging
+[x] Instrument ErrorBoundary with structured logging
+[x] Make TextField and Textarea labels optional
+[x] Add structured logging to EventsPage data fetching
