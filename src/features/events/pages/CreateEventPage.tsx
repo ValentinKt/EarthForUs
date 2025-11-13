@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../../../shared/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '../../../shared/utils/logger';
 
 const CreateEventPage: React.FC = () => {
   const navigate = useNavigate();
+  const log = logger.withContext('CreateEventPage');
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -16,27 +18,76 @@ const CreateEventPage: React.FC = () => {
   const [toolInput, setToolInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [hasValidationError, setHasValidationError] = useState(false);
+
+  useEffect(() => {
+    const dirty = Boolean(
+      form.title || form.description || form.location || form.start_time || form.end_time ||
+      tools.length > 0 || form.capacity !== 10
+    );
+    setIsDirty(dirty);
+  }, [form, tools]);
+
+  useEffect(() => {
+    if (form.start_time && form.end_time) {
+      const invalid = new Date(form.end_time) <= new Date(form.start_time);
+      setHasValidationError(invalid);
+    } else {
+      setHasValidationError(false);
+    }
+  }, [form.start_time, form.end_time]);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    log.debug('field_change', { name, value });
     setForm(prev => ({ ...prev, [name]: name === 'capacity' ? Number(value) : value }));
-    setError(null);
   };
 
-  const incrementCapacity = () => setForm(prev => ({ ...prev, capacity: prev.capacity + 1 }));
-  const decrementCapacity = () => setForm(prev => ({ ...prev, capacity: Math.max(1, prev.capacity - 1) }));
+  const incrementCapacity = () => setForm(prev => {
+    const next = prev.capacity + 1;
+    log.info('capacity_increment', { from: prev.capacity, to: next });
+    return { ...prev, capacity: next };
+  });
+  const decrementCapacity = () => setForm(prev => {
+    const next = Math.max(1, prev.capacity - 1);
+    log.info('capacity_decrement', { from: prev.capacity, to: next });
+    return { ...prev, capacity: next };
+  });
 
   const onAddTool = () => {
     const t = toolInput.trim();
     if (!t) return;
+    log.info('tool_added', { tool: t });
     setTools(prev => [...prev, t]);
     setToolInput('');
   };
-  const removeTool = (idx: number) => setTools(prev => prev.filter((_, i) => i !== idx));
+  const removeTool = (idx: number) => {
+    const removed = tools[idx];
+    log.info('tool_removed', { index: idx, tool: removed });
+    setTools(prev => prev.filter((_, i) => i !== idx));
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (hasValidationError) {
+      log.warn('submit_blocked_due_to_validation');
+      return;
+    }
     setIsLoading(true);
+    const grp = log.group('Create Event Submit');
+    const tm = log.time('submit');
     try {
       const payload = {
         title: form.title,
@@ -47,6 +98,7 @@ const CreateEventPage: React.FC = () => {
         capacity: form.capacity,
         // tools: tools, // Uncomment when backend supports tools
       };
+      log.info('submit_start', { payload });
       const res = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,13 +106,18 @@ const CreateEventPage: React.FC = () => {
       });
       const data = await res.json();
       if (!res.ok) {
+        log.error('submit_error', { error: data?.error, status: res.status });
         setError(data?.error || 'Failed to create event');
         return;
       }
+      log.info('submit_success', { eventId: data?.id });
       navigate('/events');
     } catch (err) {
+      log.error('submit_exception', err);
       setError('Unexpected error creating event');
     } finally {
+      tm.end();
+      grp.end();
       setIsLoading(false);
     }
   };
@@ -124,6 +181,7 @@ const CreateEventPage: React.FC = () => {
                 type="datetime-local"
                 value={form.start_time}
                 onChange={onChange}
+                aria-invalid={hasValidationError}
                 className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
                 required
               />
@@ -136,11 +194,15 @@ const CreateEventPage: React.FC = () => {
                 type="datetime-local"
                 value={form.end_time}
                 onChange={onChange}
+                aria-invalid={hasValidationError}
                 className="w-full rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
                 required
               />
             </div>
           </div>
+          {hasValidationError && (
+            <p className="text-sm text-red-600 mt-2" aria-live="polite">End time must be after start time.</p>
+          )}
           <div className="mt-4">
             <label className="block text-sm font-medium mb-2" htmlFor="location">Location</label>
             <input
@@ -196,6 +258,7 @@ const CreateEventPage: React.FC = () => {
                 <input
                   value={toolInput}
                   onChange={e => setToolInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); onAddTool(); } }}
                   placeholder="Add a tool (e.g., gloves)"
                   className="form-input flex-1 rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
@@ -223,13 +286,13 @@ const CreateEventPage: React.FC = () => {
           </div>
         </section>
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && <p className="text-red-600 text-sm" aria-live="polite">{error}</p>}
       </form>
 
       {/* Sticky Footer Action */}
       <div className="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-white to-transparent">
         <div className="max-w-3xl mx-auto">
-          <Button form="create-event-form" type="submit" variant="primary" size="md" loading={isLoading} disabled={isLoading}>
+          <Button form="create-event-form" type="submit" variant="primary" size="md" loading={isLoading} disabled={isLoading || hasValidationError}>
             Create Event
           </Button>
         </div>
