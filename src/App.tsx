@@ -8,6 +8,7 @@ import CreateEventPage from './features/events/pages/CreateEventPage';
 import ErrorBoundary from './shared/components/ErrorBoundary';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
+import { ToastProvider } from './shared/components/Toast';
 
 // Placeholder components for routes that haven't been created yet
 const HomePage = () => <div className="content-wrapper"><h1 className="text-2xl font-bold">Home Page</h1></div>;
@@ -73,6 +74,7 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
+        <ToastProvider>
         <Router>
         <div className="App">
           <Routes>
@@ -147,6 +149,7 @@ function App() {
           </Routes>
         </div>
       </Router>
+      </ToastProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

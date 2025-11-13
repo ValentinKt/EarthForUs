@@ -6,10 +6,12 @@ import DateTimeField from '../../../shared/components/DateTimeField';
 import NumberField from '../../../shared/components/NumberField';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '../../../shared/utils/logger';
+import { useToast } from '../../../shared/components/Toast';
 
 const CreateEventPage: React.FC = () => {
   const navigate = useNavigate();
   const log = logger.withContext('CreateEventPage');
+  const { success: showSuccess, error: showError } = useToast();
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -111,14 +113,19 @@ const CreateEventPage: React.FC = () => {
       const data = await res.json();
       if (!res.ok) {
         log.error('submit_error', { error: data?.error, status: res.status });
-        setError(data?.error || 'Failed to create event');
+        const msg = data?.error || 'Failed to create event';
+        setError(msg);
+        showError(msg, 'Create Event Failed');
         return;
       }
       log.info('submit_success', { eventId: data?.id });
+      showSuccess('Event created successfully', 'Success');
       navigate('/events');
     } catch (err) {
       log.error('submit_exception', err);
-      setError('Unexpected error creating event');
+      const msg = 'Unexpected error creating event';
+      setError(msg);
+      showError(msg, 'Create Event Failed');
     } finally {
       tm.end();
       grp.end();
