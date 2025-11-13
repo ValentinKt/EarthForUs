@@ -16,14 +16,25 @@ const HomePage = () => <div className="content-wrapper"><h1 className="text-2xl 
 const UserDashboard = () => <div className="content-wrapper"><h1 className="text-2xl font-bold">User Dashboard</h1></div>;
 const EventsPage = () => {
   const [list, setList] = useState<Array<{ id: number; title: string; location: string | null; start_time: string; end_time: string }>>([]);
+  const log = logger.withContext('EventsPage');
   useEffect(() => {
     (async () => {
       try {
+        const grp = log.group('fetch_events');
+        const tm = log.time('fetch');
+        log.info('fetch_start');
         const res = await fetch('/api/events');
         const data = await res.json();
-        if (res.ok) setList(data.events ?? []);
+        if (res.ok) {
+          log.info('fetch_success', { count: (data?.events ?? []).length });
+          setList(data.events ?? []);
+        } else {
+          log.error('fetch_error', { status: res.status, error: data?.error });
+        }
+        tm.end();
+        grp.end();
       } catch {
-        // ignore for now
+        log.error('fetch_exception');
       }
     })();
   }, []);
