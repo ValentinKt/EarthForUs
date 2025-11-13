@@ -262,13 +262,15 @@ const CreateEventPage: React.FC = () => {
                   placeholder="Add a tool (e.g., gloves)"
                   className="form-input flex-1 rounded-xl border border-gray-300 bg-white h-14 px-4 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
                   onClick={onAddTool}
-                  className="flex-shrink-0 bg-brand-600 hover:bg-brand-700 text-white rounded-xl px-5 font-semibold"
+                  aria-label="Add tool"
                 >
                   Add
-                </button>
+                </Button>
               </div>
               {tools.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
