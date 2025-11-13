@@ -34,3 +34,5 @@
 [x] Instrument ErrorBoundary with structured logging
 [x] Make TextField and Textarea labels optional
 [x] Add structured logging to EventsPage data fetching
+[x] Implement shared API client with logging and timing
+[x] Refactor EventsPage to use API client; add loading/error toast; Link
