@@ -23,3 +23,5 @@
 [x] Enhance CreateEventPage with validation, accessibility, keyboard support
 [x] Add logging to AvatarMenuDropdown interactions
 [x] Preview app to validate logging and UX
+[x] Add logging to AuthProvider and ProtectedRoute
+[x] Unify Add Tool button using shared Button
