@@ -18,3 +18,8 @@
 [x] Redesign CreateEventPage to match prototype style and UX
 [x] Commit avatar/layout and event page changes
 [x] Preview app to verify dropdown and event creation UI
+[x] Implement shared logger utility
+[x] Integrate logging into CreateEventPage
+[x] Enhance CreateEventPage with validation, accessibility, keyboard support
+[x] Add logging to AvatarMenuDropdown interactions
+[x] Preview app to validate logging and UX
