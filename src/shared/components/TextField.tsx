@@ -3,7 +3,7 @@ import React from 'react';
 type TextFieldProps = {
   id?: string;
   name: string;
-  label: string;
+  label?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
@@ -36,9 +36,11 @@ export default function TextField({
   const invalid = Boolean(error);
   return (
     <div className="mb-4">
-      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        {label} {required ? <span className="text-red-600">*</span> : null}
-      </label>
+      {label ? (
+        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {label} {required ? <span className="text-red-600">*</span> : null}
+        </label>
+      ) : null}
       {description ? (
         <p id={descId} className="mt-1 text-xs text-gray-500">{description}</p>
       ) : null}
