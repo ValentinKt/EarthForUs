@@ -7,6 +7,9 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const testEmail = (import.meta as any).env?.VITE_TEST_USER_EMAIL as string | undefined;
+  const testPassword = (import.meta as any).env?.VITE_TEST_USER_PASSWORD as string | undefined;
+  const hasTestCreds = !!(testEmail && testPassword);
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
@@ -104,6 +107,16 @@ const LoginPage: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 sm:p-8">
+          {hasTestCreds && (
+            <div className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm">
+              <p className="font-semibold text-brand-700">Test credentials</p>
+              <div className="mt-2 space-y-1 text-gray-800">
+                <div><span className="font-medium">Email:</span> {testEmail}</div>
+                <div><span className="font-medium">Password:</span> {testPassword}</div>
+              </div>
+              <p className="mt-2 text-xs text-gray-600">Use for local testing only.</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Email Field */}
             <div>
