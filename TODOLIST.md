@@ -43,6 +43,14 @@
 [x] Create EventsPage with modern card grid, loading/error/empty states
 [x] Create ProfilePage showing user info and account actions
 [x] Refactor App.tsx routes to use new pages
-[x] Preview UI across Home, Events, and Profile[x] Implement EventPage with modern details UI and tabs
+[x] Preview UI across Home, Events, and Profile
+[x] Implement EventPage with modern details UI and tabs
 [x] Wire /events/:id route and update EventsPage card links
 [x] Preview Events list and Event details navigation
+
+[x] Install Leaflet and React-Leaflet dependencies
+[x] Import Leaflet CSS globally in src/main.tsx
+[x] Create EventMap component with marker and radius overlay
+[x] Implement address geocoding and robust error handling
+[x] Integrate EventMap into EventPage (Map tab)
+[ ] Preview and validate map responsiveness and interactions
