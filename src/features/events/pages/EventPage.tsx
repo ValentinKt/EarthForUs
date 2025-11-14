@@ -43,10 +43,25 @@ const EventPage: React.FC = () => {
         setEvent(data);
         log.info('fetch_success', { id });
       } catch (e) {
-        const msg = (e as Error)?.message || 'Failed to load event';
-        log.error('fetch_error', { message: msg, id });
-        setError(msg);
-        showError(msg, 'Event Load Error');
+        // Fallback: fetch list and select by id if detail endpoint is unavailable
+        try {
+          const list = await api.get<{ events: EventDetail[] }>(`/api/events`);
+          const found = (list?.events || []).find(ev => String(ev.id) === String(id));
+          if (found) {
+            setEvent(found);
+            log.warn('detail_unavailable_used_list_fallback', { id });
+          } else {
+            const msg = (e as Error)?.message || 'Failed to load event';
+            log.error('fetch_error', { message: msg, id });
+            setError(msg);
+            showError(msg, 'Event Load Error');
+          }
+        } catch (e2) {
+          const msg = (e as Error)?.message || 'Failed to load event';
+          log.error('fetch_error', { message: msg, id });
+          setError(msg);
+          showError(msg, 'Event Load Error');
+        }
       } finally {
         tm.end();
         grp.end();
