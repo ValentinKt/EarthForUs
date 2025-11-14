@@ -4,6 +4,7 @@ import Button from '../../../shared/ui/Button';
 import { useToast } from '../../../shared/components/Toast';
 import { logger } from '../../../shared/utils/logger';
 import { api } from '../../../shared/utils/api';
+import EventMap from '../components/EventMap';
 
 type EventDetail = {
   id: number;
@@ -20,6 +21,7 @@ const tabs = [
   { id: 'updates', label: 'Updates' },
   { id: 'checklist', label: 'Checklist' },
   { id: 'chat', label: 'Chat' },
+  { id: 'map', label: 'Map' },
 ];
 
 const EventPage: React.FC = () => {
@@ -103,10 +105,15 @@ const EventPage: React.FC = () => {
 
       {/* Error State */}
       {!isLoading && error && (
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 flex items-center justify-between">
             <span>{error}</span>
             <Button variant="earth" onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <h3 className="text-lg font-semibold mb-2">Try the map</h3>
+            <p className="text-sm text-gray-600 mb-3">Explore location and radius controls even if event data is unavailable.</p>
+            <EventMap radius={500} minRadius={100} maxRadius={5000} />
           </div>
         </div>
       )}
@@ -177,6 +184,18 @@ const EventPage: React.FC = () => {
             {activeTab === 'chat' && (
               <div className="rounded-xl border border-gray-200 bg-white p-4 text-gray-700">
                 <p>Chat will be available soon. Join to be notified.</p>
+              </div>
+            )}
+            {activeTab === 'map' && (
+              <div className="space-y-3">
+                <div className="rounded-xl border border-gray-200 bg-white p-4">
+                  <EventMap
+                    address={event?.location || undefined}
+                    radius={500}
+                    minRadius={100}
+                    maxRadius={5000}
+                  />
+                </div>
               </div>
             )}
           </div>
