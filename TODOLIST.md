@@ -54,3 +54,6 @@
 [x] Implement address geocoding and robust error handling
 [x] Integrate EventMap into EventPage (Map tab)
 [x] Preview and validate map responsiveness and interactions
+
+[x] Install @types/leaflet and adjust EventMap typings
+[x] Resolve TypeScript diagnostics in EventMap, App, Layout, AvatarMenuDropdown, and logger
