@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LoginForm } from '../../../types';
 import Button from '../../../shared/ui/Button';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
     password: '',
@@ -66,7 +68,14 @@ const LoginPage: React.FC = () => {
         setErrors(prev => ({ ...prev, password: message }));
         return;
       }
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Normalize server payload and update AuthContext
+      const normalized = {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: data.user.first_name ?? data.user.firstName,
+        lastName: data.user.last_name ?? data.user.lastName,
+      };
+      login(normalized);
       navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
