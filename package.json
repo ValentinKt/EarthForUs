@@ -35,6 +35,7 @@
     "@tailwindcss/vite": "^4.1.16",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+    "@types/leaflet": "^1.9.21",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.9.2",
     "@types/pg": "^8.15.6",
