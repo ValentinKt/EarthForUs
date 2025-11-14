@@ -7,6 +7,7 @@ import SignupPage from './features/auth/pages/SignupPage';
 import CreateEventPage from './features/events/pages/CreateEventPage';
 import HomePage from './features/home/pages/HomePage';
 import EventsPage from './features/events/pages/EventsPage';
+import EventPage from './features/events/pages/EventPage';
 import ProfilePage from './features/profile/pages/ProfilePage';
 import ErrorBoundary from './shared/components/ErrorBoundary';
 import { AuthProvider } from './features/auth/context/AuthContext';
@@ -71,6 +72,11 @@ function App() {
             <Route path="/events" element={
               <Layout>
                 <EventsPage />
+              </Layout>
+            } />
+            <Route path="/events/:id" element={
+              <Layout>
+                <EventPage />
               </Layout>
             } />
             <Route path="/events/create" element={

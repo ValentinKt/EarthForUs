@@ -110,7 +110,7 @@ const EventsPage: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 flex items-center justify-between">
-                <Link to={`/events`}>
+                <Link to={`/events/${ev.id}`}>
                   <Button variant="outline">Details</Button>
                 </Link>
                 <Button variant="earth">Join</Button>
