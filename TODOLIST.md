@@ -38,3 +38,11 @@
 [x] Refactor EventsPage to use API client; add loading/error toast; Link
 
 [x] Fix login redirect loop by using AuthContext.login in LoginPage
+[x] Implement test credentials panel on LoginPage driven by env variables
+[x] Create HomePage with modern hero and CTAs
+[x] Create EventsPage with modern card grid, loading/error/empty states
+[x] Create ProfilePage showing user info and account actions
+[x] Refactor App.tsx routes to use new pages
+[x] Preview UI across Home, Events, and Profile[x] Implement EventPage with modern details UI and tabs
+[x] Wire /events/:id route and update EventsPage card links
+[x] Preview Events list and Event details navigation
