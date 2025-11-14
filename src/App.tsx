@@ -14,7 +14,6 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import { ToastProvider } from './shared/components/Toast';
 import { logger } from './shared/utils/logger';
-import { api } from './shared/utils/api';
 
 // Placeholder component for routes not yet created
 const Settings = () => <div className="content-wrapper"><h1 className="text-2xl font-bold">Settings</h1></div>;

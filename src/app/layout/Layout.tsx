@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({
   showFooter = true,
   className = '' 
 }) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   return (
     <ErrorBoundary>
       <div className={`min-h-screen flex flex-col bg-brand-50 ${className}`}>

@@ -14,7 +14,8 @@ function now() {
 
 function getDefaultLevel(): LogLevel {
   const fromEnv = (import.meta as any)?.env?.VITE_LOG_LEVEL as LogLevel | undefined;
-  const fromStorage = (typeof window !== 'undefined') ? (localStorage.getItem('EFU_DEBUG') === 'true' ? 'debug' : undefined) : undefined;
+  const hasLocalStorage = typeof (globalThis as any).localStorage !== 'undefined';
+  const fromStorage = hasLocalStorage ? (((globalThis as any).localStorage.getItem('EFU_DEBUG') === 'true') ? 'debug' : undefined) : undefined;
   if (fromStorage) return fromStorage as LogLevel;
   if (fromEnv && LEVELS[fromEnv] !== undefined) return fromEnv;
   const mode = (import.meta as any)?.env?.MODE;
@@ -40,8 +41,9 @@ export const logger = {
     return currentLevel;
   },
   enableDebug(enable = true) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('EFU_DEBUG', enable ? 'true' : 'false');
+    const hasLocalStorage = typeof (globalThis as any).localStorage !== 'undefined';
+    if (hasLocalStorage) {
+      (globalThis as any).localStorage.setItem('EFU_DEBUG', enable ? 'true' : 'false');
     }
     currentLevel = enable ? 'debug' : 'warn';
   },

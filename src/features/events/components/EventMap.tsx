@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Circle, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import * as L from 'leaflet';
 import Button from '../../../shared/ui/Button';
 
 type EventMapProps = {
@@ -91,28 +91,27 @@ const EventMap: React.FC<EventMapProps> = ({
   }, [coords]);
 
   const DraggableMarker: React.FC = () => {
-    const [draggable, setDraggable] = useState(true);
+    const [draggable]       = useState(true);
     useMapEvents({
-      click(e) {
+      click(e: L.LeafletMouseEvent) {
         setCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
         onLocationChange?.(e.latlng.lat, e.latlng.lng);
       },
     });
     if (!coords) return null;
-    return (
-      <Marker
-        position={coords}
-        draggable={draggable}
-        eventHandlers={{
-          dragend: (ev) => {
-            const m = ev.target as L.Marker;
-            const p = m.getLatLng();
-            setCoords({ lat: p.lat, lng: p.lng });
-            onLocationChange?.(p.lat, p.lng);
-          },
-        }}
-      />
-    );
+    const markerProps: any = {
+      position: coords,
+      draggable: draggable,
+      eventHandlers: {
+        dragend: (ev: L.LeafletEvent) => {
+          const m = ev.target as L.Marker;
+          const p = m.getLatLng();
+          setCoords({ lat: p.lat, lng: p.lng });
+          onLocationChange?.(p.lat, p.lng);
+        },
+      },
+    };
+    return <Marker {...markerProps} />;
   };
 
   return (
@@ -214,24 +213,33 @@ const EventMap: React.FC<EventMapProps> = ({
               <span className="text-brand-700 text-sm">Loading map...</span>
             </div>
           )}
-          <MapContainer
-            center={[center.lat, center.lng]}
-            zoom={13}
-            className="w-full h-64 sm:h-80 md:h-96"
-            scrollWheelZoom={true}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              eventHandlers={{
+          {(() => {
+            const mapProps: any = {
+              center: [center.lat, center.lng] as L.LatLngExpression,
+              zoom: 13,
+              className: 'w-full h-64 sm:h-80 md:h-96',
+              scrollWheelZoom: true,
+            };
+            const tileProps: any = {
+              url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+              eventHandlers: {
                 tileerror: () => setMapError('Map tiles failed to load'),
-              }}
-            />
-            <DraggableMarker />
-            {coords && (
-              <Circle center={[coords.lat, coords.lng]} radius={r} pathOptions={{ color: '#0f766e', fillColor: '#99f6e4', fillOpacity: 0.2 }} />
-            )}
-          </MapContainer>
+              },
+            };
+            const circleProps = (lat: number, lng: number): any => ({
+              center: [lat, lng] as L.LatLngExpression,
+              radius: r,
+              pathOptions: { color: '#0f766e', fillColor: '#99f6e4', fillOpacity: 0.2 },
+            });
+            return (
+              <MapContainer {...mapProps}>
+                <TileLayer {...tileProps} />
+                <DraggableMarker />
+                {coords && <Circle {...circleProps(coords.lat, coords.lng)} />}
+              </MapContainer>
+            );
+          })()}
         </div>
         {mapError && (
           <div className="border-t border-red-200 bg-red-50 p-2 text-red-700 text-sm" aria-live="polite">{mapError}</div>

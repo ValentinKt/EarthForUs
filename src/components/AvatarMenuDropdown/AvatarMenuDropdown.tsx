@@ -27,6 +27,11 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
     avatar: undefined,
   };
 
+  const avatarUrl = ((): string | undefined => {
+    const cu: any = currentUser as any;
+    return cu && typeof cu === 'object' && 'avatar' in cu ? (cu.avatar as string | undefined) : undefined;
+  })();
+
   const menuItems: DropdownItem[] = [
     { id: 'profile', label: 'My Profile', icon: '👤', action: () => navigate('/profile') },
     { id: 'events', label: 'My Registered Events', icon: '📅', action: () => navigate('/events') },
@@ -65,9 +70,9 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
         aria-expanded={isOpen}
       >
         <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white font-medium text-sm">
-          {currentUser.avatar ? (
+          {avatarUrl ? (
             <img
-              src={currentUser.avatar}
+              src={avatarUrl}
               alt={`${currentUser.firstName} ${currentUser.lastName}`}
               className="w-8 h-8 rounded-full object-cover"
             />
