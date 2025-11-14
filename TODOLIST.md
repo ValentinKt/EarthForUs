@@ -53,4 +53,4 @@
 [x] Create EventMap component with marker and radius overlay
 [x] Implement address geocoding and robust error handling
 [x] Integrate EventMap into EventPage (Map tab)
-[ ] Preview and validate map responsiveness and interactions
+[x] Preview and validate map responsiveness and interactions
