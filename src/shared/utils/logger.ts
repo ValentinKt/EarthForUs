@@ -8,18 +8,33 @@ const LEVELS: Record<LogLevel, number> = {
   debug: 4,
 };
 
+// Enhanced environment detection for deployment context
+function getEnvironmentContext(): { environment: string; isProduction: boolean; isDevelopment: boolean } {
+  const nodeEnv = (typeof process !== 'undefined' && process.env?.NODE_ENV) || 
+                 (import.meta as any)?.env?.MODE || 
+                 'development';
+  
+  const environment = nodeEnv.toUpperCase();
+  const isProduction = environment === 'PRODUCTION' || environment === 'PROD';
+  const isDevelopment = environment === 'DEVELOPMENT' || environment === 'DEV' || environment === 'development';
+  
+  return { environment, isProduction, isDevelopment };
+}
+
 function now() {
-  return new Date().toISOString();
+  const timestamp = new Date().toISOString();
+  const { environment } = getEnvironmentContext();
+  return `[${environment}] ${timestamp}`;
 }
 
 function getDefaultLevel(): LogLevel {
   const fromEnv = (import.meta as any)?.env?.VITE_LOG_LEVEL as LogLevel | undefined;
+  const { isProduction } = getEnvironmentContext();
   const hasLocalStorage = typeof (globalThis as any).localStorage !== 'undefined';
   const fromStorage = hasLocalStorage ? (((globalThis as any).localStorage.getItem('EFU_DEBUG') === 'true') ? 'debug' : undefined) : undefined;
   if (fromStorage) return fromStorage as LogLevel;
   if (fromEnv && LEVELS[fromEnv] !== undefined) return fromEnv;
-  const mode = (import.meta as any)?.env?.MODE;
-  return mode === 'development' ? 'debug' : 'warn';
+  return isProduction ? 'warn' : 'debug';
 }
 
 let currentLevel: LogLevel = getDefaultLevel();
@@ -29,14 +44,30 @@ function shouldLog(level: LogLevel) {
 }
 
 function format(ns: string | undefined, level: LogLevel, msg: string) {
+  const { isProduction } = getEnvironmentContext();
+  const envTag = isProduction ? '🔴 PROD' : '🟢 DEV';
   const prefix = ns ? `[${ns}]` : '';
-  return `${now()} ${prefix} ${level.toUpperCase()}: ${msg}`;
+  const levelBadge = getLevelBadge(level);
+  return `${envTag} ${now()} ${prefix} ${levelBadge} ${msg}`;
 }
+
+function getLevelBadge(level: LogLevel): string {
+  switch (level) {
+    case 'error': return '❌ ERROR';
+    case 'warn': return '⚠️  WARN';
+    case 'info': return 'ℹ️  INFO';
+    case 'debug': return '🐛 DEBUG';
+    default: return level.toUpperCase();
+  }
+}
+
+
 
 export const logger = {
   setLevel(level: LogLevel) {
-    currentLevel = level;
-  },
+      currentLevel = level;
+      this.info(`Log level set to: ${level}`, undefined, 'Logger');
+    },
   getLevel(): LogLevel {
     return currentLevel;
   },
@@ -46,6 +77,8 @@ export const logger = {
       (globalThis as any).localStorage.setItem('EFU_DEBUG', enable ? 'true' : 'false');
     }
     currentLevel = enable ? 'debug' : 'warn';
+    const { environment } = getEnvironmentContext();
+    this.info(`Debug mode ${enable ? 'enabled' : 'disabled'} in ${environment}`, undefined, 'Logger');
   },
   debug(msg: string, payload?: unknown, ns?: string) {
     if (!shouldLog('debug')) return;

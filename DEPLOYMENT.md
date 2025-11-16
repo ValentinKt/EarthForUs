@@ -1,87 +1,288 @@
-# EarthForUs Deployment Guide for Hostinger
+# EarthForUs Deployment Guide
 
-This guide explains how to deploy the EarthForUs React application to Hostinger shared hosting.
+This comprehensive guide covers the deployment of the EarthForUs React application to Hostinger shared hosting using our enhanced deployment system.
+
+## Table of Contents
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Deployment Scripts](#deployment-scripts)
+- [Environment Configuration](#environment-configuration)
+- [Security Features](#security-features)
+- [Step-by-Step Deployment](#step-by-step-deployment)
+- [Troubleshooting](#troubleshooting)
+- [Best Practices](#best-practices)
+
+## Overview
+
+The EarthForUs deployment system provides automated deployment with:
+- **Environment-specific configurations** (Development & Production)
+- **Security validation** for production deployments
+- **Enhanced logging** with timestamps and environment context
+- **Automated build and file preparation**
+- **Deployment manifest generation**
 
 ## Prerequisites
 
+- Node.js 18+ installed locally
 - Hostinger shared hosting account with file manager access
 - Domain name configured with Hostinger
 - FTP access or file manager access
+- Git repository with the application code
 
-## Build Process
+## Deployment Scripts
 
-1. **Build the application locally:**
-   ```bash
-   npm run build
-   ```
+Our deployment system provides two main commands:
 
-2. **This creates a `dist` folder with all production files.**
+### Development Deployment
+```bash
+npm run deploy:dev
+```
+- Uses `.env.development` configuration
+- Enables debug logging
+- Allows test credentials
+- Optimized for development/testing
 
-## Hostinger Deployment Steps
+### Production Deployment
+```bash
+npm run deploy:prod
+```
+- Uses `.env.production` configuration
+- Runs comprehensive security checks
+- Disables debug features
+- Optimized for live environments
 
-### 1. Upload Files
+## Environment Configuration
 
-1. Access your Hostinger file manager or use FTP
-2. Navigate to the `public_html` directory (or your domain's root directory)
-3. Upload all files from the `dist` folder to this directory
-4. **Important:** Upload the `.htaccess` file to enable proper SPA routing
+### Development Environment (`.env.development`)
+```bash
+# API Configuration
+VITE_API_BASE=http://localhost:3000/api
+
+# Debug & Logging
+VITE_LOG_LEVEL=debug
+VITE_ENABLE_DEBUG=true
+
+# Test Credentials (for development only)
+VITE_TEST_USER_EMAIL=test@example.com
+VITE_TEST_USER_PASSWORD=test123
+
+# Development Flags
+VITE_ENVIRONMENT=development
+VITE_ALLOW_CONSOLE_LOGS=true
+```
+
+### Production Environment (`.env.production`)
+```bash
+# API Configuration
+VITE_API_BASE=https://your-api-domain.com/api
+
+# Security & Logging
+VITE_LOG_LEVEL=info
+VITE_ENABLE_DEBUG=false
+
+# Production Security (empty in production)
+VITE_TEST_USER_EMAIL=
+VITE_TEST_USER_PASSWORD=
+
+# Production Flags
+VITE_ENVIRONMENT=production
+VITE_ALLOW_CONSOLE_LOGS=false
+```
+
+## Security Features
+
+### Production Security Validation
+The deployment system includes comprehensive security checks for production:
+
+1. **HTTPS Enforcement**: Ensures API endpoints use HTTPS
+2. **Test Credentials Check**: Verifies test credentials are removed
+3. **Debug Mode Validation**: Confirms debug mode is disabled
+4. **API Base URL**: Validates production API configuration
+5. **Environment File**: Checks for production environment file
+6. **Console Logs**: Scans for console.log statements in build files
+
+### Security Validation Results
+- ✅ **PASSED**: All security requirements met
+- ⚠️ **WARN**: Non-critical issues detected (deployment continues)
+- ❌ **FAILED**: Critical security issues (deployment stops)
+
+## Step-by-Step Deployment
+
+### 1. Initial Setup
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd EarthForUs
+
+# Install dependencies
+npm install
+
+# Configure environment files
+cp .env.example .env.development
+cp .env.example .env.production
+```
 
 ### 2. Configure Environment Variables
 
-1. Go to your Hostinger control panel
-2. Find the "Environment Variables" section (usually under Advanced or Developer tools)
-3. Add the following environment variables:
+**Development Configuration:**
+- Edit `.env.development` with your development API URL
+- Keep test credentials for local testing
+- Enable debug features as needed
 
-   ```
-   VITE_API_BASE=https://your-api-domain.com/api
-   VITE_LOG_LEVEL=info
-   ```
+**Production Configuration:**
+- Edit `.env.production` with your production API URL
+- Remove all test credentials
+- Disable debug features
+- Ensure HTTPS for API endpoints
 
-4. **Note:** Remove test credentials in production:
-   ```
-   VITE_TEST_USER_EMAIL=
-   VITE_TEST_USER_PASSWORD=
-   ```
+### 3. Run Deployment
 
-### 3. Verify Deployment
+**For Development/Testing:**
+```bash
+npm run deploy:dev
+```
 
-1. Visit your domain in a browser
-2. Check that:
-   - The application loads without errors
-   - Navigation works correctly (SPA routing)
-   - API calls work (if backend is deployed)
-   - All assets load properly
+**For Production:**
+```bash
+npm run deploy:prod
+```
 
-## Important Notes
+### 4. Deployment Process
 
-### Frontend vs Backend
-This deployment guide is for the **frontend only**. The EarthForUs application consists of:
-- **Frontend:** React application (what you're deploying)
-- **Backend:** Node.js/Express API server (requires separate hosting)
+The deployment script will:
+1. ✅ Validate environment configuration
+2. ✅ Run security checks (production only)
+3. ✅ Set up environment variables
+4. ✅ Build the application
+5. ✅ Prepare deployment files
+6. ✅ Validate the build
+7. ✅ Generate deployment manifest
 
-### Backend Deployment
-For the backend API server, you'll need:
-- Node.js hosting (VPS, cloud hosting, or Node.js-specific hosting)
-- PostgreSQL database
-- Environment variables for database connection
+### 5. Upload to Hostinger
+
+After successful deployment preparation:
+
+1. **Access Hostinger File Manager**
+   - Log into your Hostinger control panel
+   - Navigate to "Files" → "File Manager"
+   - Go to your domain's root directory (usually `public_html`)
+
+2. **Upload Files**
+   - Upload all files from the `dist` folder
+   - Ensure `.htaccess` file is uploaded (critical for SPA routing)
+   - Verify `deployment-manifest.json` is present
+
+3. **Set Environment Variables**
+   - Go to "Advanced" → "Environment Variables"
+   - Add your production environment variables
+   - Key format: `VITE_*` (without the prefix in Hostinger)
+
+## Deployment Output
+
+### Successful Development Deployment
+```
+🚀 DEPLOYMENT READY!
+Next steps:
+1. Upload the contents of the 'dist' folder to your Hostinger server
+2. Ensure your backend API is properly configured
+3. Test the deployment in your target environment
+```
+
+### Successful Production Deployment
+```
+🚀 DEPLOYMENT READY!
+Next steps:
+1. Upload the contents of the 'dist' folder to your Hostinger server
+2. Ensure your backend API is properly configured
+3. Test the deployment in your target environment
+
+⚠️  PRODUCTION DEPLOYMENT:
+- Verify SSL certificates are properly configured
+- Test all API endpoints before going live
+- Monitor application logs for any issues
+```
+
+## Troubleshooting
 
 ### Common Issues
 
-1. **404 errors on page refresh:** Make sure `.htaccess` file is uploaded and working
-2. **API calls failing:** Update `VITE_API_BASE` environment variable with correct backend URL
-3. **Assets not loading:** Check that `base: './'` is set in `vite.config.ts`
+**1. Build Failures**
+```bash
+# Check TypeScript errors
+npm run build
 
-### Security Recommendations
+# Check for syntax errors
+npm run lint
+```
 
-1. **HTTPS:** Always use HTTPS in production
-2. **API Security:** Implement proper CORS and authentication
-3. **Database:** Use SSL connections for database (set `PG_SSL_MODE=require`)
-4. **Secrets:** Never commit sensitive data to version control
+**2. Security Validation Failures**
+- Ensure `.env.production` exists and is properly configured
+- Verify API endpoints use HTTPS in production
+- Remove test credentials from production environment
+- Disable debug mode for production
+
+**3. File Upload Issues**
+- Verify `.htaccess` file is uploaded to the correct directory
+- Check file permissions on Hostinger
+- Ensure all files from `dist` folder are uploaded
+
+**4. Routing Issues (404 on refresh)**
+- Confirm `.htaccess` file is present and working
+- Check that the file contains proper SPA routing rules
+- Verify the file wasn't corrupted during upload
+
+**5. API Connection Issues**
+- Verify `VITE_API_BASE` environment variable is set correctly
+- Check CORS configuration on your backend
+- Ensure backend API is accessible and running
+
+### Debug Mode
+
+Enable debug logging to troubleshoot issues:
+```bash
+# Set debug environment
+export VITE_LOG_LEVEL=debug
+export VITE_ENABLE_DEBUG=true
+
+# Run deployment with debug output
+npm run deploy:dev
+```
+
+## Best Practices
+
+### Security
+1. **Never commit sensitive data** to version control
+2. **Use HTTPS** for all API endpoints in production
+3. **Implement proper CORS** configuration on your backend
+4. **Regular security audits** of dependencies
+5. **Keep environment files secure** and backed up
+
+### Performance
+1. **Optimize images** before deployment
+2. **Enable compression** on your Hostinger server
+3. **Use CDN** for static assets when possible
+4. **Monitor application performance** after deployment
+5. **Regular builds** to incorporate latest optimizations
+
+### Maintenance
+1. **Test deployments** in development environment first
+2. **Keep backups** of working deployments
+3. **Monitor error logs** regularly
+4. **Update dependencies** periodically
+5. **Document custom configurations** for future reference
 
 ## Support
 
 If you encounter issues:
-1. Check browser console for errors
-2. Verify environment variables are set correctly
-3. Check Hostinger error logs
-4. Ensure all files are uploaded correctly
+
+1. **Check the deployment logs** for specific error messages
+2. **Verify environment configuration** matches your hosting setup
+3. **Test API connectivity** independently of the frontend
+4. **Review Hostinger documentation** for hosting-specific issues
+5. **Check browser console** for client-side errors
+
+For additional help:
+- Review the troubleshooting section above
+- Check the deployment manifest in the `dist` folder
+- Consult Hostinger support for hosting-related issues
+- Verify backend API is properly configured and accessible
