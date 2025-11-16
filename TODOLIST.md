@@ -57,3 +57,9 @@
 
 [x] Install @types/leaflet and adjust EventMap typings
 [x] Resolve TypeScript diagnostics in EventMap, App, Layout, AvatarMenuDropdown, and logger
+
+[x] Configure vite.config.ts for Hostinger deployment with relative base path
+[x] Create .htaccess file for SPA routing on Apache server
+[x] Create .env.production template for production environment variables
+[x] Create comprehensive DEPLOYMENT.md guide for Hostinger
+[x] Build production-ready dist folder with all deployment files
