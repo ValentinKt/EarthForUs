@@ -263,14 +263,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
       } catch (innerOrg: any) {
         const iMsg = String(innerOrg?.message || '');
         const iCol = String((innerOrg as any)?.column || '');
-        const invalidOrganizerUuid = (innerOrg as any)?.code === '22P02' && iMsg.includes('uuid') && (iMsg.includes('organizer_id') || iCol === 'organizer_id');
-        if (invalidOrganizerUuid) {
-          // Retry with a valid UUID fallback when organizer_id expects uuid
-          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const rWithOrgUuid = await client.query(createEventWithOrganizer, [args[0], args[1], args[2], args[3], args[4], args[5], '00000000-0000-0000-0000-000000000001']);
-          await client.query('RELEASE SAVEPOINT create_event_sp');
-          return rWithOrgUuid.rows[0];
-        }
         const iMissingStart = iMsg.includes('start_time') || iCol === 'start_time';
         const iMissingEnd = iMsg.includes('end_time') || iCol === 'end_time';
         const iMissingCapacity = iMsg.includes('capacity') || iCol === 'capacity';
