@@ -13,24 +13,17 @@ router.get('/', async (req: Request, res: Response) => {
     const limit = Number((req.query.limit as string) || 20);
     const offset = Number((req.query.offset as string) || 0);
     log.info('list_events_request', { limit, offset });
-    // Inspect schema to choose query without triggering transaction aborts
-    const meta = await pool.query(
-      `SELECT column_name FROM information_schema.columns 
-       WHERE table_schema = current_schema() 
-         AND table_name = 'events' 
-         AND column_name IN ('start_time','end_time','start','end')`
-    );
-    const cols = new Set(meta.rows.map((r: any) => r.column_name));
-    const useModern = cols.has('start_time') || cols.has('end_time');
-    const useLegacy = !useModern && (cols.has('start') || cols.has('end'));
+    // Try modern columns first; fall back to legacy on unknown column errors
     let result;
-    if (useModern) {
+    try {
       result = await pool.query(listEvents, [limit, offset]);
-    } else if (useLegacy) {
-      result = await pool.query(listEventsLegacy, [limit, offset]);
-    } else {
-      // Default: try modern, let error be mapped
-      result = await pool.query(listEvents, [limit, offset]);
+    } catch (err: any) {
+      const msg = String(err?.message || '');
+      if (err?.code === '42703' && (msg.includes('start_time') || msg.includes('end_time'))) {
+        result = await pool.query(listEventsLegacy, [limit, offset]);
+      } else {
+        throw err;
+      }
     }
     log.debug('list_events_response', { count: result.rowCount ?? result.rows.length });
     return res.json({ events: result.rows, count: result.rowCount ?? result.rows.length });
