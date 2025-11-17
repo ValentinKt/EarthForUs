@@ -3,7 +3,8 @@ import { api } from '../../../shared/utils/api';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
 import Button from '../../../shared/ui/Button';
-import { useWebSocket, WebSocketMessage } from '../../../shared/utils/websocket';
+import { useWebSocket } from '../../../shared/utils/websocket';
+import type { WebSocketMessage } from '../../../shared/utils/websocket';
 
 type ChatMessage = {
   id: number;
