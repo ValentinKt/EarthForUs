@@ -188,8 +188,7 @@ const SettingsPage: React.FC = () => {
                 name="firstName"
                 label="First name"
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                onBlur={() => setTouched(prev => ({ ...prev, firstName: true }))}
+                onChange={(e) => { setFirstName(e.target.value); setTouched(prev => ({ ...prev, firstName: true })); }}
                 required
                 error={errors.firstName}
                 description="Your public display name"
@@ -199,8 +198,7 @@ const SettingsPage: React.FC = () => {
                 name="lastName"
                 label="Last name"
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                onBlur={() => setTouched(prev => ({ ...prev, lastName: true }))}
+                onChange={(e) => { setLastName(e.target.value); setTouched(prev => ({ ...prev, lastName: true })); }}
                 required
                 error={errors.lastName}
                 description="Your family name"
@@ -238,8 +236,7 @@ const SettingsPage: React.FC = () => {
                   label="Current password"
                   type={showCurrent ? 'text' : 'password'}
                   value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  onBlur={() => setPwTouched(prev => ({ ...prev, current: true }))}
+                  onChange={(e) => { setCurrentPassword(e.target.value); setPwTouched(prev => ({ ...prev, current: true })); }}
                   required
                   error={pwTouched.current ? passwordErrors.currentPassword : undefined}
                 />
@@ -255,8 +252,7 @@ const SettingsPage: React.FC = () => {
                   label="New password"
                   type={showNew ? 'text' : 'password'}
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  onBlur={() => setPwTouched(prev => ({ ...prev, new: true }))}
+                  onChange={(e) => { setNewPassword(e.target.value); setPwTouched(prev => ({ ...prev, new: true })); }}
                   required
                   error={pwTouched.new ? passwordErrors.newPassword : undefined}
                   description="Use 8+ characters with a mix of letters, numbers, symbols"
@@ -276,8 +272,7 @@ const SettingsPage: React.FC = () => {
                   label="Confirm new password"
                   type={showConfirm ? 'text' : 'password'}
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  onBlur={() => setPwTouched(prev => ({ ...prev, confirm: true }))}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setPwTouched(prev => ({ ...prev, confirm: true })); }}
                   required
                   error={pwTouched.confirm ? passwordErrors.confirmPassword : undefined}
                 />
