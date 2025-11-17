@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { withTransaction, pool } from '../../db/pool';
-import { createEventTx, listEventsTx, existsDuplicateEvent } from '../../db/queries/events';
+import { createEventTx, listEvents, listEventsLegacy, existsDuplicateEvent } from '../../db/queries/events';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
 
@@ -13,11 +13,24 @@ router.get('/', async (req: Request, res: Response) => {
     const limit = Number((req.query.limit as string) || 20);
     const offset = Number((req.query.offset as string) || 0);
     log.info('list_events_request', { limit, offset });
-    const rows = await withTransaction(async (client) => {
-      return listEventsTx(client, limit, offset);
-    });
-    log.debug('list_events_response', { count: (rows as any[]).length });
-    return res.json({ events: rows, count: (rows as any[]).length });
+    // Inspect schema to choose query without triggering transaction aborts
+    const meta = await pool.query(
+      `SELECT column_name FROM information_schema.columns WHERE table_name = 'events' AND column_name IN ('start_time','end_time','start','end')`
+    );
+    const cols = new Set(meta.rows.map((r: any) => r.column_name));
+    const useModern = cols.has('start_time') || cols.has('end_time');
+    const useLegacy = cols.has('start') || cols.has('end');
+    let result;
+    if (useModern) {
+      result = await pool.query(listEvents, [limit, offset]);
+    } else if (useLegacy) {
+      result = await pool.query(listEventsLegacy, [limit, offset]);
+    } else {
+      // Default: try modern, let error be mapped
+      result = await pool.query(listEvents, [limit, offset]);
+    }
+    log.debug('list_events_response', { count: result.rowCount ?? result.rows.length });
+    return res.json({ events: result.rows, count: result.rowCount ?? result.rows.length });
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('list_events_error', mapped);
