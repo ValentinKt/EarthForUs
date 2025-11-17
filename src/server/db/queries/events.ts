@@ -263,6 +263,14 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
       } catch (innerOrg: any) {
         const iMsg = String(innerOrg?.message || '');
         const iCol = String((innerOrg as any)?.column || '');
+        const invalidOrganizerUuid = (innerOrg as any)?.code === '22P02' && iMsg.includes('uuid') && (iMsg.includes('organizer_id') || iCol === 'organizer_id');
+        if (invalidOrganizerUuid) {
+          // Retry with a valid UUID fallback when organizer_id expects uuid
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          const rWithOrgUuid = await client.query(createEventWithOrganizer, [args[0], args[1], args[2], args[3], args[4], args[5], '00000000-0000-0000-0000-000000000001']);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rWithOrgUuid.rows[0];
+        }
         const iMissingStart = iMsg.includes('start_time') || iCol === 'start_time';
         const iMissingEnd = iMsg.includes('end_time') || iCol === 'end_time';
         const iMissingCapacity = iMsg.includes('capacity') || iCol === 'capacity';
@@ -275,10 +283,31 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         }
         if (iMissingCapacity) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const modernNoCapWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
-          const rNoCapOrg = await client.query(createEventNoCapacityWithOrganizer, modernNoCapWithOrg);
-          await client.query('RELEASE SAVEPOINT create_event_sp');
-          return rNoCapOrg.rows[0];
+          try {
+            const rNoCapOrg = await client.query(createEventNoCapacityWithOrganizer, [args[0], args[1], args[2], args[3], args[4], args[6]]);
+            await client.query('RELEASE SAVEPOINT create_event_sp');
+            return rNoCapOrg.rows[0];
+          } catch (innerOrg2: any) {
+            const i2Msg = String(innerOrg2?.message || '');
+            const i2Col = String((innerOrg2 as any)?.column || '');
+            const invalidOrganizerUuid2 = (innerOrg2 as any)?.code === '22P02' && i2Msg.includes('uuid') && (i2Msg.includes('organizer_id') || i2Col === 'organizer_id');
+            if (invalidOrganizerUuid2) {
+              await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+              const rNoCapOrgUuid = await client.query(createEventNoCapacityWithOrganizer, [args[0], args[1], args[2], args[3], args[4], '00000000-0000-0000-0000-000000000001']);
+              await client.query('RELEASE SAVEPOINT create_event_sp');
+              return rNoCapOrgUuid.rows[0];
+            }
+            const i2MissingStart = i2Msg.includes('start_time') || i2Col === 'start_time';
+            const i2MissingEnd = i2Msg.includes('end_time') || i2Col === 'end_time';
+            if (i2MissingStart || i2MissingEnd) {
+              await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+              const legacyNoCapWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
+              const rLegacyNoCapOrg = await client.query(createEventLegacyNoCapacityWithOrganizer, legacyNoCapWithOrg);
+              await client.query('RELEASE SAVEPOINT create_event_sp');
+              return rLegacyNoCapOrg.rows[0];
+            }
+            throw innerOrg2;
+          }
         }
         throw innerOrg;
       }
@@ -333,13 +362,25 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             const inner2Col = String((inner2 as any)?.column || '');
             const inner2CategoryNotNull = (inner2 as any)?.code === '23502' && (inner2Msg.includes('category') || inner2Col === 'category');
             const inner2OrganizerNotNull = (inner2 as any)?.code === '23502' && (inner2Msg.includes('organizer_id') || inner2Col === 'organizer_id');
-            if (inner2OrganizerNotNull) {
+        if (inner2OrganizerNotNull) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          try {
+            const rNoCapDateOrg = await client.query(createEventNoCapacityWithDateAndOrganizer, [args[0], args[1], args[2], args[3], args[4], args[6]]);
+            await client.query('RELEASE SAVEPOINT create_event_sp');
+            return rNoCapDateOrg.rows[0];
+          } catch (innerOrg3: any) {
+            const i3Msg = String(innerOrg3?.message || '');
+            const i3Col = String((innerOrg3 as any)?.column || '');
+            const invalidOrganizerUuid3 = (innerOrg3 as any)?.code === '22P02' && i3Msg.includes('uuid') && (i3Msg.includes('organizer_id') || i3Col === 'organizer_id');
+            if (invalidOrganizerUuid3) {
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-              const modernNoCapDateWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
-              const rNoCapDateOrg = await client.query(createEventNoCapacityWithDateAndOrganizer, modernNoCapDateWithOrg);
+              const rNoCapDateOrgUuid = await client.query(createEventNoCapacityWithDateAndOrganizer, [args[0], args[1], args[2], args[3], args[4], '00000000-0000-0000-0000-000000000001']);
               await client.query('RELEASE SAVEPOINT create_event_sp');
-              return rNoCapDateOrg.rows[0];
+              return rNoCapDateOrgUuid.rows[0];
             }
+            throw innerOrg3;
+          }
+        }
             if (inner2CategoryNotNull) {
               console.warn('[createEventTx] no-cap+date: category NOT NULL; retrying date+category');
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
@@ -353,10 +394,22 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
                 const cOrganizerNotNull = (catOrg as any)?.code === '23502' && (cMsg.includes('organizer_id') || cCol === 'organizer_id');
                 if (cOrganizerNotNull) {
                   await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-                  const modernNoCapDateCatWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
-                  const rNoCapDateCatOrg = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, modernNoCapDateCatWithOrg);
-                  await client.query('RELEASE SAVEPOINT create_event_sp');
-                  return rNoCapDateCatOrg.rows[0];
+                  try {
+                    const rNoCapDateCatOrg = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, [args[0], args[1], args[2], args[3], args[4], args[6]]);
+                    await client.query('RELEASE SAVEPOINT create_event_sp');
+                    return rNoCapDateCatOrg.rows[0];
+                  } catch (orgTypeErr: any) {
+                    const otMsg = String(orgTypeErr?.message || '');
+                    const otCol = String((orgTypeErr as any)?.column || '');
+                    const invalidOrganizerUuid4 = (orgTypeErr as any)?.code === '22P02' && otMsg.includes('uuid') && (otMsg.includes('organizer_id') || otCol === 'organizer_id');
+                    if (invalidOrganizerUuid4) {
+                      await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+                      const rNoCapDateCatOrgUuid = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, [args[0], args[1], args[2], args[3], args[4], '00000000-0000-0000-0000-000000000001']);
+                      await client.query('RELEASE SAVEPOINT create_event_sp');
+                      return rNoCapDateCatOrgUuid.rows[0];
+                    }
+                    throw orgTypeErr;
+                  }
                 }
                 throw catOrg;
               }
@@ -386,10 +439,22 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             const cOrganizerNotNull = (catOrg as any)?.code === '23502' && (cMsg.includes('organizer_id') || cCol === 'organizer_id');
             if (cOrganizerNotNull) {
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-              const modernNoCapDateCatWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
-              const rNoCapDateCatOrg = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, modernNoCapDateCatWithOrg);
-              await client.query('RELEASE SAVEPOINT create_event_sp');
-              return rNoCapDateCatOrg.rows[0];
+              try {
+                const rNoCapDateCatOrg = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, [args[0], args[1], args[2], args[3], args[4], args[6]]);
+                await client.query('RELEASE SAVEPOINT create_event_sp');
+                return rNoCapDateCatOrg.rows[0];
+              } catch (orgTypeErr: any) {
+                const otMsg = String(orgTypeErr?.message || '');
+                const otCol = String((orgTypeErr as any)?.column || '');
+                const invalidOrganizerUuid4 = (orgTypeErr as any)?.code === '22P02' && otMsg.includes('uuid') && (otMsg.includes('organizer_id') || otCol === 'organizer_id');
+                if (invalidOrganizerUuid4) {
+                  await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+                  const rNoCapDateCatOrgUuid = await client.query(createEventNoCapacityWithDateCategoryAndOrganizer, [args[0], args[1], args[2], args[3], args[4], '00000000-0000-0000-0000-000000000001']);
+                  await client.query('RELEASE SAVEPOINT create_event_sp');
+                  return rNoCapDateCatOrgUuid.rows[0];
+                }
+                throw orgTypeErr;
+              }
             }
             throw catOrg;
           }
