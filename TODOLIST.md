@@ -87,4 +87,13 @@
 [x] Replace placeholder Settings route with new page
 [x] Create users API routes for profile and password update
 [x] Mount users routes in API server
-[x] Restart API and run dev server; open preview to verify
+[x] Restart API and run dev server; open preview to verify[x] Enhance Edit Account UI/UX with modern layout and spacing
+[x] Add clear labels, helper text, and field instructions
+[x] Implement responsive form layout across mobile, tablet, desktop
+[x] Add real-time validation with inline, helpful error messages
+[x] Add visual feedback: loading states, success and error toasts
+[x] Ensure consistent styling with app theme and Button variants
+[x] Group related account settings for logical navigation
+[x] Improve accessibility: ARIA labels, aria-live, keyboard navigation, contrast
+[x] Add password strength indicator and visibility toggles
+[x] Verify Settings page in dev preview and interactions
