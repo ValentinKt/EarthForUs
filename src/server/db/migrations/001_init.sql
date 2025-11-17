@@ -13,12 +13,35 @@ CREATE TABLE IF NOT EXISTS events (
   title TEXT NOT NULL,
   description TEXT,
   location TEXT,
-  start_time TIMESTAMPTZ NOT NULL,
-  end_time TIMESTAMPTZ NOT NULL,
+  -- Prefer start_time/end_time, but ensure compatibility with existing schemas
+  start_time TIMESTAMPTZ,
+  end_time TIMESTAMPTZ,
   capacity INT NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Backfill: add columns if an older schema existed without start_time/end_time
+ALTER TABLE events ADD COLUMN IF NOT EXISTS start_time TIMESTAMPTZ;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS end_time TIMESTAMPTZ;
+
+-- If legacy columns exist (e.g., start/end), copy data into new columns
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'events' AND column_name = 'start'
+  ) THEN
+    EXECUTE 'UPDATE events SET start_time = start WHERE start_time IS NULL';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'events' AND column_name = 'end'
+  ) THEN
+    EXECUTE 'UPDATE events SET end_time = "end" WHERE end_time IS NULL';
+  END IF;
+END $$;
+
+-- Create index safely now that columns exist (even if NULL)
 CREATE INDEX IF NOT EXISTS idx_events_start_time ON events (start_time);
 
 CREATE TABLE IF NOT EXISTS registrations (
