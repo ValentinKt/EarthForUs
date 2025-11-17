@@ -155,3 +155,33 @@ html.dark .ui-checkbox {
 @media (prefers-reduced-motion: reduce) {
   .ui-input, .ui-checkbox { transition: none; }
 }
+
+/* Standardized radio styles */
+.ui-radio {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px; /* fully rounded */
+  border: 1px solid #D1D5DB; /* gray-300 */
+  background-color: #ffffff;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  accent-color: var(--color-brand-600);
+}
+
+.ui-radio:focus {
+  outline: none;
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25);
+}
+
+.ui-radio:hover {
+  border-color: var(--color-brand-400);
+}
+
+html.dark .ui-radio {
+  background-color: #111827;
+  border-color: #4B5563;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-radio { transition: none; }
+}
