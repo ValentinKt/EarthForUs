@@ -121,3 +121,4 @@
 [x] Add theme-aware media styling to avatar image
 [x] Refactor Button focus rings to use theme variables
 [x] Add transition-colors to layout wrapper, header, and footer
+[x] Apply theme-bg and theme-text to Layout root container
