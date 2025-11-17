@@ -78,3 +78,5 @@
 [x] Implement due date reminders and overdue indicators
 [ ] Add unit and integration tests for event creation and todo list
 [ ] Start dev server and preview UI changes
+[x] Fix events listing API to handle legacy DB columns (start/end)
+[x] Restart API server and verify UI shows events without schema errors
