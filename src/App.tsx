@@ -10,6 +10,7 @@ import EventsPage from './features/events/pages/EventsPage';
 import EventPage from './features/events/pages/EventPage';
 import ProfilePage from './features/profile/pages/ProfilePage';
 import ErrorBoundary from './shared/components/ErrorBoundary';
+import { ThemeProvider } from './shared/theme/ThemeContext';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import { ToastProvider } from './shared/components/Toast';
@@ -34,6 +35,7 @@ function App() {
   };
   return (
     <ErrorBoundary>
+      <ThemeProvider>
       <AuthProvider>
         <ToastProvider>
         <Router>
@@ -113,6 +115,7 @@ function App() {
       </Router>
       </ToastProvider>
       </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

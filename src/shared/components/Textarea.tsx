@@ -53,7 +53,8 @@ export default function Textarea({
         rows={rows}
         aria-invalid={invalid}
         aria-describedby={describedBy}
-        className={`mt-1 block w-full rounded-md border ${invalid ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-brand-500'} shadow-sm focus:border-brand-500 dark:bg-gray-800 dark:text-white`}
+        aria-errormessage={errId}
+        className={`ui-input mt-1`}
       />
       {error ? (
         <p id={errId} className="mt-2 text-sm text-red-600" aria-live="polite">{error}</p>
