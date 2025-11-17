@@ -136,12 +136,14 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
         const innerDateNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('date') || innerCol === 'date');
         if (innerDateNotNull) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rNoCapWithDate = await client.query(createEventNoCapacityWithDate, modernArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rNoCapWithDate.rows[0];
         }
         if (innerMissingStart || innerMissingEnd) {
           const legacyArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyNoCap = await client.query(createEventLegacyNoCapacity, legacyArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyNoCap.rows[0];
@@ -167,6 +169,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
           return rLegacyNoCap.rows[0];
         }
         if (innerDateNotNull) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyWithDate = await client.query(createEventLegacyWithDate, args);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyWithDate.rows[0];
@@ -189,12 +192,14 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
         const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
         if (innerMissingStart || innerMissingEnd) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyWithDate = await client.query(createEventLegacyWithDate, args);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyWithDate.rows[0];
         }
         if (innerMissingCapacity) {
           const legacyArgsNoCap: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyNoCapWithDate = await client.query(createEventLegacyNoCapacityWithDate, legacyArgsNoCap);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyNoCapWithDate.rows[0];
