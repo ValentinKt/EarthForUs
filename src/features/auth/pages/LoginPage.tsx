@@ -131,11 +131,14 @@ const LoginPage: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                className={`ui-input`}
                 placeholder="Enter your email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'login-email-error' : undefined}
+                aria-errormessage={errors.email ? 'login-email-error' : undefined}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p id="login-email-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.email}</p>
               )}
             </div>
 
@@ -152,11 +155,14 @@ const LoginPage: React.FC = () => {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                className={`ui-input`}
                 placeholder="Enter your password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'login-password-error' : undefined}
+                aria-errormessage={errors.password ? 'login-password-error' : undefined}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p id="login-password-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.password}</p>
               )}
             </div>
 
@@ -169,7 +175,7 @@ const LoginPage: React.FC = () => {
                   type="checkbox"
                   checked={formData.rememberMe}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
+                  className="ui-checkbox"
                 />
                 <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
                   Remember me

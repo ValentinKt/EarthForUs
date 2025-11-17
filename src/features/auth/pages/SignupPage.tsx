@@ -134,11 +134,14 @@ const SignupPage: React.FC = () => {
                   required
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.firstName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                  className={`ui-input`}
                   placeholder="First name"
+                  aria-invalid={Boolean(errors.firstName)}
+                  aria-describedby={errors.firstName ? 'signup-firstName-error' : undefined}
+                  aria-errormessage={errors.firstName ? 'signup-firstName-error' : undefined}
                 />
                 {errors.firstName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+                  <p id="signup-firstName-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.firstName}</p>
                 )}
               </div>
 
@@ -154,11 +157,14 @@ const SignupPage: React.FC = () => {
                   required
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.lastName ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                  className={`ui-input`}
                   placeholder="Last name"
+                  aria-invalid={Boolean(errors.lastName)}
+                  aria-describedby={errors.lastName ? 'signup-lastName-error' : undefined}
+                  aria-errormessage={errors.lastName ? 'signup-lastName-error' : undefined}
                 />
                 {errors.lastName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+                  <p id="signup-lastName-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.lastName}</p>
                 )}
               </div>
             </div>
@@ -176,11 +182,14 @@ const SignupPage: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.email ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                className={`ui-input`}
                 placeholder="Enter your email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'signup-email-error' : undefined}
+                aria-errormessage={errors.email ? 'signup-email-error' : undefined}
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p id="signup-email-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.email}</p>
               )}
             </div>
 
@@ -197,13 +206,16 @@ const SignupPage: React.FC = () => {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.password ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                className={`ui-input`}
                 placeholder="Create a password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'signup-password-error' : 'signup-password-help'}
+                aria-errormessage={errors.password ? 'signup-password-error' : undefined}
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p id="signup-password-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.password}</p>
               )}
-              <p className="mt-1 text-xs text-gray-500">
+              <p id="signup-password-help" className="mt-1 text-xs text-gray-500">
                 Must be at least 8 characters with uppercase, lowercase, and number
               </p>
             </div>
@@ -221,11 +233,14 @@ const SignupPage: React.FC = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-brand-500 focus:ring-4 focus:ring-brand-100 ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
+                className={`ui-input`}
                 placeholder="Confirm your password"
+                aria-invalid={Boolean(errors.confirmPassword)}
+                aria-describedby={errors.confirmPassword ? 'signup-confirm-error' : undefined}
+                aria-errormessage={errors.confirmPassword ? 'signup-confirm-error' : undefined}
               />
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                <p id="signup-confirm-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.confirmPassword}</p>
               )}
             </div>
 
@@ -238,9 +253,7 @@ const SignupPage: React.FC = () => {
                   type="checkbox"
                   checked={formData.agreeToTerms}
                   onChange={handleInputChange}
-                  className={`h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded mt-1 ${
-                    errors.agreeToTerms ? 'border-red-500' : ''
-                  }`}
+                  className={`ui-checkbox mt-1 ${errors.agreeToTerms ? 'border-red-500' : ''}`}
                 />
                 <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700">
                   I agree to the{' '}
