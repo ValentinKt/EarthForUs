@@ -101,17 +101,15 @@ async function hasColumn(client: PoolClient, table: string, column: string): Pro
  * Avoids try/catch ambiguity by introspecting the schema first.
  */
 export async function listEventsTx(client: PoolClient, limit: number, offset: number) {
-  const useModern = await hasColumn(client, 'events', 'start_time');
-  if (useModern) {
+  try {
     const r = await client.query(listEvents, [limit, offset]);
     return r.rows;
+  } catch (e: any) {
+    const msg = String(e?.message || '');
+    if (e?.code === '42703' || msg.includes('start_time') || msg.includes('end_time')) {
+      const r2 = await client.query(listEventsLegacy, [limit, offset]);
+      return r2.rows;
+    }
+    throw e;
   }
-  const useLegacy = await hasColumn(client, 'events', 'start');
-  if (useLegacy) {
-    const r = await client.query(listEventsLegacy, [limit, offset]);
-    return r.rows;
-  }
-  // Fallback to modern and let any error bubble with a clear message
-  const r = await client.query(listEvents, [limit, offset]);
-  return r.rows;
 }
