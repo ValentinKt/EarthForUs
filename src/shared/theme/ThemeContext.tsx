@@ -21,6 +21,7 @@ function getInitialTheme(): Theme {
 }
 
 const prefersDarkQuery = '(prefers-color-scheme: dark)';
+let transitionTimeoutId: number | null = null;
 
 function applyTheme(theme: Theme, systemPrefersDark: boolean) {
   const root = document.documentElement;
@@ -28,6 +29,18 @@ function applyTheme(theme: Theme, systemPrefersDark: boolean) {
   root.classList.toggle('dark', isDark);
   // Improve form controls contrast in supported browsers
   root.style.colorScheme = isDark ? 'dark' : 'light';
+  // Expose theme state for CSS/data-theme selectors
+  root.dataset.theme = isDark ? 'dark' : 'light';
+  // Smooth transition on theme changes
+  if (transitionTimeoutId) {
+    clearTimeout(transitionTimeoutId);
+    transitionTimeoutId = null;
+  }
+  root.classList.add('theme-transition');
+  transitionTimeoutId = window.setTimeout(() => {
+    root.classList.remove('theme-transition');
+    transitionTimeoutId = null;
+  }, 220);
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
