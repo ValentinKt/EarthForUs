@@ -11,6 +11,7 @@
     "server:demo": "tsx src/server/index.ts",
     "api:start": "tsx src/server/api/server.ts",
     "db:migrate": "tsx scripts/migrate.ts",
+    "db:fix-events": "tsx scripts/fix_events_columns.ts",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "deploy:prod": "node scripts/deploy.js PROD",

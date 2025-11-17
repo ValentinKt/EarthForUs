@@ -97,3 +97,6 @@
 [x] Improve accessibility: ARIA labels, aria-live, keyboard navigation, contrast
 [x] Add password strength indicator and visibility toggles
 [x] Verify Settings page in dev preview and interactions
+[x] Ensure events table has modern columns start_time/end_time in DB
+[x] Add npm script db:fix-events to run column fix
+[x] Restart API and verify Events page loads without 500 errors
