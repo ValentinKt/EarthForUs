@@ -166,6 +166,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         // If modern also fails, consider date requirement or legacy fallback
         const innerMsg = String(inner?.message || '');
         const innerCol = String((inner as any)?.column || '');
+        console.warn('[createEventTx] no-cap insert failed', { code: (inner as any)?.code, col: innerCol, msg: innerMsg });
         const innerMissingStart = innerMsg.includes('start_time') || innerCol === 'start_time';
         const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
         const innerDateNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('date') || innerCol === 'date');
@@ -185,6 +186,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         // Category NOT NULL
         const innerCategoryNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('category') || innerCol === 'category');
         if (innerCategoryNotNull) {
+          console.warn('[createEventTx] no-cap: category NOT NULL; retrying date+category');
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rNoCapDateCat = await client.query(createEventNoCapacityWithDateAndCategory, modernArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
