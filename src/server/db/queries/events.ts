@@ -149,6 +149,8 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
   } catch (e: any) {
     const msg = String(e?.message || '');
     const col = String((e as any)?.column || '');
+    // Debug trace to aid fallback selection during cross-schema inserts
+    console.warn('[createEventTx] initial insert failed', { code: (e as any)?.code, col, msg });
     const missingStartTime = msg.includes('start_time') || col === 'start_time';
     const missingEndTime = msg.includes('end_time') || col === 'end_time';
     const missingCapacity = msg.includes('capacity') || col === 'capacity';
@@ -290,6 +292,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
     // Category NOT NULL on initial modern attempt
     const categoryNotNull = (e as any)?.code === '23502' && (msg.includes('category') || col === 'category');
     if (categoryNotNull) {
+      console.warn('[createEventTx] category NOT NULL detected; retrying with date+category');
       await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
       try {
         const rModernDateCat = await client.query(createEventWithDateAndCategory, args);
@@ -302,12 +305,14 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
         const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
         if (innerMissingStart || innerMissingEnd) {
+          console.warn('[createEventTx] category branch: missing start/end; retry legacy with date+category');
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, args);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyDateCat.rows[0];
         }
         if (innerMissingCapacity) {
+          console.warn('[createEventTx] category branch: missing capacity; retry legacy no-cap with date+category');
           const legacyArgsNoCap: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyNoCapDateCat = await client.query(createEventLegacyNoCapacityWithDateAndCategory, legacyArgsNoCap);
