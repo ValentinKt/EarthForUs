@@ -31,6 +31,22 @@ export const createEventNoCapacityWithDate = {
          RETURNING id, title, description, location, start_time, end_time, date, created_at`,
 };
 
+// Modern schema: include date and category, with capacity
+export const createEventWithDateAndCategory = {
+  name: 'create-event-with-date-and-category',
+  text: `INSERT INTO events (title, description, location, start_time, end_time, capacity, date, category)
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general')
+         RETURNING id, title, description, location, start_time, end_time, capacity, date, category, created_at`,
+};
+
+// Modern schema: include date and category, without capacity
+export const createEventNoCapacityWithDateAndCategory = {
+  name: 'create-event-no-capacity-with-date-and-category',
+  text: `INSERT INTO events (title, description, location, start_time, end_time, date, category)
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general')
+         RETURNING id, title, description, location, start_time, end_time, date, category, created_at`,
+};
+
 // Legacy: databases with columns named 'start' and 'end'
 export const createEventLegacy = {
   name: 'create-event-legacy',
@@ -61,6 +77,22 @@ export const createEventLegacyNoCapacityWithDate = {
   text: `INSERT INTO events (title, description, location, start, "end", date)
          VALUES ($1, $2, $3, $4, $5, DATE($4))
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, date, created_at`,
+};
+
+// Legacy schema: include date and category, with capacity
+export const createEventLegacyWithDateAndCategory = {
+  name: 'create-event-legacy-with-date-and-category',
+  text: `INSERT INTO events (title, description, location, start, "end", capacity, date, category)
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general')
+         RETURNING id, title, description, location, start AS start_time, "end" AS end_time, capacity, date, category, created_at`,
+};
+
+// Legacy schema: include date and category, without capacity
+export const createEventLegacyNoCapacityWithDateAndCategory = {
+  name: 'create-event-legacy-no-capacity-with-date-and-category',
+  text: `INSERT INTO events (title, description, location, start, "end", date, category)
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general')
+         RETURNING id, title, description, location, start AS start_time, "end" AS end_time, date, category, created_at`,
 };
 
 export const getEventById = {
@@ -148,6 +180,14 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyNoCap.rows[0];
         }
+        // Category NOT NULL
+        const innerCategoryNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('category') || innerCol === 'category');
+        if (innerCategoryNotNull) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          const rNoCapDateCat = await client.query(createEventNoCapacityWithDateAndCategory, modernArgs);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rNoCapDateCat.rows[0];
+        }
         throw inner;
       }
     }
@@ -162,6 +202,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerCol = String((inner as any)?.column || '');
         const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
         const innerDateNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('date') || innerCol === 'date');
+        const innerCategoryNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('category') || innerCol === 'category');
         if (innerMissingCapacity) {
           const legacyArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
@@ -174,6 +215,13 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
           const rLegacyWithDate = await client.query(createEventLegacyWithDate, args);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyWithDate.rows[0];
+        }
+        if (innerCategoryNotNull) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          // Prefer legacy with date and category mixed
+          const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, args);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rLegacyDateCat.rows[0];
         }
         throw inner;
       }
@@ -192,6 +240,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerMissingStart = innerMsg.includes('start_time') || innerCol === 'start_time';
         const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
         const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
+        const innerCategoryNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('category') || innerCol === 'category');
         if (innerMissingStart || innerMissingEnd) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyWithDate = await client.query(createEventLegacyWithDate, args);
@@ -204,6 +253,66 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
           const rLegacyNoCapWithDate = await client.query(createEventLegacyNoCapacityWithDate, legacyArgsNoCap);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyNoCapWithDate.rows[0];
+        }
+        if (innerCategoryNotNull) {
+          // Try modern with date and category first
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          try {
+            const rModernDateCat = await client.query(createEventWithDateAndCategory, args);
+            await client.query('RELEASE SAVEPOINT create_event_sp');
+            return rModernDateCat.rows[0];
+          } catch (inner2: any) {
+            const inner2Msg = String(inner2?.message || '');
+            const inner2Col = String((inner2 as any)?.column || '');
+            const inner2MissingStart = inner2Msg.includes('start_time') || inner2Col === 'start_time';
+            const inner2MissingEnd = inner2Msg.includes('end_time') || inner2Col === 'end_time';
+            const inner2MissingCapacity = inner2Msg.includes('capacity') || inner2Col === 'capacity';
+            if (inner2MissingStart || inner2MissingEnd) {
+              await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+              const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, args);
+              await client.query('RELEASE SAVEPOINT create_event_sp');
+              return rLegacyDateCat.rows[0];
+            }
+            if (inner2MissingCapacity) {
+              const legacyArgsNoCap2: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+              await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+              const rLegacyNoCapDateCat = await client.query(createEventLegacyNoCapacityWithDateAndCategory, legacyArgsNoCap2);
+              await client.query('RELEASE SAVEPOINT create_event_sp');
+              return rLegacyNoCapDateCat.rows[0];
+            }
+            throw inner2;
+          }
+        }
+        throw inner;
+      }
+    }
+
+    // Category NOT NULL on initial modern attempt
+    const categoryNotNull = (e as any)?.code === '23502' && (msg.includes('category') || col === 'category');
+    if (categoryNotNull) {
+      await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+      try {
+        const rModernDateCat = await client.query(createEventWithDateAndCategory, args);
+        await client.query('RELEASE SAVEPOINT create_event_sp');
+        return rModernDateCat.rows[0];
+      } catch (inner: any) {
+        const innerMsg = String(inner?.message || '');
+        const innerCol = String((inner as any)?.column || '');
+        const innerMissingStart = innerMsg.includes('start_time') || innerCol === 'start_time';
+        const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
+        const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
+        if (innerMissingStart || innerMissingEnd) {
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, args);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rLegacyDateCat.rows[0];
+        }
+        if (innerMissingCapacity) {
+          const legacyArgsNoCap: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+          const rLegacyNoCapDateCat = await client.query(createEventLegacyNoCapacityWithDateAndCategory, legacyArgsNoCap);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rLegacyNoCapDateCat.rows[0];
         }
         throw inner;
       }
