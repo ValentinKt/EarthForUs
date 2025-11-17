@@ -115,3 +115,9 @@
 [x] Enhance CreateEventPage app bar and sticky footer for dark mode
 [x] Add dark mode utility overrides for common Tailwind classes
 [x] Start dev server and preview dark mode across modified pages
+
+[x] Implement theme CSS variables and smooth transitions in index.css
+[x] Add theme-transition and data-theme in ThemeContext for smooth switching
+[x] Add theme-aware media styling to avatar image
+[x] Refactor Button focus rings to use theme variables
+[x] Add transition-colors to layout wrapper, header, and footer
