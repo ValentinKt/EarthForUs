@@ -3,10 +3,15 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { createServer } from 'http';
 import authRouter from './routes/auth';
 import eventsRouter from './routes/events';
+import chatRouter from './routes/chat';
+import todosRouter from './routes/todos';
+import { createWebSocketServer } from '../websocket/server';
 
 const app = express();
+const server = createServer(app);
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -18,9 +23,15 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/events', eventsRouter);
+app.use('/api', chatRouter);
+app.use('/api', todosRouter);
+
+// Create WebSocket server for real-time chat
+const wsManager = createWebSocketServer(server);
 
 const port = Number(process.env.API_PORT || 3001);
-app.listen(port, () => {
+server.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`[api] Server listening on http://localhost:${port}`);
+  console.log(`[websocket] WebSocket server started`);
 });

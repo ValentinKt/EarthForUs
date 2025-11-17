@@ -5,6 +5,8 @@ import { useToast } from '../../../shared/components/Toast';
 import { logger } from '../../../shared/utils/logger';
 import { api } from '../../../shared/utils/api';
 import EventMap from '../components/EventMap';
+import ChatComponent from '../components/ChatComponent';
+import TodoListComponent from '../components/TodoListComponent';
 
 type EventDetail = {
   id: number;
@@ -173,18 +175,19 @@ const EventPage: React.FC = () => {
               </div>
             )}
             {activeTab === 'checklist' && (
-              <div className="rounded-xl border border-gray-200 bg-white p-4 text-gray-700">
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Bring reusable water bottle</li>
-                  <li>Wear gloves and comfortable shoes</li>
-                  <li>Check local weather before heading out</li>
-                </ul>
-              </div>
+              <TodoListComponent 
+                eventId={event?.id || 0}
+                currentUserId={1} // TODO: Get from auth context
+                currentUserName="Current User" // TODO: Get from auth context
+                isOrganizer={true} // TODO: Determine based on user role
+              />
             )}
             {activeTab === 'chat' && (
-              <div className="rounded-xl border border-gray-200 bg-white p-4 text-gray-700">
-                <p>Chat will be available soon. Join to be notified.</p>
-              </div>
+              <ChatComponent 
+                eventId={event?.id || 0}
+                currentUserId={1} // TODO: Get from auth context
+                currentUserName="Current User" // TODO: Get from auth context
+              />
             )}
             {activeTab === 'map' && (
               <div className="space-y-3">

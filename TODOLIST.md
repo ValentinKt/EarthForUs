@@ -65,3 +65,9 @@
 [x] Build production-ready dist folder with all deployment files
 [x] Create comprehensive deployment documentation with security features and troubleshooting
 [x] Create comprehensive README.md with project overview, technologies, and deployment instructions
+
+[x] Create ChatComponent for event-specific chat functionality
+[x] Create TodoListComponent for event-specific todo/checklist functionality
+[x] Update EventPage to integrate new chat and todo components
+[x] Create API endpoints for chat messages and todo items
+[x] Add real-time functionality to chat using WebSocket or polling
