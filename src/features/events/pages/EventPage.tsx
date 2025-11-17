@@ -125,35 +125,35 @@ const EventPage: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 py-6">
           {/* Header */}
           <div className="mb-4">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">{event?.title || 'Untitled Event'}</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{event?.title || 'Untitled Event'}</h2>
             <div className="mt-2 flex flex-wrap gap-4">
               {metaItem(
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>,
+                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>,
                 new Date(event?.start_time || Date.now()).toLocaleString()
               )}
               {metaItem(
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>,
+                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>,
                 new Date(event?.end_time || Date.now()).toLocaleString()
               )}
               {metaItem(
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 12.414m0 0L9.172 8.172m4.242 4.242l4.243 4.243M9.172 8.172l4.243 4.243"/></svg>,
+                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 12.414m0 0L9.172 8.172m4.242 4.242l4.243 4.243M9.172 8.172l4.243 4.243"/></svg>,
                 event?.location || 'Location TBA'
               )}
               {typeof event?.capacity === 'number' && metaItem(
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a3 3 0 015.356-1.857M18 8a3 3 0 11-6 0 3 3 0 016 0zM6 8a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a3 3 0 015.356-1.857M18 8a3 3 0 11-6 0 3 3 0 016 0zM6 8a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
                 `${event.capacity} volunteers`
               )}
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-200">
+          <div className="border-b border-gray-200 dark:border-gray-800">
             <nav className="-mb-px flex flex-wrap gap-2" aria-label="Event sections">
               {tabs.map(t => (
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`px-4 py-2 border-b-2 ${activeTab === t.id ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'} transition-colors`}
+                  className={`px-4 py-2 border-b-2 ${activeTab === t.id ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-700'} transition-colors`}
                   aria-current={activeTab === t.id ? 'page' : undefined}
                 >
                   {t.label}
@@ -166,11 +166,11 @@ const EventPage: React.FC = () => {
           <div className="mt-6">
             {activeTab === 'about' && (
               <div className="prose max-w-none">
-                <p className="text-gray-700">{event?.description || 'No description provided for this event yet.'}</p>
+                <p className="text-gray-700 dark:text-gray-200">{event?.description || 'No description provided for this event yet.'}</p>
               </div>
             )}
             {activeTab === 'updates' && (
-              <div className="rounded-xl border border-gray-200 bg-white p-4 text-gray-700">
+              <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 text-gray-700 dark:text-gray-200">
                 <p>No updates yet. Organizers can post plans and progress here.</p>
               </div>
             )}

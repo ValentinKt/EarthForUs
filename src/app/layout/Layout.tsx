@@ -20,9 +20,9 @@ const Layout: React.FC<LayoutProps> = ({
   const { isAuthenticated } = useAuth();
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen flex flex-col bg-brand-50 ${className}`}>
+      <div className={`min-h-screen flex flex-col bg-brand-50 dark:bg-gray-950 ${className}`}>
         {showHeader && (
-          <header className="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm border-b border-gray-200">
+          <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur shadow-sm border-b border-gray-200 dark:border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 {/* Logo */}
@@ -33,15 +33,15 @@ const Layout: React.FC<LayoutProps> = ({
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
                       </svg>
                     </div>
-                    <span className="text-xl font-bold text-gray-900">EarthForUs</span>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white">EarthForUs</span>
                   </div>
                 </div>
 
                 {/* Navigation */}
                 <nav className="hidden md:flex items-center space-x-8">
-                  <a href="/events" className="text-gray-700 hover:text-brand-600 font-medium transition-colors">Events</a>
-                  <a href="/about" className="text-gray-700 hover:text-brand-600 font-medium transition-colors">About</a>
-                  <a href="/contact" className="text-gray-700 hover:text-brand-600 font-medium transition-colors">Contact</a>
+                  <a href="/events" className="text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 font-medium transition-colors">Events</a>
+                  <a href="/about" className="text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 font-medium transition-colors">About</a>
+                  <a href="/contact" className="text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400 font-medium transition-colors">Contact</a>
                 </nav>
 
                 {/* User Actions */}
@@ -50,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({
                     <AvatarMenuDropdown />
                   ) : (
                     <>
-                      <a href="/login" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Sign In</a>
+                      <a href="/login" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Sign In</a>
                       <a href="/signup" className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition-colors">Get Started</a>
                     </>
                   )}
@@ -63,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({
           {children}
         </main>
         {showFooter && (
-          <footer className="bg-white border-t border-gray-200">
+          <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 mb-4">
@@ -72,12 +72,12 @@ const Layout: React.FC<LayoutProps> = ({
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-xl font-bold text-gray-900">EarthForUs</span>
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">EarthForUs</span>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Connecting passionate volunteers with meaningful environmental initiatives.
                 </p>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
                   © {new Date().getFullYear()} EarthForUs. All rights reserved.
                 </p>
               </div>

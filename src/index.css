@@ -185,3 +185,17 @@ html.dark .ui-radio {
 @media (prefers-reduced-motion: reduce) {
   .ui-radio { transition: none; }
 }
+
+/* Dark mode utility overrides for legacy classes */
+/* Ensures consistent contrast when components used basic Tailwind gray classes */
+html.dark .bg-white { background-color: #111827; /* gray-900 */ }
+html.dark .bg-white\/90 { background-color: rgba(17,24,39,0.9); }
+html.dark .border-gray-200 { border-color: #374151; /* gray-700 */ }
+html.dark .text-gray-900 { color: #F9FAFB; /* gray-50 */ }
+html.dark .text-gray-700 { color: #E5E7EB; /* gray-200 */ }
+html.dark .text-gray-600 { color: #D1D5DB; /* gray-300 */ }
+html.dark .text-gray-500 { color: #9CA3AF; /* gray-400 */ }
+html.dark .bg-gray-100 { background-color: #1F2937; /* gray-800 */ }
+html.dark .bg-gray-200 { background-color: #1F2937; /* gray-800 */ }
+html.dark .hover\:bg-gray-100:hover { background-color: #1F2937; /* gray-800 */ }
+html.dark .hover\:bg-gray-300:hover { background-color: #374151; /* gray-700 */ }

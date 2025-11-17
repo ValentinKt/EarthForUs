@@ -63,14 +63,14 @@ const EventsPage: React.FC = () => {
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[0,1,2].map(i => (
-            <div key={i} className="h-40 rounded-xl bg-gray-200 animate-pulse" />
+            <div key={i} className="h-40 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
           ))}
         </div>
       )}
 
       {/* Error */}
       {!isLoading && error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900 p-4 text-red-700 dark:text-red-300">
           <div className="flex items-center justify-between">
             <span>{error}</span>
             <Button variant="earth" onClick={() => window.location.reload()}>Retry</Button>
@@ -80,9 +80,9 @@ const EventsPage: React.FC = () => {
 
       {/* Empty */}
       {!isLoading && !error && events.length === 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <h3 className="text-lg font-semibold mb-2">No upcoming events</h3>
-          <p className="text-gray-600 mb-4">Be the first to create one for your community.</p>
+        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 text-center">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No upcoming events</h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Be the first to create one for your community.</p>
           <Link to="/events/create">
             <Button variant="primary">Create Event</Button>
           </Link>
@@ -93,19 +93,19 @@ const EventsPage: React.FC = () => {
       {!isLoading && !error && events.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map(ev => (
-            <div key={ev.id} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <div key={ev.id} className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
               <div className="flex items-start justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">{ev.title}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{ev.title}</h3>
                 <span className="text-xs text-brand-700 bg-brand-100 px-2 py-1 rounded">{new Date(ev.start_time).toLocaleDateString()}</span>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{ev.location || 'Location TBA'}</p>
-              <div className="mt-3 text-sm text-gray-700">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{ev.location || 'Location TBA'}</p>
+              <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">
                 <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>
                   <span>{new Date(ev.start_time).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
                   <span>{new Date(ev.end_time).toLocaleString()}</span>
                 </div>
               </div>

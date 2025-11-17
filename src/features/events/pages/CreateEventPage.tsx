@@ -166,11 +166,11 @@ const CreateEventPage: React.FC = () => {
   return (
     <div className="content-wrapper">
       {/* Top App Bar */}
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur-sm p-4 border-b border-gray-200">
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-4 border-b border-gray-200 dark:border-gray-800">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-gray-700 flex size-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+          className="text-gray-700 dark:text-gray-200 flex size-10 items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           aria-label="Go back"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -316,7 +316,7 @@ const CreateEventPage: React.FC = () => {
       </form>
 
       {/* Sticky Footer Action */}
-      <div className="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-white to-transparent">
+      <div className="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-white dark:from-gray-900 to-transparent">
         <div className="max-w-3xl mx-auto">
           <Button form="create-event-form" type="submit" variant="primary" size="md" loading={isLoading} disabled={isLoading || hasValidationError}>
             Create Event
