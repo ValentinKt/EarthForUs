@@ -100,3 +100,11 @@
 [x] Ensure events table has modern columns start_time/end_time in DB
 [x] Add npm script db:fix-events to run column fix
 [x] Restart API and verify Events page loads without 500 errors
+
+[x] Implement ThemeProvider with system detection and persistence
+[x] Wrap App with ThemeProvider to enable global dark mode
+[x] Standardize input styles with .ui-input and .ui-checkbox
+[x] Refactor shared inputs to use .ui-input (TextField, NumberField, Textarea, DateTimeField)
+[x] Update Login and Signup pages to use .ui-input with ARIA improvements
+[x] Add Appearance settings in Settings with light/dark/system radios
+[x] Open preview to verify dark mode toggles and persistence
