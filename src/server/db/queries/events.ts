@@ -7,12 +7,28 @@ export const createEvent = {
          RETURNING id, title, description, location, start_time, end_time, capacity, created_at`,
 };
 
+// Modern schema without capacity column
+export const createEventNoCapacity = {
+  name: 'create-event-no-capacity',
+  text: `INSERT INTO events (title, description, location, start_time, end_time)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, title, description, location, start_time, end_time, created_at`,
+};
+
 // Legacy: databases with columns named 'start' and 'end'
 export const createEventLegacy = {
   name: 'create-event-legacy',
   text: `INSERT INTO events (title, description, location, start, "end", capacity)
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, capacity, created_at`,
+};
+
+// Legacy schema without capacity column
+export const createEventLegacyNoCapacity = {
+  name: 'create-event-legacy-no-capacity',
+  text: `INSERT INTO events (title, description, location, start, "end")
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, title, description, location, start AS start_time, "end" AS end_time, created_at`,
 };
 
 export const getEventById = {
@@ -71,11 +87,48 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
     const col = String((e as any)?.column || '');
     const missingStartTime = msg.includes('start_time') || col === 'start_time';
     const missingEndTime = msg.includes('end_time') || col === 'end_time';
+    const missingCapacity = msg.includes('capacity') || col === 'capacity';
+    if (missingCapacity) {
+      // Retry modern insert without capacity
+      const modernArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+      await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
+      try {
+        const rNoCap = await client.query(createEventNoCapacity, modernArgs);
+        await client.query('RELEASE SAVEPOINT create_event_sp');
+        return rNoCap.rows[0];
+      } catch (inner: any) {
+        // If modern also fails on start/end, fallback to legacy without capacity
+        const innerMsg = String(inner?.message || '');
+        const innerCol = String((inner as any)?.column || '');
+        const innerMissingStart = innerMsg.includes('start_time') || innerCol === 'start_time';
+        const innerMissingEnd = innerMsg.includes('end_time') || innerCol === 'end_time';
+        if (innerMissingStart || innerMissingEnd) {
+          const legacyArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          const rLegacyNoCap = await client.query(createEventLegacyNoCapacity, legacyArgs);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rLegacyNoCap.rows[0];
+        }
+        throw inner;
+      }
+    }
     if (missingStartTime || missingEndTime) {
       await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-      const res = await client.query(createEventLegacy, args);
-      await client.query('RELEASE SAVEPOINT create_event_sp');
-      return res.rows[0];
+      try {
+        const res = await client.query(createEventLegacy, args);
+        await client.query('RELEASE SAVEPOINT create_event_sp');
+        return res.rows[0];
+      } catch (inner: any) {
+        const innerMsg = String(inner?.message || '');
+        const innerCol = String((inner as any)?.column || '');
+        const innerMissingCapacity = innerMsg.includes('capacity') || innerCol === 'capacity';
+        if (innerMissingCapacity) {
+          const legacyArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          const rLegacyNoCap = await client.query(createEventLegacyNoCapacity, legacyArgs);
+          await client.query('RELEASE SAVEPOINT create_event_sp');
+          return rLegacyNoCap.rows[0];
+        }
+        throw inner;
+      }
     }
     throw e;
   }
