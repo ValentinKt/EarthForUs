@@ -78,14 +78,14 @@ const Button: React.FC<ButtonProps> = ({
   'aria-label': ariaLabel,
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    primary: 'bg-brand-600 hover:bg-brand-700 text-white focus:ring-brand-500',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:focus:ring-gray-400',
-    earth: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500',
-    outline: 'border-2 border-brand-600 text-brand-600 hover:bg-brand-50 focus:ring-brand-500 dark:border-brand-300 dark:text-brand-300 dark:hover:bg-brand-900/30 dark:focus:ring-brand-400',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-200 dark:hover:bg-gray-800 dark:focus:ring-gray-400'
+    primary: 'bg-brand-600 hover:bg-brand-700 text-white',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100',
+    earth: 'bg-green-600 hover:bg-green-700 text-white',
+    outline: 'border-2 border-brand-600 text-brand-600 hover:bg-brand-50 dark:border-brand-300 dark:text-brand-300 dark:hover:bg-brand-900/30',
+    ghost: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
   };
 
   const sizeClasses = {
