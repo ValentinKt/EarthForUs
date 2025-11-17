@@ -71,3 +71,10 @@
 [x] Update EventPage to integrate new chat and todo components
 [x] Create API endpoints for chat messages and todo items
 [x] Add real-time functionality to chat using WebSocket or polling
+
+[x] Enhance CreateEventPage validation and duplicate prevention
+[x] Optimize TodoListComponent performance with memoization and stable callbacks
+[x] Add local tags/categories and caching to TodoListComponent
+[x] Implement due date reminders and overdue indicators
+[ ] Add unit and integration tests for event creation and todo list
+[ ] Start dev server and preview UI changes
