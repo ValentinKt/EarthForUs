@@ -36,7 +36,10 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { title, description, location, start_time, end_time, capacity } = req.body || {};
+    const { title, start_time, end_time, capacity } = req.body || {};
+    // Default optional text fields to empty strings to satisfy NOT NULL constraints across schema variants
+    const description: string = (req.body?.description ?? '').toString();
+    const location: string = (req.body?.location ?? '').toString();
     if (!title || !start_time || !end_time || !capacity) {
       log.warn('validation_failed_missing', { title: !!title, start_time: !!start_time, end_time: !!end_time, capacity: !!capacity });
       return res.status(400).json({ error: 'Missing required fields' });
@@ -64,7 +67,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     log.info('create_event_request', { title, location, start_time, end_time, capacity: cap });
     const event = await withTransaction(async (client) => {
-      return createEventTx(client, [title, description ?? null, location ?? null, start, end, cap]);
+      return createEventTx(client, [title, description, location, start, end, cap]);
     });
     log.info('create_event_success', { id: (event as any)?.id ?? 'unknown' });
     return res.status(201).json({ event });
