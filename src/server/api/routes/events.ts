@@ -15,11 +15,14 @@ router.get('/', async (req: Request, res: Response) => {
     log.info('list_events_request', { limit, offset });
     // Inspect schema to choose query without triggering transaction aborts
     const meta = await pool.query(
-      `SELECT column_name FROM information_schema.columns WHERE table_name = 'events' AND column_name IN ('start_time','end_time','start','end')`
+      `SELECT column_name FROM information_schema.columns 
+       WHERE table_schema = current_schema() 
+         AND table_name = 'events' 
+         AND column_name IN ('start_time','end_time','start','end')`
     );
     const cols = new Set(meta.rows.map((r: any) => r.column_name));
     const useModern = cols.has('start_time') || cols.has('end_time');
-    const useLegacy = cols.has('start') || cols.has('end');
+    const useLegacy = !useModern && (cols.has('start') || cols.has('end'));
     let result;
     if (useModern) {
       result = await pool.query(listEvents, [limit, offset]);
