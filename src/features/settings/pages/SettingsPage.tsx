@@ -228,11 +228,11 @@ const SettingsPage: React.FC = () => {
 
         {/* Password card */}
         {/* Appearance card */}
-        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <h2 id="appearance-heading" className="text-lg font-semibold">Appearance</h2>
-              <p id="appearance-help" className="text-sm text-gray-600">Choose your theme preference for the app.</p>
+              <p id="appearance-help" className="text-sm text-gray-600 dark:text-gray-300">Choose your theme preference for the app.</p>
             </div>
             <span className="inline-flex items-center rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-xs font-medium">
               {resolvedTheme === 'dark' ? 'Dark' : 'Light'}{theme === 'system' ? ' (System)' : ''}
@@ -242,7 +242,7 @@ const SettingsPage: React.FC = () => {
           <fieldset className="mt-4" aria-labelledby="appearance-heading" aria-describedby="appearance-help">
             <legend className="sr-only">Theme</legend>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <label htmlFor="theme-light" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:border-brand-400">
+              <label htmlFor="theme-light" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
                 <input
                   id="theme-light"
                   type="radio"
@@ -254,7 +254,7 @@ const SettingsPage: React.FC = () => {
                 />
                 <span className="text-sm font-medium">Light</span>
               </label>
-              <label htmlFor="theme-dark" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:border-brand-400">
+              <label htmlFor="theme-dark" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
                 <input
                   id="theme-dark"
                   type="radio"
@@ -266,7 +266,7 @@ const SettingsPage: React.FC = () => {
                 />
                 <span className="text-sm font-medium">Dark</span>
               </label>
-              <label htmlFor="theme-system" className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:border-brand-400">
+              <label htmlFor="theme-system" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
                 <input
                   id="theme-system"
                   type="radio"
@@ -283,9 +283,9 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Password card */}
-        <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
           <h2 id="security-heading" className="text-lg font-semibold">Security</h2>
-          <p className="text-sm text-gray-600">Change your password</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Change your password</p>
           <form onSubmit={savePassword} aria-labelledby="security-heading">
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
