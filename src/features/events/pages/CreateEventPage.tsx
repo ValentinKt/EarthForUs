@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Button from '../../../shared/ui/Button';
 import TextField from '../../../shared/components/TextField';
 import Textarea from '../../../shared/components/Textarea';
@@ -26,6 +26,8 @@ const CreateEventPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [hasValidationError, setHasValidationError] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ title?: string; start_time?: string; end_time?: string; capacity?: string }>({});
+  const [successBanner, setSuccessBanner] = useState(false);
 
   useEffect(() => {
     const dirty = Boolean(
@@ -60,6 +62,33 @@ const CreateEventPage: React.FC = () => {
     log.debug('field_change', { name, value });
     setForm(prev => ({ ...prev, [name]: name === 'capacity' ? Number(value) : value }));
   };
+
+  // Inline validation
+  useEffect(() => {
+    const errs: { title?: string; start_time?: string; end_time?: string; capacity?: string } = {};
+    if (!form.title.trim()) {
+      errs.title = 'Title is required';
+    } else if (form.title.trim().length > 200) {
+      errs.title = 'Title is too long (max 200 characters)';
+    }
+    if (!form.start_time) {
+      errs.start_time = 'Start time is required';
+    } else if (Number.isNaN(new Date(form.start_time).getTime())) {
+      errs.start_time = 'Invalid start time';
+    }
+    if (!form.end_time) {
+      errs.end_time = 'End time is required';
+    } else if (Number.isNaN(new Date(form.end_time).getTime())) {
+      errs.end_time = 'Invalid end time';
+    } else if (form.start_time && new Date(form.end_time) <= new Date(form.start_time)) {
+      errs.end_time = 'End time must be after start time';
+    }
+    if (!Number.isFinite(form.capacity) || form.capacity <= 0) {
+      errs.capacity = 'Capacity must be a positive number';
+    }
+    setFormErrors(errs);
+    setHasValidationError(Object.keys(errs).length > 0);
+  }, [form.title, form.start_time, form.end_time, form.capacity]);
 
   const incrementCapacity = () => setForm(prev => {
     const next = prev.capacity + 1;
@@ -113,14 +142,15 @@ const CreateEventPage: React.FC = () => {
       const data = await res.json();
       if (!res.ok) {
         log.error('submit_error', { error: data?.error, status: res.status });
-        const msg = data?.error || 'Failed to create event';
+        const msg = res.status === 409 ? 'Duplicate event detected: same title and start time' : (data?.error || 'Failed to create event');
         setError(msg);
         showError(msg, 'Create Event Failed');
         return;
       }
       log.info('submit_success', { eventId: data?.id });
       showSuccess('Event created successfully', 'Success');
-      navigate('/events');
+      setSuccessBanner(true);
+      setTimeout(() => navigate('/events'), 800);
     } catch (err) {
       log.error('submit_exception', err);
       const msg = 'Unexpected error creating event';
@@ -161,6 +191,7 @@ const CreateEventPage: React.FC = () => {
               onChange={onChange}
               placeholder="e.g., Coastal Cleanup at Sunrise Beach"
               required
+              error={formErrors.title}
             />
             <Textarea
               name="description"
@@ -183,6 +214,7 @@ const CreateEventPage: React.FC = () => {
               onChange={onChange}
               required
               description="Select the starting date and time"
+              error={formErrors.start_time}
             />
             <DateTimeField
               name="end_time"
@@ -190,7 +222,7 @@ const CreateEventPage: React.FC = () => {
               value={form.end_time}
               onChange={onChange}
               required
-              error={hasValidationError ? 'End time must be after start time.' : undefined}
+              error={formErrors.end_time}
               description="Select the ending date and time"
             />
           </div>
@@ -276,6 +308,11 @@ const CreateEventPage: React.FC = () => {
         </section>
 
         {error && <p className="text-red-600 text-sm" aria-live="polite">{error}</p>}
+        {successBanner && (
+          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-green-700">
+            Event created successfully. Redirecting...
+          </div>
+        )}
       </form>
 
       {/* Sticky Footer Action */}

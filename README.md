@@ -9,11 +9,34 @@ EarthForUs is built as a full-stack React application with a Node.js/Express bac
 ## 🚀 Features
 
 ### Core Functionality
+- **User Authentication**: Secure login/signup with email verification, password reset, and protected routes
+- **Event Management**: Create, edit, delete, and manage environmental events with rich media support
+- **Interactive Maps**: Location-based event discovery with Leaflet integration, radius search, and geolocation
+- **User Profiles**: Personal dashboards with event participation tracking, achievement badges, and activity history
+- **Event Registration**: RSVP system with attendance tracking and participant limits
+- **Search & Filtering**: Advanced search with filters for event type, location, date, and difficulty level
+- **Real-time Notifications**: Email notifications for event updates, registrations, and reminders
+- **Responsive Design**: Mobile-first approach with modern UI/UX optimized for all devices
+
+### Detailed Features
+- **Event Categories**: Organized by type (cleanup, planting, education, conservation, recycling)
+- **Event Scheduling**: Recurring events, multi-day events, and flexible time slots
+- **Media Gallery**: Photo and video uploads for events with automatic optimization
+- **Volunteer Coordination**: Team formation, role assignments, and communication tools
+- **Impact Tracking**: Environmental impact metrics (trees planted, waste collected, CO2 saved)
+- **Social Sharing**: Share events on social media with custom graphics and tracking
+- **Review System**: Rate and review events with moderation and verification
+- **Calendar Integration**: Export events to Google Calendar, iCal, and Outlook
+- **Offline Support**: Progressive Web App with offline event browsing
+- **Multi-language Support**: Interface available in multiple languages
+- **Accessibility**: WCAG 2.1 compliant with screen reader support
+- **Data Export**: Export participation records and impact reports
+- **Analytics Dashboard**: Track platform usage and environmental impact statistics
 - **User Authentication**: Secure login/signup with protected routes
 - **Event Management**: Create, discover, and manage environmental events
 - **Interactive Maps**: Location-based event discovery with Leaflet integration
 - **User Profiles**: Personal dashboards with event participation tracking
-- **Responsive Design**: Mobile-first approach with modern UI/UX
+- **Responsive Design**: Mobile-Web-APP approach with modern UI/UX
 
 ### Technical Features
 - **TypeScript**: Full type safety across frontend and backend
@@ -28,7 +51,7 @@ EarthForUs is built as a full-stack React application with a Node.js/Express bac
 - **React 18** - Modern UI framework with hooks and concurrent features
 - **TypeScript** - Type-safe JavaScript for better development experience
 - **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework for modern styling
+- **Tailwind CSS** - Utility-first CSS framework for modern styling, uqing version 4.0.0
 - **React Router v6** - Client-side routing with nested routes
 - **Leaflet** - Interactive maps for location-based features
 - **React Hook Form** - Efficient form handling and validation

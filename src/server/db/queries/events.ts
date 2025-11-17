@@ -18,6 +18,11 @@ export const listEvents = {
   text: `SELECT id, title, location, start_time, end_time FROM events ORDER BY start_time ASC LIMIT $1 OFFSET $2`,
 };
 
+export const findEventByTitleAndStart = {
+  name: 'find-event-by-title-and-start',
+  text: `SELECT id FROM events WHERE LOWER(title) = LOWER($1) AND start_time = $2 LIMIT 1`,
+};
+
 export const updateEvent = {
   name: 'update-event',
   text: `UPDATE events SET title = $2, description = $3, location = $4, start_time = $5, end_time = $6, capacity = $7
@@ -32,4 +37,9 @@ export const deleteEvent = {
 export async function createEventTx(client: PoolClient, args: [string, string | null, string | null, Date, Date, number]) {
   const res = await client.query(createEvent, args);
   return res.rows[0];
+}
+
+export async function existsDuplicateEvent(client: PoolClient, title: string, start: Date) {
+  const res = await client.query(findEventByTitleAndStart, [title, start]);
+  return res.rowCount && res.rowCount > 0;
 }

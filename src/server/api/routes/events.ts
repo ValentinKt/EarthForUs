@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { withTransaction, pool } from '../../db/pool';
-import { createEventTx, listEvents } from '../../db/queries/events';
+import { createEventTx, listEvents, existsDuplicateEvent } from '../../db/queries/events';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
 
@@ -41,6 +41,16 @@ router.post('/', async (req: Request, res: Response) => {
       log.warn('validation_failed_invalid_capacity', { capacity });
       return res.status(400).json({ error: 'Invalid capacity' });
     }
+
+    // Duplicate prevention: same title (case-insensitive) and exact start time
+    const isDuplicate = await withTransaction(async (client) => {
+      return existsDuplicateEvent(client, title, start);
+    });
+    if (isDuplicate) {
+      log.warn('create_event_duplicate', { title, start_time });
+      return res.status(409).json({ error: 'An event with the same title and start time already exists' });
+    }
+
     log.info('create_event_request', { title, location, start_time, end_time, capacity: cap });
     const event = await withTransaction(async (client) => {
       return createEventTx(client, [title, description ?? null, location ?? null, start, end, cap]);
