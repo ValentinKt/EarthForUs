@@ -86,3 +86,32 @@ export async function existsDuplicateEvent(client: PoolClient, title: string, st
     throw e;
   }
 }
+
+/**
+ * Detect column presence for robust cross-schema support.
+ */
+async function hasColumn(client: PoolClient, table: string, column: string): Promise<boolean> {
+  const sql = `SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2 LIMIT 1`;
+  const r = await client.query(sql, [table, column]);
+  return (r.rowCount ?? 0) > 0;
+}
+
+/**
+ * List events using modern columns if available, otherwise legacy.
+ * Avoids try/catch ambiguity by introspecting the schema first.
+ */
+export async function listEventsTx(client: PoolClient, limit: number, offset: number) {
+  const useModern = await hasColumn(client, 'events', 'start_time');
+  if (useModern) {
+    const r = await client.query(listEvents, [limit, offset]);
+    return r.rows;
+  }
+  const useLegacy = await hasColumn(client, 'events', 'start');
+  if (useLegacy) {
+    const r = await client.query(listEventsLegacy, [limit, offset]);
+    return r.rows;
+  }
+  // Fallback to modern and let any error bubble with a clear message
+  const r = await client.query(listEvents, [limit, offset]);
+  return r.rows;
+}
