@@ -164,6 +164,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerDateNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('date') || innerCol === 'date');
         if (innerMissingCapacity) {
           const legacyArgs: [string, string | null, string | null, Date, Date] = [args[0], args[1], args[2], args[3], args[4]];
+          await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rLegacyNoCap = await client.query(createEventLegacyNoCapacity, legacyArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyNoCap.rows[0];
