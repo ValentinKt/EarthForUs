@@ -8,6 +8,7 @@ import authRouter from './routes/auth';
 import eventsRouter from './routes/events';
 import chatRouter from './routes/chat';
 import todosRouter from './routes/todos';
+import usersRouter from './routes/users';
 import { createWebSocketServer } from '../websocket/server';
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/events', eventsRouter);
 app.use('/api', chatRouter);
 app.use('/api', todosRouter);
+app.use('/api/users', usersRouter);
 
 // Create WebSocket server for real-time chat
 const wsManager = createWebSocketServer(server);

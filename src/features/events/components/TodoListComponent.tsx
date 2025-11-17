@@ -386,7 +386,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-gray-700">To Do ({incompleteTodos.length})</h4>
                 {incompleteTodos.map((todo) => (
-                  <div key={todo.id} className={`p-3 rounded-lg border ${getPriorityColor(todo.priority)} ${isOverdue(todo.due_date) ? 'border-red-300 bg-red-50' : ''}`}>
+                  <div key={todo.id} className={`p-3 rounded-lg border ${getPriorityColor(todo.priority)} ${isOverdue(todo.due_date ?? null) ? 'border-red-300 bg-red-50' : ''}`}>
                     <div className="flex items-start gap-3">
                       <input
                         type="checkbox"
