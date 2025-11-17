@@ -23,7 +23,7 @@ async function demo() {
       const found = await getUserByEmailTx(client, 'alice@example.com');
       console.log('Found user:', found);
 
-      const event = await createEventTx(client, ['Beach Cleanup', 'Clean the beach', 'Santa Monica', new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000), 50]);
+      const event = await createEventTx(client, ['Beach Cleanup', 'Clean the beach', 'Santa Monica', new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000), 50, '00000000-0000-0000-0000-000000000001']);
       console.log('Created event:', event);
 
       const reg = await registerTx(client, user.id, event.id);
