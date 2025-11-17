@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { api } from '../../../shared/utils/api';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
@@ -38,20 +38,74 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     title: '', 
     description: '', 
     priority: 'medium' as TodoItem['priority'],
-    due_date: ''
+    due_date: '',
+    tagsInput: ''
   });
   const [isCreating, setIsCreating] = useState(false);
   const { error: showError, success: showSuccess } = useToast();
   const log = logger.withContext('TodoListComponent');
 
+  // Local tags cache: todoId -> [tags]
+  const [tagsByTodoId, setTagsByTodoId] = useState<Record<number, string[]>>({});
+  const persistTimerRef = useRef<number | null>(null);
+  const reminderTimersRef = useRef<Record<number, number>>({});
+
+  const todosCacheKey = useMemo(() => `earthforus:event:${eventId}:todosCache`, [eventId]);
+  const tagsCacheKey = useMemo(() => `earthforus:event:${eventId}:tagsCache`, [eventId]);
+
   useEffect(() => {
+    // Load cached todos and tags first for faster UX
+    try {
+      const cached = localStorage.getItem(todosCacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached) as TodoItem[];
+        if (Array.isArray(parsed)) {
+          setTodos(parsed);
+          setIsLoading(false);
+        }
+      }
+      const cachedTags = localStorage.getItem(tagsCacheKey);
+      if (cachedTags) {
+        const parsedTags = JSON.parse(cachedTags) as Record<number, string[]>;
+        if (parsedTags && typeof parsedTags === 'object') {
+          setTagsByTodoId(parsedTags);
+        }
+      }
+    } catch (err) {
+      log.warn('local_cache_read_error', { err });
+    }
+
     fetchTodos();
-  }, [eventId]);
+  }, [eventId, todosCacheKey, tagsCacheKey]);
+
+  const persistTodosCache = useCallback((nextTodos: TodoItem[]) => {
+    // Debounce localStorage writes
+    if (persistTimerRef.current) {
+      window.clearTimeout(persistTimerRef.current);
+    }
+    persistTimerRef.current = window.setTimeout(() => {
+      try {
+        localStorage.setItem(todosCacheKey, JSON.stringify(nextTodos));
+      } catch (err) {
+        log.warn('local_cache_write_error', { err });
+      }
+    }, 250);
+  }, [todosCacheKey, log]);
+
+  const persistTagsCache = useCallback((nextTags: Record<number, string[]>) => {
+    try {
+      localStorage.setItem(tagsCacheKey, JSON.stringify(nextTags));
+    } catch (err) {
+      log.warn('tags_cache_write_error', { err });
+    }
+  }, [tagsCacheKey, log]);
 
   const fetchTodos = async () => {
     try {
       const data = await api.get<TodoItem[]>(`/api/events/${eventId}/todos`);
-      setTodos(data || []);
+      const nextTodos = data || [];
+      setTodos(nextTodos);
+      persistTodosCache(nextTodos);
       log.info('todos_fetched', { count: data?.length || 0, eventId });
     } catch (error) {
       log.error('fetch_todos_error', { error, eventId });
@@ -61,7 +115,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     }
   };
 
-  const handleCreateTodo = async (e: React.FormEvent) => {
+  const handleCreateTodo = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTodo.title.trim() || isCreating) return;
 
@@ -78,12 +132,29 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
 
       const createdTodo = await api.post<TodoItem>(`/api/events/${eventId}/todos`, todoData);
       
-      setTodos(prev => [...prev, createdTodo]);
+      setTodos(prev => {
+        const next = [...prev, createdTodo];
+        persistTodosCache(next);
+        return next;
+      });
+
+      // Apply tags entered during creation (comma-separated)
+      const rawTags = newTodo.tagsInput.trim();
+      if (rawTags.length > 0) {
+        const tags = rawTags.split(',').map(t => t.trim()).filter(Boolean);
+        if (tags.length > 0) {
+          setTagsByTodoId(prev => {
+            const next = { ...prev, [createdTodo.id]: Array.from(new Set(tags)) };
+            persistTagsCache(next);
+            return next;
+          });
+        }
+      }
       showSuccess('Todo item created successfully');
       log.info('todo_created', { eventId, todoId: createdTodo.id });
       
       // Reset form
-      setNewTodo({ title: '', description: '', priority: 'medium', due_date: '' });
+      setNewTodo({ title: '', description: '', priority: 'medium', due_date: '', tagsInput: '' });
       setShowAddForm(false);
     } catch (error) {
       log.error('create_todo_error', { error, eventId });
@@ -91,40 +162,53 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     } finally {
       setIsCreating(false);
     }
-  };
+  }, [newTodo, isCreating, eventId, currentUserId, showSuccess, showError, log, persistTodosCache, persistTagsCache]);
 
-  const handleToggleComplete = async (todoId: number, isCompleted: boolean) => {
+  const handleToggleComplete = useCallback(async (todoId: number, isCompleted: boolean) => {
     try {
       await api.put(`/api/events/${eventId}/todos/${todoId}`, { 
         is_completed: !isCompleted 
       });
       
-      setTodos(prev => prev.map(todo => 
-        todo.id === todoId 
-          ? { ...todo, is_completed: !isCompleted, updated_at: new Date().toISOString() }
-          : todo
-      ));
+      setTodos(prev => {
+        const next = prev.map(todo => 
+          todo.id === todoId 
+            ? { ...todo, is_completed: !isCompleted, updated_at: new Date().toISOString() }
+            : todo
+        );
+        persistTodosCache(next);
+        return next;
+      });
       
       log.info('todo_toggled', { eventId, todoId, completed: !isCompleted });
     } catch (error) {
       log.error('toggle_todo_error', { error, eventId, todoId });
       showError('Failed to update todo item', 'Todo Error');
     }
-  };
+  }, [eventId, showError, log, persistTodosCache]);
 
-  const handleDeleteTodo = async (todoId: number) => {
+  const handleDeleteTodo = useCallback(async (todoId: number) => {
     if (!isOrganizer) return;
     
     try {
       await api.del(`/api/events/${eventId}/todos/${todoId}`);
-      setTodos(prev => prev.filter(todo => todo.id !== todoId));
+      setTodos(prev => {
+        const next = prev.filter(todo => todo.id !== todoId);
+        persistTodosCache(next);
+        return next;
+      });
+      setTagsByTodoId(prev => {
+        const { [todoId]: _, ...rest } = prev;
+        persistTagsCache(rest);
+        return rest;
+      });
       showSuccess('Todo item deleted successfully');
       log.info('todo_deleted', { eventId, todoId });
     } catch (error) {
       log.error('delete_todo_error', { error, eventId, todoId });
       showError('Failed to delete todo item', 'Todo Error');
     }
-  };
+  }, [isOrganizer, eventId, showSuccess, showError, log, persistTodosCache, persistTagsCache]);
 
   const getPriorityColor = (priority: TodoItem['priority']) => {
     switch (priority) {
@@ -144,9 +228,45 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     return new Date(dueDate) < new Date();
   };
 
-  const completedTodos = todos.filter(todo => todo.is_completed);
-  const incompleteTodos = todos.filter(todo => !todo.is_completed);
-  const completionRate = todos.length > 0 ? Math.round((completedTodos.length / todos.length) * 100) : 0;
+  const completedTodos = useMemo(() => todos.filter(todo => todo.is_completed), [todos]);
+  const incompleteTodos = useMemo(() => todos.filter(todo => !todo.is_completed), [todos]);
+  const completionRate = useMemo(() => (
+    todos.length > 0 ? Math.round((completedTodos.length / todos.length) * 100) : 0
+  ), [todos, completedTodos.length]);
+
+  // Reminders: notify 1 hour before due date and when overdue
+  useEffect(() => {
+    // Clear existing timers
+    Object.values(reminderTimersRef.current).forEach(id => window.clearTimeout(id));
+    reminderTimersRef.current = {};
+
+    todos.forEach(todo => {
+      if (!todo.due_date || todo.is_completed) return;
+      const due = new Date(todo.due_date).getTime();
+      if (Number.isNaN(due)) return;
+
+      const now = Date.now();
+      const oneHourBefore = due - 60 * 60 * 1000;
+
+      if (due <= now) {
+        showError(`Task "${todo.title}" is overdue`, 'Due Date Reminder');
+        return;
+      }
+
+      if (oneHourBefore > now) {
+        const ms = oneHourBefore - now;
+        const id = window.setTimeout(() => {
+          showSuccess(`Upcoming task: "${todo.title}" due in 1 hour`);
+        }, ms);
+        reminderTimersRef.current[todo.id] = id;
+      }
+    });
+
+    return () => {
+      Object.values(reminderTimersRef.current).forEach(id => window.clearTimeout(id));
+      reminderTimersRef.current = {};
+    };
+  }, [todos, showSuccess, showError]);
 
   if (isLoading) {
     return (
@@ -213,6 +333,13 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
               onChange={(e) => setNewTodo(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
               rows={2}
+            />
+            <input
+              type="text"
+              placeholder="Tags (comma-separated)"
+              value={newTodo.tagsInput}
+              onChange={(e) => setNewTodo(prev => ({ ...prev, tagsInput: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <div className="flex gap-3">
               <select
@@ -282,7 +409,58 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                                   {isOverdue(todo.due_date) && ' (Overdue)'}
                                 </span>
                               )}
+                              {/* Tags */}
+                              {tagsByTodoId[todo.id]?.length ? (
+                                <span className="flex flex-wrap gap-1">
+                                  {tagsByTodoId[todo.id].map(tag => (
+                                    <span key={tag} className="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full">#{tag}</span>
+                                  ))}
+                                </span>
+                              ) : null}
                             </div>
+                            {/* Tag editor */}
+                            {isOrganizer && (
+                              <div className="mt-2 flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Add tag"
+                                  onKeyDown={(e) => {
+                                    const input = (e.target as HTMLInputElement);
+                                    if (e.key === 'Enter') {
+                                      const t = input.value.trim();
+                                      if (t.length === 0) return;
+                                      setTagsByTodoId(prev => {
+                                        const current = prev[todo.id] || [];
+                                        const nextTags = Array.from(new Set([...current, t]));
+                                        const next = { ...prev, [todo.id]: nextTags };
+                                        persistTagsCache(next);
+                                        return next;
+                                      });
+                                      input.value = '';
+                                    }
+                                  }}
+                                  className="px-2 py-1 border border-gray-300 rounded"
+                                />
+                                {tagsByTodoId[todo.id]?.map(tag => (
+                                  <button
+                                    key={`${todo.id}-${tag}`}
+                                    onClick={() => {
+                                      setTagsByTodoId(prev => {
+                                        const current = prev[todo.id] || [];
+                                        const nextTags = current.filter(t => t !== tag);
+                                        const next = { ...prev, [todo.id]: nextTags };
+                                        persistTagsCache(next);
+                                        return next;
+                                      });
+                                    }}
+                                    className="text-teal-700 hover:text-teal-900 text-xs"
+                                    title={`Remove #${tag}`}
+                                  >
+                                    remove #{tag}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           {isOrganizer && (
                             <button
