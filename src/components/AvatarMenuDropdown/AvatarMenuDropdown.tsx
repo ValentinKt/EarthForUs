@@ -74,7 +74,7 @@ const AvatarMenuDropdown: React.FC<AvatarMenuDropdownProps> = ({ user }) => {
             <img
               src={avatarUrl}
               alt={`${currentUser.firstName} ${currentUser.lastName}`}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-8 h-8 rounded-full object-cover theme-image"
             />
           ) : (
             getInitials(currentUser.firstName, currentUser.lastName || '')
