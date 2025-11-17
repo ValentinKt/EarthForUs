@@ -68,7 +68,10 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
     return res.rows[0];
   } catch (e: any) {
     const msg = String(e?.message || '');
-    if (e?.code === '42703' || msg.includes('start_time') || msg.includes('end_time')) {
+    const col = String((e as any)?.column || '');
+    const missingStartTime = msg.includes('start_time') || col === 'start_time';
+    const missingEndTime = msg.includes('end_time') || col === 'end_time';
+    if (missingStartTime || missingEndTime) {
       await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
       const res = await client.query(createEventLegacy, args);
       await client.query('RELEASE SAVEPOINT create_event_sp');
@@ -87,7 +90,9 @@ export async function existsDuplicateEvent(client: PoolClient, title: string, st
     return !!(res.rowCount && res.rowCount > 0);
   } catch (e: any) {
     const msg = String(e?.message || '');
-    if (e?.code === '42703' || msg.includes('start_time')) {
+    const col = String((e as any)?.column || '');
+    const missingStartTime = msg.includes('start_time') || col === 'start_time';
+    if (missingStartTime) {
       await client.query('ROLLBACK TO SAVEPOINT dup_check_sp');
       const res = await client.query(findEventByTitleAndStartLegacy, [title, start]);
       await client.query('RELEASE SAVEPOINT dup_check_sp');
