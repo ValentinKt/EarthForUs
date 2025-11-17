@@ -14,9 +14,8 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import { ToastProvider } from './shared/components/Toast';
 import { logger } from './shared/utils/logger';
+import SettingsPage from './features/settings/pages/SettingsPage';
 
-// Placeholder component for routes not yet created
-const Settings = () => <div className="content-wrapper"><h1 className="text-2xl font-bold">Settings</h1></div>;
 const NotFound = () => (
   <div className="content-wrapper text-center py-20">
     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
@@ -95,7 +94,7 @@ function App() {
             <Route path="/settings" element={
               <Layout>
                 <ProtectedRoute>
-                  <Settings />
+                  <SettingsPage />
                 </ProtectedRoute>
               </Layout>
             } />
