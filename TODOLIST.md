@@ -77,8 +77,14 @@
 [x] Add local tags/categories and caching to TodoListComponent
 [x] Implement due date reminders and overdue indicators
 [ ] Add unit and integration tests for event creation and todo list
-[ ] Start dev server and preview UI changes
+[x] Start dev server and preview UI changes
 [x] Fix events listing API to handle legacy DB columns (start/end)
 [x] Restart API server and verify UI shows events without schema errors
 [x] Add legacy fallback for event creation and duplicate checks
 [x] Restart API and verify no schema errors on create/list
+
+[x] Implement Settings page with profile and password forms
+[x] Replace placeholder Settings route with new page
+[x] Create users API routes for profile and password update
+[x] Mount users routes in API server
+[x] Restart API and run dev server; open preview to verify
