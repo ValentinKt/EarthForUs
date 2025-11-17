@@ -266,8 +266,8 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const iMissingStart = iMsg.includes('start_time') || iCol === 'start_time';
         const iMissingEnd = iMsg.includes('end_time') || iCol === 'end_time';
         const iMissingCapacity = iMsg.includes('capacity') || iCol === 'capacity';
-        const invalidOrganizerUuid = (innerOrg as any)?.code === '22P02' && iMsg.includes('uuid') && (iMsg.includes('organizer_id') || iCol === 'organizer_id');
-        const invalidOrganizerInteger = (innerOrg as any)?.code === '22P02' && iMsg.includes('integer') && (iMsg.includes('organizer_id') || iCol === 'organizer_id');
+        const invalidOrganizerUuid = (innerOrg as any)?.code === '22P02' && iMsg.toLowerCase().includes('uuid');
+        const invalidOrganizerInteger = (innerOrg as any)?.code === '22P02' && iMsg.toLowerCase().includes('integer');
         if (invalidOrganizerUuid) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           const rWithOrgUuid = await client.query(createEventWithOrganizer, [args[0], args[1], args[2], args[3], args[4], args[5], '00000000-0000-0000-0000-000000000001']);
@@ -296,8 +296,8 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
           } catch (innerOrg2: any) {
             const i2Msg = String(innerOrg2?.message || '');
             const i2Col = String((innerOrg2 as any)?.column || '');
-            const invalidOrganizerUuid2 = (innerOrg2 as any)?.code === '22P02' && i2Msg.includes('uuid') && (i2Msg.includes('organizer_id') || i2Col === 'organizer_id');
-            const invalidOrganizerInteger2 = (innerOrg2 as any)?.code === '22P02' && i2Msg.includes('integer') && (i2Msg.includes('organizer_id') || i2Col === 'organizer_id');
+            const invalidOrganizerUuid2 = (innerOrg2 as any)?.code === '22P02' && i2Msg.toLowerCase().includes('uuid');
+            const invalidOrganizerInteger2 = (innerOrg2 as any)?.code === '22P02' && i2Msg.toLowerCase().includes('integer');
             if (invalidOrganizerUuid2) {
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
               const rNoCapOrgUuid = await client.query(createEventNoCapacityWithOrganizer, [args[0], args[1], args[2], args[3], args[4], '00000000-0000-0000-0000-000000000001']);
