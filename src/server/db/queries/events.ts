@@ -101,13 +101,18 @@ async function hasColumn(client: PoolClient, table: string, column: string): Pro
  * Avoids try/catch ambiguity by introspecting the schema first.
  */
 export async function listEventsTx(client: PoolClient, limit: number, offset: number) {
+  // Use a SAVEPOINT to allow fallback without aborting the transaction
+  await client.query('SAVEPOINT list_events_sp');
   try {
     const r = await client.query(listEvents, [limit, offset]);
+    await client.query('RELEASE SAVEPOINT list_events_sp');
     return r.rows;
   } catch (e: any) {
     const msg = String(e?.message || '');
     if (e?.code === '42703' || msg.includes('start_time') || msg.includes('end_time')) {
+      await client.query('ROLLBACK TO SAVEPOINT list_events_sp');
       const r2 = await client.query(listEventsLegacy, [limit, offset]);
+      await client.query('RELEASE SAVEPOINT list_events_sp');
       return r2.rows;
     }
     throw e;
