@@ -80,3 +80,5 @@
 [ ] Start dev server and preview UI changes
 [x] Fix events listing API to handle legacy DB columns (start/end)
 [x] Restart API server and verify UI shows events without schema errors
+[x] Add legacy fallback for event creation and duplicate checks
+[x] Restart API and verify no schema errors on create/list
