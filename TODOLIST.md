@@ -108,3 +108,10 @@
 [x] Update Login and Signup pages to use .ui-input with ARIA improvements
 [x] Add Appearance settings in Settings with light/dark/system radios
 [x] Open preview to verify dark mode toggles and persistence
+[x] Fix dark mode color scheme in Layout header, nav, and footer
+[x] Update Button variants with dark hover, active, and disabled states
+[x] Improve EventsPage cards, text, skeletons, and icons for dark mode
+[x] Improve EventPage tabs, cards, text, and icons for dark mode
+[x] Enhance CreateEventPage app bar and sticky footer for dark mode
+[x] Add dark mode utility overrides for common Tailwind classes
+[x] Start dev server and preview dark mode across modified pages
