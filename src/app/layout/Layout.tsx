@@ -20,9 +20,9 @@ const Layout: React.FC<LayoutProps> = ({
   const { isAuthenticated } = useAuth();
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen flex flex-col bg-brand-50 dark:bg-gray-950 ${className}`}>
+      <div className={`min-h-screen flex flex-col bg-brand-50 dark:bg-gray-950 transition-colors duration-200 ${className}`}>
         {showHeader && (
-          <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur shadow-sm border-b border-gray-200 dark:border-gray-800">
+          <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur shadow-sm border-b border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 {/* Logo */}
@@ -63,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({
           {children}
         </main>
         {showFooter && (
-          <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+          <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 mb-4">
