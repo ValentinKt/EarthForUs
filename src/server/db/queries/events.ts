@@ -67,7 +67,7 @@ export const createEventNoCapacityWithDateAndOrganizer = {
 export const createEventWithDateAndCategory = {
   name: 'create-event-with-date-and-category',
   text: `INSERT INTO events (title, description, location, start_time, end_time, capacity, date, category)
-         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general')
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'environmental')
          RETURNING id, title, description, location, start_time, end_time, capacity, date, category, created_at`,
 };
 
@@ -75,7 +75,7 @@ export const createEventWithDateAndCategory = {
 export const createEventWithDateCategoryAndOrganizer = {
   name: 'create-event-with-date-category-and-organizer',
   text: `INSERT INTO events (title, description, location, start_time, end_time, capacity, date, category, organizer_id)
-         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general', $7)
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'environmental', $7)
          RETURNING id, title, description, location, start_time, end_time, capacity, date, category, created_at`,
 };
 
@@ -83,7 +83,7 @@ export const createEventWithDateCategoryAndOrganizer = {
 export const createEventNoCapacityWithDateAndCategory = {
   name: 'create-event-no-capacity-with-date-and-category',
   text: `INSERT INTO events (title, description, location, start_time, end_time, date, category)
-         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general')
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'environmental')
          RETURNING id, title, description, location, start_time, end_time, date, category, created_at`,
 };
 
@@ -91,7 +91,7 @@ export const createEventNoCapacityWithDateAndCategory = {
 export const createEventNoCapacityWithDateCategoryAndOrganizer = {
   name: 'create-event-no-capacity-with-date-category-and-organizer',
   text: `INSERT INTO events (title, description, location, start_time, end_time, date, category, organizer_id)
-         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general', $6)
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'environmental', $6)
          RETURNING id, title, description, location, start_time, end_time, date, category, created_at`,
 };
 
@@ -163,7 +163,7 @@ export const createEventLegacyNoCapacityWithDateAndOrganizer = {
 export const createEventLegacyWithDateAndCategory = {
   name: 'create-event-legacy-with-date-and-category',
   text: `INSERT INTO events (title, description, location, start, "end", capacity, date, category)
-         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general')
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'environmental')
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, capacity, date, category, created_at`,
 };
 
@@ -171,7 +171,7 @@ export const createEventLegacyWithDateAndCategory = {
 export const createEventLegacyWithDateCategoryAndOrganizer = {
   name: 'create-event-legacy-with-date-category-and-organizer',
   text: `INSERT INTO events (title, description, location, start, "end", capacity, date, category, organizer_id)
-         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'general', $7)
+         VALUES ($1, $2, $3, $4, $5, $6, DATE($4), 'environmental', $7)
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, capacity, date, category, created_at`,
 };
 
@@ -179,7 +179,7 @@ export const createEventLegacyWithDateCategoryAndOrganizer = {
 export const createEventLegacyNoCapacityWithDateAndCategory = {
   name: 'create-event-legacy-no-capacity-with-date-and-category',
   text: `INSERT INTO events (title, description, location, start, "end", date, category)
-         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general')
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'environmental')
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, date, category, created_at`,
 };
 
@@ -187,7 +187,7 @@ export const createEventLegacyNoCapacityWithDateAndCategory = {
 export const createEventLegacyNoCapacityWithDateCategoryAndOrganizer = {
   name: 'create-event-legacy-no-capacity-with-date-category-and-organizer',
   text: `INSERT INTO events (title, description, location, start, "end", date, category, organizer_id)
-         VALUES ($1, $2, $3, $4, $5, DATE($4), 'general', $6)
+         VALUES ($1, $2, $3, $4, $5, DATE($4), 'environmental', $6)
          RETURNING id, title, description, location, start AS start_time, "end" AS end_time, date, category, created_at`,
 };
 
