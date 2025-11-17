@@ -13,7 +13,20 @@ router.get('/', async (req: Request, res: Response) => {
     const limit = Number((req.query.limit as string) || 20);
     const offset = Number((req.query.offset as string) || 0);
     log.info('list_events_request', { limit, offset });
-    const result = await pool.query(listEvents, [limit, offset]);
+    let result;
+    try {
+      result = await pool.query(listEvents, [limit, offset]);
+    } catch (e: any) {
+      // Fallback if modern columns don't exist (e.g., 42703 undefined_column)
+      const msg = String(e?.message || '');
+      if (e?.code === '42703' || msg.includes('start_time') || msg.includes('end_time')) {
+        log.warn('list_events_fallback_legacy_columns');
+        const { listEventsLegacy } = await import('../../db/queries/events');
+        result = await pool.query(listEventsLegacy, [limit, offset]);
+      } else {
+        throw e;
+      }
+    }
     log.debug('list_events_response', { count: result.rowCount ?? result.rows.length });
     return res.json({ events: result.rows, count: result.rowCount ?? result.rows.length });
   } catch (err) {

@@ -18,6 +18,12 @@ export const listEvents = {
   text: `SELECT id, title, location, start_time, end_time FROM events ORDER BY start_time ASC LIMIT $1 OFFSET $2`,
 };
 
+// Legacy fallback for databases using columns named 'start' and 'end'
+export const listEventsLegacy = {
+  name: 'list-events-legacy',
+  text: `SELECT id, title, location, start AS start_time, "end" AS end_time FROM events ORDER BY start ASC LIMIT $1 OFFSET $2`,
+};
+
 export const findEventByTitleAndStart = {
   name: 'find-event-by-title-and-start',
   text: `SELECT id FROM events WHERE LOWER(title) = LOWER($1) AND start_time = $2 LIMIT 1`,
