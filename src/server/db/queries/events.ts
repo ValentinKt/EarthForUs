@@ -60,43 +60,22 @@ export const deleteEvent = {
 };
 
 export async function createEventTx(client: PoolClient, args: [string, string | null, string | null, Date, Date, number]) {
-  // Use a SAVEPOINT so fallback queries don't hit an aborted transaction
-  await client.query('SAVEPOINT create_event_sp');
-  try {
-    const res = await client.query(createEvent, args);
-    await client.query('RELEASE SAVEPOINT create_event_sp');
-    return res.rows[0];
-  } catch (e: any) {
-    const msg = String(e?.message || '');
-    if (e?.code === '42703' || msg.includes('start_time') || msg.includes('end_time')) {
-      // Roll back to savepoint and try legacy columns
-      await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-      const res = await client.query(createEventLegacy, args);
-      await client.query('RELEASE SAVEPOINT create_event_sp');
-      return res.rows[0];
-    }
-    // Unknown error, rethrow
-    throw e;
-  }
+  // Decide query based on schema introspection to avoid transaction aborts
+  const hasStartTime = await hasColumn(client, 'events', 'start_time');
+  const hasEndTime = await hasColumn(client, 'events', 'end_time');
+  const useLegacy = !(hasStartTime && hasEndTime);
+  const q = useLegacy ? createEventLegacy : createEvent;
+  const res = await client.query(q, args);
+  return res.rows[0];
 }
 
 export async function existsDuplicateEvent(client: PoolClient, title: string, start: Date) {
-  // Use a SAVEPOINT to allow legacy fallback inside the transaction
-  await client.query('SAVEPOINT dup_check_sp');
-  try {
-    const res = await client.query(findEventByTitleAndStart, [title, start]);
-    await client.query('RELEASE SAVEPOINT dup_check_sp');
-    return !!(res.rowCount && res.rowCount > 0);
-  } catch (e: any) {
-    const msg = String(e?.message || '');
-    if (e?.code === '42703' || msg.includes('start_time')) {
-      await client.query('ROLLBACK TO SAVEPOINT dup_check_sp');
-      const res = await client.query(findEventByTitleAndStartLegacy, [title, start]);
-      await client.query('RELEASE SAVEPOINT dup_check_sp');
-      return !!(res.rowCount && res.rowCount > 0);
-    }
-    throw e;
-  }
+  // Choose query based on whether modern or legacy columns exist
+  const hasStartTime = await hasColumn(client, 'events', 'start_time');
+  const useLegacy = !hasStartTime; // if no start_time, use legacy 'start'
+  const q = useLegacy ? findEventByTitleAndStartLegacy : findEventByTitleAndStart;
+  const res = await client.query(q, [title, start]);
+  return !!(res.rowCount && res.rowCount > 0);
 }
 
 /**
