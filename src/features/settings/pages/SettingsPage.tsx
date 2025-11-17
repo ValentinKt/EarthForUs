@@ -15,12 +15,19 @@ const SettingsPage: React.FC = () => {
   const [lastName, setLastName] = useState(user?.lastName || '');
   const [savingProfile, setSavingProfile] = useState(false);
   const [errors, setErrors] = useState<{ firstName?: string; lastName?: string }>({});
+  const [touched, setTouched] = useState<{ firstName: boolean; lastName: boolean }>({ firstName: false, lastName: false });
+  const [profileStatus, setProfileStatus] = useState<string>('');
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
+  const [passwordErrors, setPasswordErrors] = useState<{ currentPassword?: string; newPassword?: string; confirmPassword?: string }>({});
+  const [pwTouched, setPwTouched] = useState<{ current: boolean; new: boolean; confirm: boolean }>({ current: false, new: false, confirm: false });
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | ''>('');
 
   useEffect(() => {
     setFirstName(user?.firstName || '');
@@ -43,11 +50,29 @@ const SettingsPage: React.FC = () => {
     return Object.keys(next).length === 0;
   };
 
-  const saveProfile = async () => {
+  useEffect(() => {
+    // Real-time validation after touch
+    const next: { firstName?: string; lastName?: string } = {};
+    const f = firstName.trim();
+    const l = lastName.trim();
+    if (touched.firstName) {
+      if (!f) next.firstName = 'First name is required';
+      else if (f.length > 100) next.firstName = 'First name is too long';
+    }
+    if (touched.lastName) {
+      if (!l) next.lastName = 'Last name is required';
+      else if (l.length > 100) next.lastName = 'Last name is too long';
+    }
+    setErrors(next);
+  }, [firstName, lastName, touched.firstName, touched.lastName]);
+
+  const saveProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!user) return;
     if (!validateProfile()) return;
     try {
       setSavingProfile(true);
+      setProfileStatus('Saving profile changes…');
       log.info('save_profile');
       const res = await api.put<{ user: { id: number; email: string; first_name: string; last_name: string } }>(`/api/users/${user.id}`, {
         firstName: firstName.trim(),
@@ -56,29 +81,57 @@ const SettingsPage: React.FC = () => {
       const updated = res.user;
       login({ id: updated.id, email: updated.email, firstName: updated.first_name, lastName: updated.last_name });
       toast.success('Profile updated');
+      setProfileStatus('Profile updated successfully');
     } catch (e: any) {
       toast.error(e?.message || 'Failed to update profile');
+      setProfileStatus('Failed to update profile');
     } finally {
       setSavingProfile(false);
     }
   };
 
-  const validatePassword = () => {
-    setPasswordError(undefined);
-    if (newPassword.length < 8) {
-      setPasswordError('New password must be at least 8 characters');
-      return false;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('New passwords do not match');
-      return false;
-    }
-    return true;
+  const computeStrength = (pwd: string): 'weak' | 'medium' | 'strong' | '' => {
+    if (!pwd) return '';
+    const length = pwd.length >= 12;
+    const hasNum = /\d/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+    const score = [length, hasNum, hasLower, hasUpper, hasSpecial].filter(Boolean).length;
+    if (score >= 4) return 'strong';
+    if (score >= 3) return 'medium';
+    return 'weak';
   };
 
-  const savePassword = async () => {
+  const validatePassword = () => {
+    const next: { currentPassword?: string; newPassword?: string; confirmPassword?: string } = {};
+    if (!currentPassword) next.currentPassword = 'Current password is required';
+    if (!newPassword) next.newPassword = 'New password is required';
+    else if (newPassword.length < 8) next.newPassword = 'Use at least 8 characters';
+    if (!confirmPassword) next.confirmPassword = 'Please confirm your new password';
+    else if (newPassword !== confirmPassword) next.confirmPassword = 'Passwords do not match';
+    setPasswordErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  useEffect(() => {
+    // Real-time password validation and strength
+    setPasswordStrength(computeStrength(newPassword));
+    const next: { currentPassword?: string; newPassword?: string; confirmPassword?: string } = {};
+    if (pwTouched.new) {
+      if (!newPassword) next.newPassword = 'New password is required';
+      else if (newPassword.length < 8) next.newPassword = 'Use at least 8 characters';
+    }
+    if (pwTouched.confirm) {
+      if (!confirmPassword) next.confirmPassword = 'Please confirm your new password';
+      else if (newPassword !== confirmPassword) next.confirmPassword = 'Passwords do not match';
+    }
+    setPasswordErrors(prev => ({ ...prev, ...next }));
+  }, [newPassword, confirmPassword, pwTouched.new, pwTouched.confirm]);
+
+  const savePassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!user) return;
-    if (!currentPassword) { setPasswordError('Current password is required'); return; }
     if (!validatePassword()) return;
     try {
       setSavingPassword(true);
@@ -90,6 +143,8 @@ const SettingsPage: React.FC = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setPwTouched({ current: false, new: false, confirm: false });
+      setPasswordErrors({});
       toast.success('Password updated');
     } catch (e: any) {
       toast.error(e?.message || 'Failed to update password');
@@ -113,6 +168,7 @@ const SettingsPage: React.FC = () => {
     <div className="content-wrapper">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold tracking-tight mb-6">Account Settings</h1>
+        <p className="text-sm text-gray-600 mb-4">Manage your personal information and security. Press Enter to submit forms.</p>
 
         {/* Profile card */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -126,31 +182,117 @@ const SettingsPage: React.FC = () => {
             ) : null}
           </div>
 
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <TextField name="firstName" label="First name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required error={errors.firstName} autoComplete="given-name" />
-            <TextField name="lastName" label="Last name" value={lastName} onChange={(e) => setLastName(e.target.value)} required error={errors.lastName} autoComplete="family-name" />
-            <TextField name="email" label="Email" value={user.email} onChange={() => {}} disabled description="Email is managed through authentication" autoComplete="email" />
-          </div>
+          <form onSubmit={saveProfile} aria-labelledby="profile-heading">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <TextField
+                name="firstName"
+                label="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                onBlur={() => setTouched(prev => ({ ...prev, firstName: true }))}
+                required
+                error={errors.firstName}
+                description="Your public display name"
+                autoComplete="given-name"
+              />
+              <TextField
+                name="lastName"
+                label="Last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onBlur={() => setTouched(prev => ({ ...prev, lastName: true }))}
+                required
+                error={errors.lastName}
+                description="Your family name"
+                autoComplete="family-name"
+              />
+              <TextField
+                name="email"
+                label="Email"
+                value={user.email}
+                onChange={() => {}}
+                disabled
+                description="Email is managed through authentication"
+                autoComplete="email"
+              />
+            </div>
 
-          <div className="mt-4 flex gap-3">
-            <Button variant="primary" onClick={saveProfile} loading={savingProfile}>Save Changes</Button>
-            <Button variant="outline" onClick={() => { setFirstName(user.firstName); setLastName(user.lastName); setErrors({}); }}>Reset</Button>
-          </div>
+            <div className="mt-4 flex gap-3">
+              <Button variant="primary" type="submit" loading={savingProfile} aria-label="Save profile changes" disabled={!profileDirty || !!errors.firstName || !!errors.lastName}>Save Changes</Button>
+              <Button variant="outline" type="button" onClick={() => { setFirstName(user.firstName); setLastName(user.lastName); setErrors({}); setTouched({ firstName: false, lastName: false }); }} aria-label="Reset profile form">Reset</Button>
+            </div>
+
+            <div className="sr-only" aria-live="polite">{profileStatus}</div>
+          </form>
         </div>
 
         {/* Password card */}
         <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">Security</h2>
+          <h2 id="security-heading" className="text-lg font-semibold">Security</h2>
           <p className="text-sm text-gray-600">Change your password</p>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <TextField name="currentPassword" label="Current password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-            <TextField name="newPassword" label="New password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required description="Minimum 8 characters" />
-            <TextField name="confirmPassword" label="Confirm new password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required error={passwordError} />
-          </div>
-          <div className="mt-4 flex gap-3">
-            <Button variant="earth" onClick={savePassword} loading={savingPassword}>Update Password</Button>
-            <Button variant="outline" onClick={() => { setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordError(undefined); }}>Clear</Button>
-          </div>
+          <form onSubmit={savePassword} aria-labelledby="security-heading">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <TextField
+                  name="currentPassword"
+                  label="Current password"
+                  type={showCurrent ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  onBlur={() => setPwTouched(prev => ({ ...prev, current: true }))}
+                  required
+                  error={pwTouched.current ? passwordErrors.currentPassword : undefined}
+                />
+                <div className="mt-1 text-right">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle current password visibility" onClick={() => setShowCurrent(s => !s)}>
+                    {showCurrent ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <TextField
+                  name="newPassword"
+                  label="New password"
+                  type={showNew ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  onBlur={() => setPwTouched(prev => ({ ...prev, new: true }))}
+                  required
+                  error={pwTouched.new ? passwordErrors.newPassword : undefined}
+                  description="Use 8+ characters with a mix of letters, numbers, symbols"
+                />
+                <div className="mt-1 flex items-center justify-between">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle new password visibility" onClick={() => setShowNew(s => !s)}>
+                    {showNew ? 'Hide' : 'Show'}
+                  </Button>
+                  {newPassword && (
+                    <span className={`text-xs font-medium ${passwordStrength === 'strong' ? 'text-green-700' : passwordStrength === 'medium' ? 'text-yellow-700' : 'text-red-700'}`}>Strength: {passwordStrength}</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <TextField
+                  name="confirmPassword"
+                  label="Confirm new password"
+                  type={showConfirm ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => setPwTouched(prev => ({ ...prev, confirm: true }))}
+                  required
+                  error={pwTouched.confirm ? passwordErrors.confirmPassword : undefined}
+                />
+                <div className="mt-1 text-right">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle confirm password visibility" onClick={() => setShowConfirm(s => !s)}>
+                    {showConfirm ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <Button variant="earth" type="submit" loading={savingPassword} aria-label="Update password" disabled={!!passwordErrors.currentPassword || !!passwordErrors.newPassword || !!passwordErrors.confirmPassword}>Update Password</Button>
+              <Button variant="outline" type="button" aria-label="Clear password fields" onClick={() => { setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordErrors({}); setPwTouched({ current: false, new: false, confirm: false }); }}>Clear</Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
