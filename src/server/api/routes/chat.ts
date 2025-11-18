@@ -4,6 +4,7 @@ import { pool } from '../../db/pool';
 import { getChatMessagesByEvent, createChatMessage } from '../../db/queries/chat';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
+import { errorLogger } from '../../utils/errorLogger';
 
 const router = Router();
 const log = logger.withContext('api/chat');
@@ -40,6 +41,8 @@ router.get('/events/:eventId/messages', async (req: Request, res: Response) => {
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('get_chat_messages_error', mapped);
+    // Persist error to ERRORS_LOGS.txt
+    await errorLogger.chatFailedToLoadMessages(Number(req.params.eventId), mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });
@@ -88,6 +91,8 @@ router.post('/events/:eventId/messages', async (req: Request, res: Response) => 
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('create_chat_message_error', mapped);
+    // Persist chat message creation errors as well
+    await errorLogger.log('Chat Error', 'Failed to create chat message', { eventId: Number(req.params.eventId), details: mapped });
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

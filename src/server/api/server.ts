@@ -10,6 +10,7 @@ import chatRouter from './routes/chat';
 import todosRouter from './routes/todos';
 import usersRouter from './routes/users';
 import { createWebSocketServer } from '../websocket/server';
+import { errorLogger } from '../utils/errorLogger';
 
 const app = express();
 const server = createServer(app);
@@ -30,6 +31,13 @@ app.use('/api/users', usersRouter);
 
 // Create WebSocket server for real-time chat
 const wsManager = createWebSocketServer(server);
+
+// Global error handler to persist unhandled errors
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(async (err: unknown, req: Request, res: Response, _next: any) => {
+  await errorLogger.serverError(req.originalUrl, err);
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 const port = Number(process.env.API_PORT || 3001);
 server.listen(port, () => {

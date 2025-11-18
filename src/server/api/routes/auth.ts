@@ -5,6 +5,7 @@ import { withTransaction, pool } from '../../db/pool';
 import { createUserTx, getUserByEmailTx } from '../../db/queries/users';
 import { mapPgError } from '../../db/errors';
 import type { QueryResult } from 'pg';
+import { errorLogger } from '../../utils/errorLogger';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     return res.status(201).json({ user });
   } catch (err) {
     const mapped = mapPgError(err);
+    await errorLogger.authSignupError(String((req.body || {}).email), mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });
@@ -44,16 +46,19 @@ router.post('/login', async (req: Request, res: Response) => {
     const result: QueryResult<{ id: number; email: string; password_hash: string; first_name: string; last_name: string; }> = await pool.query(q, [email]);
     const row = result.rows[0];
     if (!row) {
+      await errorLogger.authLoginError(email, { reason: 'user_not_found' });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     const ok = await bcrypt.compare(password, row.password_hash);
     if (!ok) {
+      await errorLogger.authLoginError(email, { reason: 'password_mismatch' });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     const user = { id: row.id, email: row.email, first_name: row.first_name, last_name: row.last_name };
     return res.json({ user });
   } catch (err) {
     const mapped = mapPgError(err);
+    await errorLogger.authLoginError(String((req.body || {}).email), mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

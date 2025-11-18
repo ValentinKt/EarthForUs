@@ -10,6 +10,7 @@ import {
 } from '../../db/queries/todos';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
+import { errorLogger } from '../../utils/errorLogger';
 
 const router = Router();
 const log = logger.withContext('api/todos');
@@ -54,6 +55,8 @@ router.get('/events/:eventId/todos', async (req: Request, res: Response) => {
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('get_todo_items_error', mapped);
+    // Persist checklist load failures
+    await errorLogger.checklistFailedToLoad(Number(req.params.eventId), mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

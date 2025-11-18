@@ -4,6 +4,7 @@ import { withTransaction, pool } from '../../db/pool';
 import { createEventTx, listEvents, listEventsLegacy, existsDuplicateEvent } from '../../db/queries/events';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
+import { errorLogger } from '../../utils/errorLogger';
 
 const router = Router();
 const log = logger.withContext('api/events');
@@ -30,6 +31,7 @@ router.get('/', async (req: Request, res: Response) => {
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('list_events_error', mapped);
+    await errorLogger.log('Event Error', 'Failed to load event list', mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

@@ -42,3 +42,27 @@ Next steps:
 - Adjust remaining migrations to uuid or mark as applied.
 - Add HTTP integration tests for /api/auth/signup and /api/auth/login.
 - Verify john.doe@test.fr login via API after restart.
+[2025-11-18T20:54:30.626Z] Chat Error
+Failed to load chat messages
+Details: {"eventId":1,"reason":"relation_missing_or_fk_mismatch"}
+---
+[2025-11-18T20:54:30.628Z] Connection
+Disconnected from real-time chat
+Details: {"clientId":"sample-client","totalClients":0}
+---
+[2025-11-18T20:54:30.628Z] Checklist Error
+Failed to load todo items
+Details: {"eventId":1,"reason":"relation_missing_or_fk_mismatch"}
+---
+[2025-11-18T20:54:30.628Z] Auth Error
+Invalid credentials
+Details: {"email":"john.doe@test.fr","reason":"password_mismatch"}
+---
+[2025-11-18T20:54:30.628Z] Server Error
+Unhandled server error
+Details: {"route":"/api/health","reason":"sample_unhandled_error"}
+---
+[2025-11-18T20:54:30.628Z] Event Error
+Failed to load event detail
+Details: {"eventId":1,"reason":"not_implemented_or_schema_mismatch"}
+---
