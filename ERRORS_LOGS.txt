@@ -1,0 +1,44 @@
+[EarthForUs Error Logs]
+Date: 2025-11-18
+
+Migration errors:
+- [migrate] Applying 001_init.sql...
+- Error: foreign key constraint "registrations_user_id_fkey" cannot be implemented
+- Code: 42804
+- Detail: Key columns "user_id" and "id" are of incompatible types: bigint and uuid.
+
+- [migrate] Skipping already applied 001_init.sql
+- [migrate] Applying 002_add_user_names.sql... Applied
+- [migrate] Applying 002_chat_and_todos.sql...
+- Error: foreign key constraint "event_chat_messages_event_id_fkey" cannot be implemented
+- Code: 42804
+- Detail: Key columns "event_id" and "id" are of incompatible types: bigint and uuid.
+
+Signup error (HTTP):
+- Endpoint: POST http://localhost:3001/api/auth/signup
+- Response: {"error":"null value in column \"name\" of relation \"users\" violates not-null constraint","code":"23502"}
+- Status: HTTP 500
+
+Login issue (reported):
+- Email: john.doe@test.fr
+- Password: Azerty123!*
+- Outcome: Invalid credentials
+
+Auth test success:
+- Script: scripts/test_auth_flow.ts
+- Result: PASS: signup + login bcrypt compare works
+- Example user: john.doe.test+1763497553778@example.com
+API server (dev):
+- Instance: http://localhost:3003
+- Signup test: HTTP 201 with created user payload
+- Example email: valentin.signup.test+1763496595@example.com
+
+Notes:
+- Live DB uses uuid for `users.id`; some legacy migrations expect bigint.
+- `users` table had `name` NOT NULL; now backfilled and enforced first_name/last_name.
+- login route validates via bcrypt compare against `password_hash`.
+
+Next steps:
+- Adjust remaining migrations to uuid or mark as applied.
+- Add HTTP integration tests for /api/auth/signup and /api/auth/login.
+- Verify john.doe@test.fr login via API after restart.
