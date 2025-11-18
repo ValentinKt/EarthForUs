@@ -122,3 +122,9 @@
 [x] Refactor Button focus rings to use theme variables
 [x] Add transition-colors to layout wrapper, header, and footer
 [x] Apply theme-bg and theme-text to Layout root container
+
+[x] Fix events insert default category to 'Cleanup' to match DB CHECK
+[x] Improve createEventTx to handle category CHECK fallback explicitly
+[x] Restart API server on port 3002 to apply changes
+[x] Verify event creation via transaction script returns category 'Cleanup'
+[ ] Investigate local HTTP connectivity to API for curl/fetch
