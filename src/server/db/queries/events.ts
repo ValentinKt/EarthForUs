@@ -342,7 +342,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         }
         if (iMissingStart || iMissingEnd) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const legacyArgsWithOrg: [string, string | null, string | null, Date, Date, number, number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
+          const legacyArgsWithOrg: [string, string | null, string | null, Date, Date, number, string | number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
           const rLegacyOrg = await client.query(createEventLegacyWithOrganizer, legacyArgsWithOrg);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyOrg.rows[0];
@@ -374,7 +374,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             const i2MissingEnd = i2Msg.includes('end_time') || i2Col === 'end_time';
             if (i2MissingStart || i2MissingEnd) {
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-              const legacyNoCapWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
+              const legacyNoCapWithOrg: [string, string | null, string | null, Date, Date, string | number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
               const rLegacyNoCapOrg = await client.query(createEventLegacyNoCapacityWithOrganizer, legacyNoCapWithOrg);
               await client.query('RELEASE SAVEPOINT create_event_sp');
               return rLegacyNoCapOrg.rows[0];
@@ -404,7 +404,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerOrganizerNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('organizer_id') || innerCol === 'organizer_id');
         if (innerOrganizerNotNull) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const modernNoCapWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
+          const modernNoCapWithOrg: [string, string | null, string | null, Date, Date, string | number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
           try {
             const rNoCapOrg = await client.query(createEventNoCapacityWithOrganizer, modernNoCapWithOrg);
             await client.query('RELEASE SAVEPOINT create_event_sp');
@@ -416,7 +416,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             const i2MissingEnd = i2Msg.includes('end_time') || i2Col === 'end_time';
             if (i2MissingStart || i2MissingEnd) {
               await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-              const legacyNoCapWithOrg: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
+              const legacyNoCapWithOrg: [string, string | null, string | null, Date, Date, string | number] = [args[0], args[1], args[2], args[3], args[4], args[6]];
               const rLegacyNoCapOrg = await client.query(createEventLegacyNoCapacityWithOrganizer, legacyNoCapWithOrg);
               await client.query('RELEASE SAVEPOINT create_event_sp');
               return rLegacyNoCapOrg.rows[0];
@@ -572,7 +572,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerOrganizerNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('organizer_id') || innerCol === 'organizer_id');
         if (innerOrganizerNotNull) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const legacyArgsWithOrg: [string, string | null, string | null, Date, Date, number, number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
+          const legacyArgsWithOrg: [string, string | null, string | null, Date, Date, number, string | number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
           const rLegacyOrg = await client.query(createEventLegacyWithOrganizer, legacyArgsWithOrg);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyOrg.rows[0];
@@ -586,14 +586,16 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         }
         if (innerDateNotNull) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const rLegacyWithDate = await client.query(createEventLegacyWithDate, legacyArgs6);
+          const legacyArgs: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[5]];
+          const rLegacyWithDate = await client.query(createEventLegacyWithDate, legacyArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyWithDate.rows[0];
         }
         if (innerCategoryNotNull) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
           // Prefer legacy with date and category mixed
-          const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, legacyArgs6);
+          const baseArgs: [string, string | null, string | null, Date, Date, number] = [args[0], args[1], args[2], args[3], args[4], args[5]];
+          const rLegacyDateCat = await client.query(createEventLegacyWithDateAndCategory, baseArgs);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rLegacyDateCat.rows[0];
         }
@@ -740,7 +742,7 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         const innerOrganizerNotNull = (inner as any)?.code === '23502' && (innerMsg.includes('organizer_id') || innerCol === 'organizer_id');
         if (innerOrganizerNotNull) {
           await client.query('ROLLBACK TO SAVEPOINT create_event_sp');
-          const argsWithOrg: [string, string | null, string | null, Date, Date, number, number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
+          const argsWithOrg: [string, string | null, string | null, Date, Date, number, string |number] = [args[0], args[1], args[2], args[3], args[4], args[5], args[6]];
           const rModernDateCatOrg = await client.query(createEventWithDateCategoryAndOrganizer, argsWithOrg);
           await client.query('RELEASE SAVEPOINT create_event_sp');
           return rModernDateCatOrg.rows[0];
