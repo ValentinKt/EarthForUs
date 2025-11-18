@@ -7,6 +7,13 @@ export const createUser = {
          RETURNING id, email, first_name, last_name, created_at`,
 };
 
+export const createUserWithName = {
+  name: 'create-user-with-name',
+  text: `INSERT INTO users (email, password_hash, first_name, last_name, name)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, email, first_name, last_name, created_at`,
+};
+
 export const getUserByEmail = {
   name: 'get-user-by-email',
   text: `SELECT id, email, first_name, last_name, created_at
@@ -30,8 +37,18 @@ export const deleteUser = {
 };
 
 export async function createUserTx(client: PoolClient, email: string, passwordHash: string, firstName: string, lastName: string) {
-  const res = await client.query(createUser, [email, passwordHash, firstName, lastName]);
-  return res.rows[0];
+  try {
+    const fullName = `${firstName} ${lastName}`.trim();
+    const resWithName = await client.query(createUserWithName, [email, passwordHash, firstName, lastName, fullName]);
+    return resWithName.rows[0];
+  } catch (err: any) {
+    const code = err?.code;
+    if (code === '42703' || code === '23503' || code === '23502') {
+      const res = await client.query(createUser, [email, passwordHash, firstName, lastName]);
+      return res.rows[0];
+    }
+    throw err;
+  }
 }
 
 export async function getUserByEmailTx(client: PoolClient, email: string) {
