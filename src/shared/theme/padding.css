@@ -1,0 +1,263 @@
+/* =============================================================================
+   Responsive Padding System
+   Base unit: 1rem (16px)
+   Scale: xs-0.25rem, sm-0.5rem, base-1rem, lg-1.5rem, xl-2rem, 2xl-3rem, 3xl-4rem
+   ============================================================================= */
+
+:root {
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-base: 1rem;    /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  --space-4xl: 6rem;     /* 96px */
+  --space-5xl: 8rem;     /* 128px */
+}
+
+/* Padding utilities */
+.p-xs { padding: var(--space-xs); }
+.p-sm { padding: var(--space-sm); }
+.p-base { padding: var(--space-base); }
+.p-lg { padding: var(--space-lg); }
+.p-xl { padding: var(--space-xl); }
+.p-2xl { padding: var(--space-2xl); }
+.p-3xl { padding: var(--space-3xl); }
+.p-4xl { padding: var(--space-4xl); }
+.p-5xl { padding: var(--space-5xl); }
+
+/* Horizontal padding */
+.px-xs { padding-left: var(--space-xs); padding-right: var(--space-xs); }
+.px-sm { padding-left: var(--space-sm); padding-right: var(--space-sm); }
+.px-base { padding-left: var(--space-base); padding-right: var(--space-base); }
+.px-lg { padding-left: var(--space-lg); padding-right: var(--space-lg); }
+.px-xl { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+.px-2xl { padding-left: var(--space-2xl); padding-right: var(--space-2xl); }
+.px-3xl { padding-left: var(--space-3xl); padding-right: var(--space-3xl); }
+.px-4xl { padding-left: var(--space-4xl); padding-right: var(--space-4xl); }
+.px-5xl { padding-left: var(--space-5xl); padding-right: var(--space-5xl); }
+
+/* Vertical padding */
+.py-xs { padding-top: var(--space-xs); padding-bottom: var(--space-xs); }
+.py-sm { padding-top: var(--space-sm); padding-bottom: var(--space-sm); }
+.py-base { padding-top: var(--space-base); padding-bottom: var(--space-base); }
+.py-lg { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
+.py-xl { padding-top: var(--space-xl); padding-bottom: var(--space-xl); }
+.py-2xl { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+.py-3xl { padding-top: var(--space-3xl); padding-bottom: var(--space-3xl); }
+.py-4xl { padding-top: var(--space-4xl); padding-bottom: var(--space-4xl); }
+.py-5xl { padding-top: var(--space-5xl); padding-bottom: var(--space-5xl); }
+
+/* Individual sides */
+.pt-xs { padding-top: var(--space-xs); }
+.pr-xs { padding-right: var(--space-xs); }
+.pb-xs { padding-bottom: var(--space-xs); }
+.pl-xs { padding-left: var(--space-xs); }
+
+.pt-sm { padding-top: var(--space-sm); }
+.pr-sm { padding-right: var(--space-sm); }
+.pb-sm { padding-bottom: var(--space-sm); }
+.pl-sm { padding-left: var(--space-sm); }
+
+.pt-base { padding-top: var(--space-base); }
+.pr-base { padding-right: var(--space-base); }
+.pb-base { padding-bottom: var(--space-base); }
+.pl-base { padding-left: var(--space-base); }
+
+.pt-lg { padding-top: var(--space-lg); }
+.pr-lg { padding-right: var(--space-lg); }
+.pb-lg { padding-bottom: var(--space-lg); }
+.pl-lg { padding-left: var(--space-lg); }
+
+.pt-xl { padding-top: var(--space-xl); }
+.pr-xl { padding-right: var(--space-xl); }
+.pb-xl { padding-bottom: var(--space-xl); }
+.pl-xl { padding-left: var(--space-xl); }
+
+.pt-2xl { padding-top: var(--space-2xl); }
+.pr-2xl { padding-right: var(--space-2xl); }
+.pb-2xl { padding-bottom: var(--space-2xl); }
+.pl-2xl { padding-left: var(--space-2xl); }
+
+.pt-3xl { padding-top: var(--space-3xl); }
+.pr-3xl { padding-right: var(--space-3xl); }
+.pb-3xl { padding-bottom: var(--space-3xl); }
+.pl-3xl { padding-left: var(--space-3xl); }
+
+/* =============================================================================
+   Responsive Padding Adjustments
+   ============================================================================= */
+
+/* Mobile (default): base padding */
+@media (max-width: 640px) {
+  .responsive-padding { padding: var(--space-base); }
+  .responsive-px { padding-left: var(--space-base); padding-right: var(--space-base); }
+  .responsive-py { padding-top: var(--space-base); padding-bottom: var(--space-base); }
+  
+  /* Reduce larger paddings on mobile */
+  .p-2xl { padding: var(--space-lg); }
+  .p-3xl { padding: var(--space-xl); }
+  .p-4xl { padding: var(--space-2xl); }
+  .p-5xl { padding: var(--space-3xl); }
+  
+  .px-2xl { padding-left: var(--space-lg); padding-right: var(--space-lg); }
+  .px-3xl { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+  .px-4xl { padding-left: var(--space-2xl); padding-right: var(--space-2xl); }
+  .px-5xl { padding-left: var(--space-3xl); padding-right: var(--space-3xl); }
+  
+  .py-2xl { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
+  .py-3xl { padding-top: var(--space-xl); padding-bottom: var(--space-xl); }
+  .py-4xl { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+  .py-5xl { padding-top: var(--space-3xl); padding-bottom: var(--space-3xl); }
+}
+
+/* Tablet: slightly larger padding */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-padding { padding: var(--space-lg); }
+  .responsive-px { padding-left: var(--space-lg); padding-right: var(--space-lg); }
+  .responsive-py { padding-top: var(--space-lg); padding-bottom: var(--space-lg); }
+}
+
+/* Desktop: full padding */
+@media (min-width: 1025px) {
+  .responsive-padding { padding: var(--space-xl); }
+  .responsive-px { padding-left: var(--space-xl); padding-right: var(--space-xl); }
+  .responsive-py { padding-top: var(--space-xl); padding-bottom: var(--space-xl); }
+}
+
+/* =============================================================================
+   Component-specific padding patterns
+   ============================================================================= */
+
+/* Card padding */
+.card-padding {
+  padding: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .card-padding {
+    padding: var(--space-base);
+  }
+}
+
+/* Button padding */
+.btn-padding-sm { padding: var(--space-xs) var(--space-sm); }
+.btn-padding-base { padding: var(--space-sm) var(--space-base); }
+.btn-padding-lg { padding: var(--space-base) var(--space-lg); }
+
+/* Form padding */
+.form-padding {
+  padding: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .form-padding {
+    padding: var(--space-base);
+  }
+}
+
+/* Section padding */
+.section-padding {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+}
+
+@media (max-width: 640px) {
+  .section-padding {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+}
+
+/* Container padding */
+.container-padding {
+  padding-left: var(--space-base);
+  padding-right: var(--space-base);
+}
+
+@media (min-width: 641px) {
+  .container-padding {
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+  }
+}
+
+@media (min-width: 1025px) {
+  .container-padding {
+    padding-left: var(--space-xl);
+    padding-right: var(--space-xl);
+  }
+}
+
+/* =============================================================================
+   Spacing utilities (margins using same scale)
+   ============================================================================= */
+
+.m-xs { margin: var(--space-xs); }
+.m-sm { margin: var(--space-sm); }
+.m-base { margin: var(--space-base); }
+.m-lg { margin: var(--space-lg); }
+.m-xl { margin: var(--space-xl); }
+.m-2xl { margin: var(--space-2xl); }
+.m-3xl { margin: var(--space-3xl); }
+
+.mx-xs { margin-left: var(--space-xs); margin-right: var(--space-xs); }
+.mx-sm { margin-left: var(--space-sm); margin-right: var(--space-sm); }
+.mx-base { margin-left: var(--space-base); margin-right: var(--space-base); }
+.mx-lg { margin-left: var(--space-lg); margin-right: var(--space-lg); }
+.mx-xl { margin-left: var(--space-xl); margin-right: var(--space-xl); }
+.mx-2xl { margin-left: var(--space-2xl); margin-right: var(--space-2xl); }
+.mx-3xl { margin-left: var(--space-3xl); margin-right: var(--space-3xl); }
+
+.my-xs { margin-top: var(--space-xs); margin-bottom: var(--space-xs); }
+.my-sm { margin-top: var(--space-sm); margin-bottom: var(--space-sm); }
+.my-base { margin-top: var(--space-base); margin-bottom: var(--space-base); }
+.my-lg { margin-top: var(--space-lg); margin-bottom: var(--space-lg); }
+.my-xl { margin-top: var(--space-xl); margin-bottom: var(--space-xl); }
+.my-2xl { margin-top: var(--space-2xl); margin-bottom: var(--space-2xl); }
+.my-3xl { margin-top: var(--space-3xl); margin-bottom: var(--space-3xl); }
+
+/* =============================================================================
+   Gap utilities for flexbox/grid
+   ============================================================================= */
+
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-base { gap: var(--space-base); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+.gap-2xl { gap: var(--space-2xl); }
+
+/* =============================================================================
+   Accessibility: Focus indicators with proper contrast
+   ============================================================================= */
+
+.focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+html.dark .focus-visible {
+  outline-color: var(--color-brand-400);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .p-xs, .p-sm, .p-base, .p-lg, .p-xl, .p-2xl, .p-3xl, .p-4xl, .p-5xl,
+  .px-xs, .px-sm, .px-base, .px-lg, .px-xl, .px-2xl, .px-3xl, .px-4xl, .px-5xl,
+  .py-xs, .py-sm, .py-base, .py-lg, .py-xl, .py-2xl, .py-3xl, .py-4xl, .py-5xl,
+  .m-xs, .m-sm, .m-base, .m-lg, .m-xl, .m-2xl, .m-3xl,
+  .mx-xs, .mx-sm, .mx-base, .mx-lg, .mx-xl, .mx-2xl, .mx-3xl,
+  .my-xs, .my-sm, .my-base, .my-lg, .my-xl, .my-2xl, .my-3xl {
+    transition: none;
+  }
+}

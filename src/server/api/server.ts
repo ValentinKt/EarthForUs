@@ -30,7 +30,7 @@ app.use('/api', todosRouter);
 app.use('/api/users', usersRouter);
 
 // Create WebSocket server for real-time chat
-const wsManager = createWebSocketServer(server);
+createWebSocketServer(server);
 
 // Global error handler to persist unhandled errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

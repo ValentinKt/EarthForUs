@@ -28,7 +28,7 @@ type TodoListComponentProps = {
 const TodoListComponent: React.FC<TodoListComponentProps> = ({ 
   eventId, 
   currentUserId, 
-  currentUserName,
+  currentUserName: _currentUserName,
   isOrganizer = false 
 }) => {
   const [todos, setTodos] = useState<TodoItem[]>([]);

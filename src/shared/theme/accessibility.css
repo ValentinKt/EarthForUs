@@ -1,0 +1,499 @@
+/* Accessibility System - WCAG 2.1 AA Compliance */
+
+/* ======================================== */
+/* CSS Variables for Accessibility */
+/* ======================================== */
+:root {
+  /* Color Contrast Ratios (WCAG 2.1 AA) */
+  --contrast-ratio-normal: 4.5;   /* Normal text */
+  --contrast-ratio-large: 3;      /* Large text (18pt+ or 14pt+ bold) */
+  --contrast-ratio-ui: 3;         /* UI components */
+  
+  /* Focus Indicators */
+  --focus-width: 3px;
+  --focus-offset: 2px;
+  --focus-color: #2563eb;           /* Blue-600 */
+  --focus-color-dark: #60a5fa;    /* Blue-400 */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
+  
+  /* Minimum Touch Targets */
+  --touch-target-min: 44px;       /* 44x44px minimum */
+  --touch-target-recommended: 48px; /* 48x48px recommended */
+  
+  /* Spacing for Accessibility */
+  --spacing-focus: 0.25rem;       /* 4px */
+  --spacing-touch: 0.5rem;        /* 8px */
+  
+  /* Motion Preferences */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  
+  /* Screen Reader Only */
+  --sr-only-width: 1px;
+  --sr-only-height: 1px;
+}
+
+/* ======================================== */
+/* Color Contrast Compliance */
+/* ======================================== */
+/* High contrast text colors */
+.text-high-contrast {
+  color: #000000; /* Black on white background = 21:1 ratio */
+}
+
+html.dark .text-high-contrast {
+  color: #ffffff; /* White on dark background = 21:1 ratio */
+}
+
+/* Enhanced contrast for important elements */
+.text-enhanced-contrast {
+  font-weight: 600; /* Semi-bold for better readability */
+  text-shadow: 0 0 0 currentColor; /* Subtle enhancement */
+}
+
+/* Link contrast enhancement */
+.link-enhanced-contrast {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.link-enhanced-contrast:hover {
+  text-decoration-thickness: 3px;
+}
+
+/* ======================================== */
+/* Focus Management */
+/* ======================================== */
+/* Enhanced focus indicators */
+.focus-enhanced {
+  outline: var(--focus-width) solid transparent;
+  outline-offset: var(--focus-offset);
+  transition: outline-color var(--duration-fast) ease;
+}
+
+.focus-enhanced:focus-visible {
+  outline-color: var(--focus-color);
+  box-shadow: var(--focus-ring);
+}
+
+html.dark .focus-enhanced:focus-visible {
+  outline-color: var(--focus-color-dark);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.35);
+}
+
+/* Focus indicator for custom elements */
+.focus-custom {
+  position: relative;
+}
+
+.focus-custom::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--focus-offset));
+  border: var(--focus-width) solid transparent;
+  border-radius: inherit;
+  transition: border-color var(--duration-fast) ease;
+  pointer-events: none;
+}
+
+.focus-custom:focus-visible::before {
+  border-color: var(--focus-color);
+}
+
+html.dark .focus-custom:focus-visible::before {
+  border-color: var(--focus-color-dark);
+}
+
+/* Skip links */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 100;
+  transition: top var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* ======================================== */
+/* Touch Target Size */
+/* ======================================== */
+/* Minimum touch target size */
+.touch-target-min {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Recommended touch target size */
+.touch-target-recommended {
+  min-width: var(--touch-target-recommended);
+  min-height: var(--touch-target-recommended);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 768px) {
+  .touch-target-enhanced {
+    min-width: var(--touch-target-recommended);
+    min-height: var(--touch-target-recommended);
+    padding: 0.75rem; /* 12px */
+  }
+}
+
+/* ======================================== */
+/* Screen Reader Only */
+/* ======================================== */
+/* Hide from sighted users but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: var(--sr-only-width);
+  height: var(--sr-only-height);
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Show on focus for keyboard navigation */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ======================================== */
+/* ARIA Live Regions */
+/* ======================================== */
+/* Enhanced live regions */
+.aria-live-polite {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.aria-live-assertive {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ======================================== */
+/* Motion & Animation Accessibility */
+/* ======================================== */
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe {
+    animation-duration: var(--duration-instant);
+    transition-duration: var(--duration-instant);
+  }
+  
+  .motion-safe * {
+    animation-duration: var(--duration-instant);
+    transition-duration: var(--duration-instant);
+  }
+  
+  /* Disable parallax effects */
+  .parallax {
+    transform: none !important;
+  }
+  
+  /* Disable auto-playing animations */
+  .auto-animate {
+    animation: none !important;
+  }
+}
+
+/* Enhanced animations for motion-safe */
+@media (prefers-reduced-motion: no-preference) {
+  .motion-enhanced {
+    transition-duration: var(--duration-base);
+    animation-duration: var(--duration-base);
+  }
+}
+
+/* ======================================== */
+/* Color & Contrast Preferences */
+/* ======================================== */
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --focus-width: 4px;
+    --focus-offset: 3px;
+  }
+  
+  .contrast-enhanced {
+    border-width: 2px !important;
+    font-weight: 600 !important;
+  }
+  
+  .contrast-enhanced:focus {
+    outline-width: 4px !important;
+    outline-offset: 3px !important;
+  }
+}
+
+/* Low contrast mode */
+@media (prefers-contrast: low) {
+  .contrast-reduced {
+    opacity: 0.9;
+    filter: contrast(0.9);
+  }
+}
+
+/* ======================================== */
+/* Language & Reading Support */
+/* ======================================== */
+/* Reading mode support */
+.reading-mode {
+  max-width: 65ch; /* Optimal reading width */
+  line-height: 1.6;
+  word-spacing: 0.05em;
+  letter-spacing: 0.01em;
+}
+
+/* Enhanced readability */
+.reading-enhanced {
+  font-feature-settings: "liga", "kern";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Support for reading disorders */
+.reading-accessible {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+/* ======================================== */
+/* Form Accessibility */
+/* ======================================== */
+/* Enhanced form labels */
+.form-label-enhanced {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+/* Required field indicators */
+.form-required::after {
+  content: " *";
+  color: #dc2626; /* red-600 */
+  font-weight: bold;
+}
+
+/* Error messaging */
+.form-error {
+  color: #dc2626; /* red-600 */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+html.dark .form-error {
+  color: #f87171; /* red-400 */
+}
+
+/* Success messaging */
+.form-success {
+  color: #059669; /* green-600 */
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+html.dark .form-success {
+  color: #34d399; /* green-400 */
+}
+
+/* ======================================== */
+/* Interactive Element Accessibility */
+/* ======================================== */
+/* Enhanced buttons */
+.btn-accessible {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all var(--duration-fast) ease;
+}
+
+.btn-accessible:focus {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* Enhanced links */
+.link-accessible {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.125rem;
+  transition: all var(--duration-fast) ease;
+}
+
+.link-accessible:focus {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+html.dark .link-accessible:focus {
+  background-color: rgba(96, 165, 250, 0.1);
+}
+
+/* ======================================== */
+/* Navigation Accessibility */
+/* ======================================== */
+/* Enhanced navigation */
+.nav-accessible {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-accessible li {
+  margin: 0;
+}
+
+.nav-accessible a {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all var(--duration-fast) ease;
+}
+
+.nav-accessible a:focus {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Breadcrumb accessibility */
+.breadcrumb-accessible {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.breadcrumb-accessible li:not(:last-child)::after {
+  content: "/";
+  margin-left: 0.5rem;
+  color: #6b7280; /* gray-500 */
+}
+
+.breadcrumb-accessible a {
+  text-decoration: underline;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* ======================================== */
+/* Media Accessibility */
+/* ======================================== */
+/* Enhanced images */
+.img-accessible {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.375rem;
+}
+
+/* Caption styling */
+.caption-accessible {
+  font-size: 0.875rem;
+  color: #4b5563; /* gray-600 */
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+html.dark .caption-accessible {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Video accessibility */
+.video-accessible {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+}
+
+/* ======================================== */
+/* Responsive Accessibility */
+/* ======================================== */
+/* Mobile accessibility enhancements */
+@media (max-width: 768px) {
+  .mobile-accessible {
+    font-size: 1rem; /* Prevent zoom on iOS */
+    min-height: var(--touch-target-recommended);
+    padding: 0.75rem;
+  }
+  
+  .mobile-accessible:focus {
+    outline-width: 3px;
+    outline-offset: 2px;
+  }
+}
+
+/* ======================================== */
+/* Print Accessibility */
+/* ======================================== */
+@media print {
+  .print-accessible {
+    color: #000 !important;
+    background: #fff !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  
+  .print-accessible a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+  
+  .print-accessible a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.875em;
+  }
+  
+  /* Hide decorative elements */
+  .print-hide {
+    display: none !important;
+  }
+}

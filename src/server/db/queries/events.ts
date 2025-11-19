@@ -277,7 +277,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             return rModernDateCatOrg.rows[0];
           } catch (innerOrgErr: any) {
             const iMsg = String(innerOrgErr?.message || '');
-            const iCol = String((innerOrgErr as any)?.column || '');
             const invalidUuid = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('uuid');
             const invalidInteger = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('integer');
             if (invalidUuid) {
@@ -322,10 +321,10 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
         return rWithOrg.rows[0];
       } catch (innerOrg: any) {
         const iMsg = String(innerOrg?.message || '');
-        const iCol = String((innerOrg as any)?.column || '');
-        const iMissingStart = iMsg.includes('start_time') || iCol === 'start_time';
-        const iMissingEnd = iMsg.includes('end_time') || iCol === 'end_time';
-        const iMissingCapacity = iMsg.includes('capacity') || iCol === 'capacity';
+        const _iCol = String((innerOrg as any)?.column || '');
+        const iMissingStart = iMsg.includes('start_time') || _iCol === 'start_time';
+        const iMissingEnd = iMsg.includes('end_time') || _iCol === 'end_time';
+        const iMissingCapacity = iMsg.includes('capacity') || _iCol === 'capacity';
         const invalidOrganizerUuid = (innerOrg as any)?.code === '22P02' && iMsg.toLowerCase().includes('uuid');
         const invalidOrganizerInteger = (innerOrg as any)?.code === '22P02' && iMsg.toLowerCase().includes('integer');
         if (invalidOrganizerUuid) {
@@ -443,7 +442,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             return rNoCapDateOrg.rows[0];
           } catch (innerOrg3: any) {
             const i3Msg = String(innerOrg3?.message || '');
-            const i3Col = String((innerOrg3 as any)?.column || '');
             const invalidOrganizerUuid3 = (innerOrg3 as any)?.code === '22P02' && i3Msg.toLowerCase().includes('uuid');
             const invalidOrganizerInteger3 = (innerOrg3 as any)?.code === '22P02' && i3Msg.toLowerCase().includes('integer');
             if (invalidOrganizerUuid3) {
@@ -480,7 +478,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
                     return rNoCapDateCatOrg.rows[0];
                   } catch (orgTypeErr: any) {
                     const otMsg = String(orgTypeErr?.message || '');
-                    const otCol = String((orgTypeErr as any)?.column || '');
                     const invalidOrganizerUuid4 = (orgTypeErr as any)?.code === '22P02' && otMsg.toLowerCase().includes('uuid');
                     const invalidOrganizerInteger4 = (orgTypeErr as any)?.code === '22P02' && otMsg.toLowerCase().includes('integer');
                     if (invalidOrganizerUuid4) {
@@ -532,7 +529,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
                 return rNoCapDateCatOrg.rows[0];
               } catch (orgTypeErr: any) {
                 const otMsg = String(orgTypeErr?.message || '');
-                const otCol = String((orgTypeErr as any)?.column || '');
                 const invalidOrganizerUuid4 = (orgTypeErr as any)?.code === '22P02' && otMsg.toLowerCase().includes('uuid');
                 const invalidOrganizerInteger4 = (orgTypeErr as any)?.code === '22P02' && otMsg.toLowerCase().includes('integer');
                 if (invalidOrganizerUuid4) {
@@ -628,7 +624,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
             return rWithDateOrg.rows[0];
           } catch (innerOrgErr: any) {
             const iMsg = String(innerOrgErr?.message || '');
-            const iCol = String((innerOrgErr as any)?.column || '');
             const invalidUuid = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('uuid');
             const invalidInteger = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('integer');
             if (invalidUuid) {
@@ -684,7 +679,6 @@ export async function createEventTx(client: PoolClient, args: [string, string | 
                 return rModernDateCatOrg.rows[0];
               } catch (innerOrgErr: any) {
                 const iMsg = String(innerOrgErr?.message || '');
-                const iCol = String((innerOrgErr as any)?.column || '');
                 const invalidUuid = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('uuid');
                 const invalidInteger = (innerOrgErr as any)?.code === '22P02' && iMsg.toLowerCase().includes('integer');
                 if (invalidUuid) {
@@ -789,15 +783,6 @@ export async function existsDuplicateEvent(client: PoolClient, title: string, st
     }
     throw e;
   }
-}
-
-/**
- * Detect column presence for robust cross-schema support.
- */
-async function hasColumn(client: PoolClient, table: string, column: string): Promise<boolean> {
-  const sql = `SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = $2 LIMIT 1`;
-  const r = await client.query(sql, [table, column]);
-  return (r.rowCount ?? 0) > 0;
 }
 
 /**

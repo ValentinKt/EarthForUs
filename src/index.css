@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import "./shared/theme/padding.css";
+@import "./shared/theme/typography.css";
+@import "./shared/theme/visual-enhancements.css";
+@import "./shared/theme/text-rendering.css";
+@import "./shared/theme/accessibility.css";
 
 @theme {
   --color-brand-50: #f0fdfa;

@@ -1,7 +1,7 @@
 import { logger } from './logger';
 
 export type WebSocketMessage = {
-  type: 'chat_message' | 'user_joined' | 'user_left' | 'system_message';
+  type: 'chat_message' | 'user_joined' | 'user_left' | 'system_message' | 'join_event';
   data: any;
   timestamp: string;
   eventId?: number;

@@ -1,0 +1,564 @@
+/* Text Rendering Optimization System */
+
+/* ======================================== */
+/* CSS Variables for Text Rendering */
+/* ======================================== */
+:root {
+  /* Text Rendering Properties */
+  --text-rendering: optimizeLegibility;
+  --font-smoothing: antialiased;
+  --font-feature-settings: normal;
+  
+  /* Text Wrapping & Overflow */
+  --text-wrap-balance: balance;
+  --text-wrap-pretty: pretty;
+  --text-wrap-stable: stable;
+  
+  /* Hyphenation */
+  --hyphenate-limit-chars: 6 3 3;
+  --hyphenate-limit-lines: 2;
+  --hyphenate-limit-zone: 8%;
+  
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+  
+  /* Letter Spacing */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* Word Spacing */
+  --word-spacing-tight: -0.05em;
+  --word-spacing-normal: 0;
+  --word-spacing-wide: 0.1em;
+  
+  /* Text Overflow */
+  --text-overflow-ellipsis: ellipsis;
+  --text-overflow-clip: clip;
+  
+  /* Tab Size */
+  --tab-size: 2;
+}
+
+/* ======================================== */
+/* Base Text Rendering */
+/* ======================================== */
+/* Apply optimal text rendering to all text elements */
+.text-optimized {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: var(--font-feature-settings);
+  
+  /* Improve text selection */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  
+  /* Better text metrics for consistent spacing */
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Apply to all text elements by default */
+body, p, h1, h2, h3, h4, h5, h6, span, div, li, td, th, a, button, input, textarea, select {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ======================================== */
+/* Text Wrapping & Balance */
+/* ======================================== */
+/* Text balance for better readability */
+.text-balance {
+  text-wrap: var(--text-wrap-balance);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Pretty text wrapping */
+.text-pretty {
+  text-wrap: var(--text-wrap-pretty);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Stable text wrapping (prevents layout shift) */
+.text-stable {
+  text-wrap: var(--text-wrap-stable);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Prevent text wrapping */
+.text-nowrap {
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+/* Preserve whitespace and wrapping */
+.text-pre {
+  white-space: pre;
+  text-wrap: nowrap;
+}
+
+/* Preserve whitespace but allow wrapping */
+.text-pre-wrap {
+  white-space: pre-wrap;
+  text-wrap: wrap;
+}
+
+/* Collapse whitespace but preserve newlines */
+.text-pre-line {
+  white-space: pre-line;
+  text-wrap: wrap;
+}
+
+/* ======================================== */
+/* Text Overflow Management */
+/* ======================================== */
+/* Single line ellipsis */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: var(--text-overflow-ellipsis);
+  white-space: nowrap;
+}
+
+/* Multi-line ellipsis (requires line-clamp) */
+.text-ellipsis-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: var(--text-overflow-ellipsis);
+}
+
+.text-ellipsis-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: var(--text-overflow-ellipsis);
+}
+
+.text-ellipsis-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: var(--text-overflow-ellipsis);
+}
+
+/* Clip overflow */
+.text-clip {
+  overflow: hidden;
+  text-overflow: var(--text-overflow-clip);
+  white-space: nowrap;
+}
+
+/* Fade out effect for overflow text */
+.text-fade {
+  position: relative;
+  overflow: hidden;
+  max-height: 3em; /* Adjust based on line height */
+}
+
+.text-fade::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40%;
+  height: 1.2em;
+  background: linear-gradient(to right, transparent, var(--color-bg, white));
+  pointer-events: none;
+}
+
+[data-theme="dark"] .text-fade::after {
+  background: linear-gradient(to right, transparent, var(--color-bg, #0B1221));
+}
+
+/* ======================================== */
+/* Hyphenation */
+/* ======================================== */
+/* Enable hyphenation */
+.text-hyphenate {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphenate-limit-chars: var(--hyphenate-limit-chars);
+  hyphenate-limit-lines: var(--hyphenate-limit-lines);
+  hyphenate-limit-zone: var(--hyphenate-limit-zone);
+  word-break: break-word;
+}
+
+/* Manual hyphenation only */
+.text-hyphenate-manual {
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  -moz-hyphens: manual;
+  -ms-hyphens: manual;
+}
+
+/* No hyphenation */
+.text-hyphenate-none {
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+}
+
+/* ======================================== */
+/* Word & Letter Spacing */
+/* ======================================== */
+/* Letter spacing utilities */
+.tracking-tighter { letter-spacing: var(--letter-spacing-tighter); }
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.tracking-widest { letter-spacing: var(--letter-spacing-widest); }
+
+/* Word spacing utilities */
+.word-spacing-tight { word-spacing: var(--word-spacing-tight); }
+.word-spacing-normal { word-spacing: var(--word-spacing-normal); }
+.word-spacing-wide { word-spacing: var(--word-spacing-wide); }
+
+/* ======================================== */
+/* Line Height Optimization */
+/* ======================================== */
+/* Line height utilities */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
+
+/* ======================================== */
+/* Font Feature Settings */
+/* ======================================== */
+/* Enable common ligatures */
+.font-ligatures {
+  font-feature-settings: "liga", "clig";
+  -webkit-font-feature-settings: "liga", "clig";
+  -moz-font-feature-settings: "liga", "clig";
+}
+
+/* Disable ligatures */
+.font-no-ligatures {
+  font-feature-settings: "liga" 0, "clig" 0;
+  -webkit-font-feature-settings: "liga" 0, "clig" 0;
+  -moz-font-feature-settings: "liga" 0, "clig" 0;
+}
+
+/* Enable tabular numbers */
+.font-tabular-nums {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-variant-numeric: tabular-nums;
+  -moz-font-variant-numeric: tabular-nums;
+}
+
+/* Enable proportional numbers */
+.font-proportional-nums {
+  font-variant-numeric: proportional-nums;
+  -webkit-font-variant-numeric: proportional-nums;
+  -moz-font-variant-numeric: proportional-nums;
+}
+
+/* Enable old-style figures */
+.font-oldstyle-nums {
+  font-variant-numeric: oldstyle-nums;
+  -webkit-font-variant-numeric: oldstyle-nums;
+  -moz-font-variant-numeric: oldstyle-nums;
+}
+
+/* Enable lining figures */
+.font-lining-nums {
+  font-variant-numeric: lining-nums;
+  -webkit-font-variant-numeric: lining-nums;
+  -moz-font-variant-numeric: lining-nums;
+}
+
+/* ======================================== */
+/* Tab Size */
+/* ======================================== */
+/* Tab size utilities */
+.tab-size-2 { tab-size: 2; -moz-tab-size: 2; }
+.tab-size-4 { tab-size: 4; -moz-tab-size: 4; }
+.tab-size-8 { tab-size: 8; -moz-tab-size: 8; }
+
+/* ======================================== */
+/* Text Selection */
+/* ======================================== */
+/* Custom text selection */
+.text-selection-brand ::selection {
+  background-color: var(--color-brand-500, #14b8a6);
+  color: white;
+}
+
+.text-selection-brand ::-moz-selection {
+  background-color: var(--color-brand-500, #14b8a6);
+  color: white;
+}
+
+/* Disable text selection */
+.text-selection-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Enable text selection */
+.text-selection-text {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
+/* ======================================== */
+/* Component-Specific Text Patterns */
+/* ======================================== */
+/* Card text optimization */
+.card-text {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-wrap: var(--text-wrap-balance);
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Navigation text optimization */
+.nav-text {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-wrap: nowrap;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+}
+
+/* Button text optimization */
+.btn-text {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-wrap: nowrap;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  font-feature-settings: "liga", "clig";
+  -webkit-font-feature-settings: "liga", "clig";
+  -moz-font-feature-settings: "liga", "clig";
+}
+
+/* Form text optimization */
+.form-text {
+  text-rendering: var(--text-rendering);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-wrap: wrap;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  word-break: break-word;
+}
+
+/* Code text optimization */
+.code-text {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: subpixel-antialiased;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-variant-numeric: tabular-nums;
+  -moz-font-variant-numeric: tabular-nums;
+  tab-size: 2;
+  -moz-tab-size: 2;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  text-wrap: nowrap;
+}
+
+/* ======================================== */
+/* Responsive Text Optimization */
+/* ======================================== */
+/* Mobile (≤640px) */
+@media (max-width: 640px) {
+  .text-responsive {
+    text-wrap: var(--text-wrap-balance);
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphenate-limit-chars: 5 2 2;
+  }
+  
+  .text-responsive-compact {
+    text-wrap: var(--text-wrap-pretty);
+    line-height: var(--line-height-snug);
+    letter-spacing: var(--letter-spacing-tight);
+  }
+}
+
+/* Tablet (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .text-responsive {
+    text-wrap: var(--text-wrap-balance);
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+  
+  .text-responsive-compact {
+    text-wrap: var(--text-wrap-pretty);
+    line-height: var(--line-height-normal);
+  }
+}
+
+/* Desktop (≥1025px) */
+@media (min-width: 1025px) {
+  .text-responsive {
+    text-wrap: var(--text-wrap-balance);
+    hyphens: manual;
+    -webkit-hyphens: manual;
+    -moz-hyphens: manual;
+    -ms-hyphens: manual;
+  }
+  
+  .text-responsive-compact {
+    text-wrap: var(--text-wrap-pretty);
+    line-height: var(--line-height-normal);
+  }
+}
+
+/* ======================================== */
+/* Accessibility & Reduced Motion */
+/* ======================================== */
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .text-optimized,
+  .text-balance,
+  .text-pretty,
+  .text-stable,
+  .card-text,
+  .nav-text,
+  .btn-text,
+  .form-text,
+  .code-text {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .text-optimized,
+  .text-balance,
+  .text-pretty,
+  .text-stable {
+    font-weight: 500; /* Increase weight for better contrast */
+  }
+  
+  .text-ellipsis::after,
+  .text-fade::after {
+    background: currentColor;
+    opacity: 0.8;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .text-optimized,
+  .text-balance,
+  .text-pretty,
+  .text-stable {
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: subpixel-antialiased;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+  
+  .text-fade::after {
+    display: none;
+  }
+  
+  .text-selection-brand ::selection,
+  .text-selection-brand ::-moz-selection {
+    background-color: transparent;
+    color: inherit;
+  }
+}
+
+/* ======================================== */
+/* Cross-browser Compatibility */
+/* ======================================== */
+/* Webkit-specific optimizations */
+@supports (-webkit-font-smoothing: antialiased) {
+  .text-optimized {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Firefox-specific optimizations */
+@supports (-moz-osx-font-smoothing: grayscale) {
+  .text-optimized {
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Modern text-wrap support */
+@supports (text-wrap: balance) {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  .text-stable {
+    text-wrap: stable;
+  }
+}
+
+/* Fallback for browsers without text-wrap support */
+@supports not (text-wrap: balance) {
+  .text-balance {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+  
+  .text-pretty {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+  
+  .text-stable {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+}

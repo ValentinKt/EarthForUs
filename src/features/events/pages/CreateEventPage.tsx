@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../../../shared/ui/Button';
 import TextField from '../../../shared/components/TextField';
 import Textarea from '../../../shared/components/Textarea';

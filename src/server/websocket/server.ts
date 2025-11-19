@@ -1,5 +1,4 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { createServer } from 'http';
 import { logger } from '../../shared/utils/logger';
 import { errorLogger } from '../utils/errorLogger';
 
@@ -44,7 +43,7 @@ export class WebSocketManager {
   }
 
   private setupEventListeners(): void {
-    this.wss.on('connection', (ws: WebSocketClient, req) => {
+    this.wss.on('connection', (ws: WebSocketClient, _req) => {
       ws.clientId = this.generateClientId();
       ws.eventIds = [];
       
