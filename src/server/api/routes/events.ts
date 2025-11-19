@@ -67,8 +67,14 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(409).json({ error: 'An event with the same title and start time already exists' });
     }
 
-    // Determine organizer ID: prefer authenticated user, then body. Avoid numeric casting.
-    const organizerId: string | number = (req as any).user?.id ?? req.body?.organizer_id ?? '00000000-0000-0000-0000-000000000001';
+    // Determine organizer ID: prefer authenticated user, then body. Require a valid existing organizer.
+    const organizerCandidate: string | number | undefined = (req as any).user?.id ?? req.body?.organizer_id;
+    if (!organizerCandidate) {
+      log.warn('create_event_missing_organizer');
+      await errorLogger.log('Event Error', 'Organizer ID is required for event creation', { title, start_time });
+      return res.status(400).json({ error: 'Organizer ID is required' });
+    }
+    const organizerId: string | number = organizerCandidate;
     log.info('create_event_request', { title, location, start_time, end_time, capacity: cap, organizer_id: organizerId });
     const event = await withTransaction(async (client) => {
       return createEventTx(client, [title, description, location, start, end, cap, organizerId]);
