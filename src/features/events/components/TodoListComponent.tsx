@@ -28,7 +28,6 @@ type TodoListComponentProps = {
 const TodoListComponent: React.FC<TodoListComponentProps> = ({ 
   eventId, 
   currentUserId, 
-  currentUserName: _currentUserName,
   isOrganizer = false 
 }) => {
   const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -198,9 +197,9 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
         return next;
       });
       setTagsByTodoId(prev => {
-        const { [todoId]: _, ...rest } = prev;
-        persistTagsCache(rest);
-        return rest;
+        const rest = Object.fromEntries(Object.entries(prev).filter(([key]) => Number(key) !== todoId));
+        persistTagsCache(rest as Record<number, string[]>);
+        return rest as Record<number, string[]>;
       });
       showSuccess('Todo item deleted successfully');
       log.info('todo_deleted', { eventId, todoId });

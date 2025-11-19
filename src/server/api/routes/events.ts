@@ -31,8 +31,8 @@ router.get('/', async (req: Request, res: Response) => {
     return res.json({ events: result.rows, count: result.rowCount ?? result.rows.length });
   } catch (err) {
     const mapped = mapPgError(err);
-    log.error('list_events_error', mapped);
-    await errorLogger.log('Event Error', 'Failed to load event list', mapped);
+    log.error('list_events_error', { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack, timestamp: new Date().toISOString() });
+    await errorLogger.logError('Event Error', err, { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack });
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });
@@ -72,7 +72,7 @@ router.post('/', async (req: Request, res: Response) => {
     const organizerCandidate: string | number | undefined = (req as any).user?.id ?? req.body?.organizer_id;
     if (!organizerCandidate) {
       log.warn('create_event_missing_organizer');
-      await errorLogger.log('Event Error', 'Organizer ID is required for event creation', { title, start_time });
+      await errorLogger.logError('Event Error', new Error('Organizer ID is required for event creation'), { title, start_time });
       return res.status(400).json({ error: 'Organizer ID is required' });
     }
     const organizerId: string | number = organizerCandidate;
@@ -117,8 +117,8 @@ router.post('/:id/join', async (req: Request, res: Response) => {
     return res.status(201).json({ registration });
   } catch (err) {
     const mapped = mapPgError(err);
-    log.error('join_event_error', mapped);
-    await errorLogger.log('Event Error', 'Failed to join event', mapped);
+    log.error('join_event_error', { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack, timestamp: new Date().toISOString() });
+    await errorLogger.logError('Event Error', err, { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack });
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

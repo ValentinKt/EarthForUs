@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { report } from '../utils/errorReporter';
 
 type ToastVariant = 'success' | 'error' | 'info';
 
@@ -31,7 +32,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, [remove]);
 
   const success = useCallback((message: string, title?: string) => show(message, 'success', title), [show]);
-  const error = useCallback((message: string, title?: string) => show(message, 'error', title), [show]);
+  const error = useCallback((message: string, title?: string) => {
+    show(message, 'error', title);
+    report({ message }, 'UI Error', { title });
+  }, [show]);
 
   return (
     <ToastContext.Provider value={{ show, success, error }}>

@@ -1,4 +1,5 @@
 import { logger } from './logger';
+import { report } from './errorReporter';
 
 export type ApiError = {
   status: number;
@@ -65,6 +66,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     throw Object.assign(new Error((body as any)?.error || 'Request failed'), err);
   } catch (e) {
     log.error('exception', { message: (e as Error)?.message });
+    report(e, 'API Error', { method, url });
     throw e;
   } finally {
     tm.end();

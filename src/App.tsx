@@ -15,6 +15,7 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import { ToastProvider } from './shared/components/Toast';
 import { logger } from './shared/utils/logger';
+import { report } from './shared/utils/errorReporter';
 import SettingsPage from './features/settings/pages/SettingsPage';
 
 const NotFound = () => (
@@ -25,6 +26,28 @@ const NotFound = () => (
 );
 
 function App() {
+  const GlobalErrorReporter = () => {
+    useEffect(() => {
+      const onError = (event: ErrorEvent) => {
+        const payload = {
+          filename: event.filename,
+          lineno: event.lineno,
+          colno: event.colno
+        };
+        report(event.error ?? event.message, 'Window Error', payload);
+      };
+      const onRejection = (event: PromiseRejectionEvent) => {
+        report(event.reason, 'Unhandled Rejection');
+      };
+      window.addEventListener('error', onError);
+      window.addEventListener('unhandledrejection', onRejection);
+      return () => {
+        window.removeEventListener('error', onError);
+        window.removeEventListener('unhandledrejection', onRejection);
+      };
+    }, []);
+    return null;
+  };
   const RouteLogger = () => {
     const location = useLocation();
     const log = logger.withContext('AppRoute');
@@ -39,6 +62,7 @@ function App() {
       <AuthProvider>
         <ToastProvider>
         <Router>
+        <GlobalErrorReporter />
         <RouteLogger />
         <div className="App">
           <Routes>

@@ -9,6 +9,7 @@ import eventsRouter from './routes/events';
 import chatRouter from './routes/chat';
 import todosRouter from './routes/todos';
 import usersRouter from './routes/users';
+import logsRouter from './routes/logs';
 import { createWebSocketServer } from '../websocket/server';
 import { errorLogger } from '../utils/errorLogger';
 
@@ -28,6 +29,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api', chatRouter);
 app.use('/api', todosRouter);
 app.use('/api/users', usersRouter);
+app.use('/api', logsRouter);
 
 // Create WebSocket server for real-time chat
 createWebSocketServer(server);
@@ -35,7 +37,7 @@ createWebSocketServer(server);
 // Global error handler to persist unhandled errors
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(async (err: unknown, req: Request, res: Response, _next: any) => {
-  await errorLogger.serverError(req.originalUrl, err);
+  await errorLogger.logError('Server Error', err, { route: req.originalUrl });
   res.status(500).json({ error: 'Internal server error' });
 });
 

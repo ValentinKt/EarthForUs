@@ -1,4 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
+import type { Server as HttpServer } from 'http';
+import type { Server as HttpsServer } from 'https';
 import { logger } from '../../shared/utils/logger';
 import { errorLogger } from '../utils/errorLogger';
 
@@ -22,7 +24,7 @@ interface ChatMessage {
 
 interface WebSocketMessage {
   type: 'chat_message' | 'user_joined' | 'user_left' | 'system_message' | 'join_event' | 'leave_event';
-  data: any;
+  data: unknown;
   timestamp: string;
   eventId?: number;
 }
@@ -31,7 +33,7 @@ export class WebSocketManager {
   private wss: WebSocketServer;
   private clients: Map<string, WebSocketClient> = new Map();
 
-  constructor(server?: any) {
+  constructor(server?: HttpServer | HttpsServer) {
     if (server) {
       this.wss = new WebSocketServer({ server });
     } else {
@@ -43,7 +45,7 @@ export class WebSocketManager {
   }
 
   private setupEventListeners(): void {
-    this.wss.on('connection', (ws: WebSocketClient, _req) => {
+    this.wss.on('connection', (ws: WebSocketClient) => {
       ws.clientId = this.generateClientId();
       ws.eventIds = [];
       
@@ -66,6 +68,7 @@ export class WebSocketManager {
 
       ws.on('error', (error) => {
         log.error('client_error', { error, clientId: ws.clientId });
+        void errorLogger.logError('WebSocket Client Error', error, { clientId: ws.clientId });
       });
 
       // Send welcome message
@@ -78,6 +81,7 @@ export class WebSocketManager {
 
     this.wss.on('error', (error) => {
       log.error('websocket_server_error', { error });
+      void errorLogger.logError('WebSocket Server Error', error, null);
     });
   }
 
@@ -95,7 +99,8 @@ export class WebSocketManager {
         this.handleLeaveEvent(client, message);
         break;
       case 'system_message':
-        if (message.data?.action === 'ping') {
+        const action = (message.data as { action?: string })?.action;
+        if (action === 'ping') {
           this.sendToClient(client, {
             type: 'system_message',
             data: { action: 'pong' },
@@ -109,7 +114,7 @@ export class WebSocketManager {
   }
 
   private handleChatMessage(client: WebSocketClient, message: WebSocketMessage): void {
-    const chatMessage = message.data as ChatMessage;
+    const chatMessage = message.data as unknown as ChatMessage;
     const eventId = chatMessage.event_id;
 
     if (!eventId) {
@@ -133,7 +138,7 @@ export class WebSocketManager {
   }
 
   private handleJoinEvent(client: WebSocketClient, message: WebSocketMessage): void {
-    const eventId = message.data.eventId;
+    const { eventId } = (message.data as { eventId?: number }) || {};
     if (!eventId) return;
 
     if (!client.eventIds) {
@@ -156,7 +161,7 @@ export class WebSocketManager {
   }
 
   private handleLeaveEvent(client: WebSocketClient, message: WebSocketMessage): void {
-    const eventId = message.data.eventId;
+    const { eventId } = (message.data as { eventId?: number }) || {};
     if (!eventId || !client.eventIds) return;
 
     const index = client.eventIds.indexOf(eventId);
@@ -239,6 +244,6 @@ export class WebSocketManager {
 }
 
 // Create and export the WebSocket server instance
-export const createWebSocketServer = (httpServer?: any): WebSocketManager => {
+export const createWebSocketServer = (httpServer?: HttpServer | HttpsServer): WebSocketManager => {
   return new WebSocketManager(httpServer);
 };
