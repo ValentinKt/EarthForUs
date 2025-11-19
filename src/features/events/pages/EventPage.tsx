@@ -7,6 +7,7 @@ import { api } from '../../../shared/utils/api';
 import EventMap from '../components/EventMap';
 import ChatComponent from '../components/ChatComponent';
 import TodoListComponent from '../components/TodoListComponent';
+import { useAuth } from '../../auth/context/AuthContext';
 
 type EventDetail = {
   id: number;
@@ -32,8 +33,39 @@ const EventPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('about');
-  const { error: showError } = useToast();
+  const { success: showSuccess, error: showError } = useToast();
   const log = logger.withContext('EventPage');
+  const { user } = useAuth();
+  const [isJoining, setIsJoining] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
+
+  const onJoin = async () => {
+    if (!event?.id) return;
+    if (!user?.id) {
+      showError('Please log in to join the event', 'Join Failed');
+      return;
+    }
+    if (isJoining || hasJoined) return;
+    setIsJoining(true);
+    try {
+      const res = await api.post(`/api/events/${event?.id}/join`, { user_id: user.id });
+      if ((res as any)?.status === 'already_registered') {
+        setHasJoined(true);
+        showSuccess('You are already registered for this event', 'Joined');
+        log.info('already_registered', { eventId: event?.id });
+        return;
+      }
+      setHasJoined(true);
+      showSuccess('Joined the event successfully', 'Joined');
+      log.info('join_success', { eventId: event?.id });
+    } catch (e) {
+      const msg = (e as Error)?.message || 'Failed to join event';
+      showError(msg, 'Join Failed');
+      log.error('join_error', { eventId: event?.id, message: msg });
+    } finally {
+      setIsJoining(false);
+    }
+  };
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -92,7 +124,7 @@ const EventPage: React.FC = () => {
         </Link>
         <h1 className="text-lg font-bold tracking-tight">Event Details</h1>
         <div className="flex items-center gap-2">
-          <Button variant="earth">Join</Button>
+          <Button variant="earth" onClick={onJoin} disabled={isJoining || hasJoined} loading={isJoining}>{hasJoined ? 'Joined' : 'Join'}</Button>
         </div>
       </div>
 

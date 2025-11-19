@@ -4,6 +4,7 @@ import Button from '../../../shared/ui/Button';
 import { api } from '../../../shared/utils/api';
 import { useToast } from '../../../shared/components/Toast';
 import { logger } from '../../../shared/utils/logger';
+import { useAuth } from '../../auth/context/AuthContext';
 
 type EventItem = {
   id: number;
@@ -18,8 +19,41 @@ const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { error: showError } = useToast();
+  const { success: showSuccess, error: showError } = useToast();
   const log = logger.withContext('EventsPage');
+  const { user } = useAuth();
+  const [joiningIds, setJoiningIds] = useState<Set<number>>(new Set());
+  const [joinedIds, setJoinedIds] = useState<Set<number>>(new Set());
+
+  const onJoin = async (eventId: number) => {
+    if (!user?.id) {
+      showError('Please log in to join events', 'Join Failed');
+      return;
+    }
+    if (joiningIds.has(eventId) || joinedIds.has(eventId)) return;
+    setJoiningIds(prev => new Set([...prev, eventId]));
+    try {
+      const res = await api.post(`/api/events/${eventId}/join`, { user_id: user.id });
+      setJoinedIds(prev => new Set([...prev, eventId]));
+      if ((res as any)?.status === 'already_registered') {
+        showSuccess('Already registered', 'Joined');
+        log.info('already_registered', { eventId });
+      } else {
+        showSuccess('Joined event', 'Joined');
+        log.info('join_success', { eventId });
+      }
+    } catch (e) {
+      const msg = (e as Error)?.message || 'Failed to join event';
+      showError(msg, 'Join Failed');
+      log.error('join_error', { eventId, message: msg });
+    } finally {
+      setJoiningIds(prev => {
+        const next = new Set(prev);
+        next.delete(eventId);
+        return next;
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -113,7 +147,7 @@ const EventsPage: React.FC = () => {
                 <Link to={`/events/${ev.id}`}>
                   <Button variant="outline">Details</Button>
                 </Link>
-                <Button variant="earth">Join</Button>
+                <Button variant="earth" onClick={() => onJoin(ev.id)} disabled={joiningIds.has(ev.id) || joinedIds.has(ev.id)} loading={joiningIds.has(ev.id)}>{joinedIds.has(ev.id) ? 'Joined' : 'Join'}</Button>
               </div>
             </div>
           ))}

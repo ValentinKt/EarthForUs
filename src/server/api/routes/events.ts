@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { withTransaction, pool } from '../../db/pool';
 import { createEventTx, listEvents, listEventsLegacy, existsDuplicateEvent } from '../../db/queries/events';
+import { registerTx } from '../../db/queries/registrations';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
 import { errorLogger } from '../../utils/errorLogger';
@@ -84,6 +85,40 @@ router.post('/', async (req: Request, res: Response) => {
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('create_event_error', mapped);
+    return res.status(500).json({ error: mapped.message, code: mapped.code });
+  }
+});
+
+router.post('/:id/join', async (req: Request, res: Response) => {
+  try {
+    const eventIdRaw = req.params.id;
+    const eventId: string | number = (() => {
+      const n = Number(eventIdRaw);
+      return Number.isFinite(n) && n > 0 ? n : eventIdRaw;
+    })();
+    if (!eventIdRaw) {
+      log.warn('join_event_invalid_id', { id: eventIdRaw });
+      return res.status(400).json({ error: 'Invalid event id' });
+    }
+    const userCandidate: string | number | undefined = (req as any).user?.id ?? (req.body?.user_id as any);
+    if (!userCandidate) {
+      log.warn('join_event_missing_user', { eventId });
+      await errorLogger.log('Event Error', 'User ID is required to join event', { eventId });
+      return res.status(401).json({ error: 'User authentication required' });
+    }
+    const registration = await withTransaction(async (client) => {
+      return registerTx(client, userCandidate, eventId);
+    });
+    if (!registration) {
+      log.info('join_event_already_registered', { eventId, user_id: userCandidate });
+      return res.status(200).json({ status: 'already_registered' });
+    }
+    log.info('join_event_success', { eventId, user_id: userCandidate, registration_id: registration.id });
+    return res.status(201).json({ registration });
+  } catch (err) {
+    const mapped = mapPgError(err);
+    log.error('join_event_error', mapped);
+    await errorLogger.log('Event Error', 'Failed to join event', mapped);
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

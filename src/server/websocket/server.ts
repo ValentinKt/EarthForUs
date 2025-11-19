@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer } from 'http';
 import { logger } from '../../shared/utils/logger';
+import { errorLogger } from '../utils/errorLogger';
 
 const log = logger.withContext('WebSocketServer');
 
@@ -191,6 +192,8 @@ export class WebSocketManager {
     }
 
     log.info('client_disconnected', { clientId: client.clientId, totalClients: this.clients.size });
+    // Persist WebSocket disconnects
+    void errorLogger.chatDisconnected({ clientId: client.clientId, totalClients: this.clients.size });
   }
 
   private broadcastToEvent(eventId: number, message: WebSocketMessage, excludeClientId?: string): void {

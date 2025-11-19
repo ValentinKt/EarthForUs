@@ -66,3 +66,27 @@ Details: {"route":"/api/health","reason":"sample_unhandled_error"}
 Failed to load event detail
 Details: {"eventId":1,"reason":"not_implemented_or_schema_mismatch"}
 ---
+[2025-11-19T13:35:56.127Z] Event Error
+Organizer ID is required for event creation
+Details: {"title":"Paris garden cleanup title","start_time":"2025-11-20T13:35:00.000Z"}
+---
+[2025-11-19T13:48:24.592Z] Connection
+Disconnected from real-time chat
+Details: {"clientId":"client_1763560104583_sklkeysb3","totalClients":0}
+---
+[2025-11-19T13:49:19.470Z] Connection
+Disconnected from real-time chat
+Details: {"clientId":"client_1763560104594_332t84cbj","totalClients":0}
+---
+[2025-11-19T14:04:00.580Z] Event Error
+Failed to join event
+Details: {"code":"25P02","name":"DbError"}
+---
+[2025-11-19T14:04:30.728Z] Event Error
+Failed to join event
+Details: {"code":"42703","name":"DbError"}
+---
+[2025-11-19T14:05:01.537Z] Event Error
+Failed to join event
+Details: {"code":"42P01","name":"DbError"}
+---

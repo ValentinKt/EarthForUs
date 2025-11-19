@@ -7,11 +7,14 @@ import NumberField from '../../../shared/components/NumberField';
 import { useNavigate } from 'react-router-dom';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
+import { useAuth } from '../../auth/context/AuthContext';
+import EventMap from '../components/EventMap';
 
 const CreateEventPage: React.FC = () => {
   const navigate = useNavigate();
   const log = logger.withContext('CreateEventPage');
   const { success: showSuccess, error: showError } = useToast();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -20,6 +23,8 @@ const CreateEventPage: React.FC = () => {
     end_time: '',
     capacity: 10,
   });
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [radius, setRadius] = useState<number>(500);
   const [tools, setTools] = useState<string[]>([]);
   const [toolInput, setToolInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -120,6 +125,12 @@ const CreateEventPage: React.FC = () => {
       log.warn('submit_blocked_due_to_validation');
       return;
     }
+    if (!user?.id) {
+      const msg = 'Please log in to create an event';
+      setError(msg);
+      showError(msg, 'Create Event Failed');
+      return;
+    }
     setIsLoading(true);
     const grp = log.group('Create Event Submit');
     const tm = log.time('submit');
@@ -131,6 +142,10 @@ const CreateEventPage: React.FC = () => {
         start_time: new Date(form.start_time).toISOString(),
         end_time: new Date(form.end_time).toISOString(),
         capacity: form.capacity,
+        organizer_id: user.id,
+        location_lat: coords?.lat ?? null,
+        location_lng: coords?.lng ?? null,
+        location_radius: radius ?? null,
         // tools: tools, // Uncomment when backend supports tools
       };
       log.info('submit_start', { payload });
@@ -179,7 +194,7 @@ const CreateEventPage: React.FC = () => {
         <div className="size-10" />
       </div>
 
-      <form id="create-event-form" onSubmit={onSubmit} className="space-y-8 max-w-3xl mx-auto px-4 py-6">
+      <form id="create-event-form" onSubmit={onSubmit} className="space-y-8 max-w-3xl mx-auto px-6 py-8">
         {/* Event Details */}
         <section>
           <h2 className="text-2xl font-bold leading-tight pb-4">Event Details</h2>
@@ -235,6 +250,14 @@ const CreateEventPage: React.FC = () => {
               placeholder="Address or location name"
             />
           </div>
+          <div className="mt-6">
+            <EventMap
+              address={form.location}
+              radius={radius}
+              onLocationChange={(lat, lng) => setCoords({ lat, lng })}
+              onRadiusChange={(r) => setRadius(r)}
+            />
+          </div>
         </section>
 
         {/* Requirements */}
@@ -247,7 +270,7 @@ const CreateEventPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={decrementCapacity}
-                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-gray-300 hover:bg-gray-100 text-gray-700"
+                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700"
                   aria-label="Decrease capacity"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" /></svg>
@@ -263,7 +286,7 @@ const CreateEventPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={incrementCapacity}
-                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-gray-300 hover:bg-gray-100 text-gray-700"
+                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700"
                   aria-label="Increase capacity"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" /></svg>
