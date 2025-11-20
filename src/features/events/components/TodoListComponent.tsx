@@ -41,6 +41,10 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     tagsInput: ''
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'priority' | 'due_date' | 'created_at'>('priority');
+  const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState<{ title: string; description: string; priority: TodoItem['priority']; due_date: string } | null>(null);
   const { error: showError, success: showSuccess } = useToast();
   const log = logger.withContext('TodoListComponent');
 
@@ -267,6 +271,33 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     };
   }, [todos, showSuccess, showError]);
 
+  const sortFn = useCallback((a: TodoItem, b: TodoItem) => {
+    if (sortBy === 'priority') {
+      const order = { high: 0, medium: 1, low: 2 } as const;
+      return order[a.priority] - order[b.priority];
+    }
+    if (sortBy === 'due_date') {
+      const ad = a.due_date ? new Date(a.due_date).getTime() : Number.POSITIVE_INFINITY;
+      const bd = b.due_date ? new Date(b.due_date).getTime() : Number.POSITIVE_INFINITY;
+      return ad - bd;
+    }
+    const at = new Date(a.created_at).getTime();
+    const bt = new Date(b.created_at).getTime();
+    return at - bt;
+  }, [sortBy]);
+
+  const filteredIncomplete = useMemo(() => {
+    return incompleteTodos
+      .filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.description || '').toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort(sortFn);
+  }, [incompleteTodos, searchQuery, sortFn]);
+
+  const filteredCompleted = useMemo(() => {
+    return completedTodos
+      .filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.description || '').toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort(sortFn);
+  }, [completedTodos, searchQuery, sortFn]);
+
   if (isLoading) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-4">
@@ -290,15 +321,34 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
               {completedTodos.length} of {todos.length} completed ({completionRate}%)
             </p>
           </div>
-          {isOrganizer && (
-            <Button
-              variant="earth"
-              size="sm"
-              onClick={() => setShowAddForm(!showAddForm)}
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search tasks"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              aria-label="Sort tasks"
             >
-              {showAddForm ? 'Cancel' : 'Add Task'}
-            </Button>
-          )}
+              <option value="priority">Sort by priority</option>
+              <option value="due_date">Sort by due date</option>
+              <option value="created_at">Sort by created</option>
+            </select>
+            {isOrganizer && (
+              <Button
+                variant="earth"
+                size="sm"
+                onClick={() => setShowAddForm(!showAddForm)}
+              >
+                {showAddForm ? 'Cancel' : 'Add Task'}
+              </Button>
+            )}
+          </div>
         </div>
         
         {/* Progress Bar */}
@@ -381,10 +431,21 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
         ) : (
           <>
             {/* Incomplete Tasks */}
-            {incompleteTodos.length > 0 && (
+            {filteredIncomplete.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">To Do ({incompleteTodos.length})</h4>
-                {incompleteTodos.map((todo) => (
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-700">To Do ({filteredIncomplete.length})</h4>
+                  {isOrganizer && (
+                    <Button variant="outline" size="sm" onClick={async () => {
+                      const pending = filteredIncomplete.filter(t => !t.is_completed);
+                      for (const t of pending) {
+                        await handleToggleComplete(t.id, t.is_completed);
+                      }
+                      showSuccess('All tasks marked complete');
+                    }}>Complete all</Button>
+                  )}
+                </div>
+                {filteredIncomplete.map((todo) => (
                   <div key={todo.id} className={`p-3 rounded-lg border ${getPriorityColor(todo.priority)} ${isOverdue(todo.due_date ?? null) ? 'border-red-300 bg-red-50' : ''}`}>
                     <div className="flex items-start gap-3">
                       <input
@@ -392,13 +453,34 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                         checked={false}
                         onChange={() => handleToggleComplete(todo.id, todo.is_completed)}
                         className="mt-1 h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
+                        aria-label={`Mark ${todo.title} as complete`}
                       />
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h5 className="font-medium text-gray-900">{todo.title}</h5>
-                            {todo.description && (
-                              <p className="text-sm text-gray-600 mt-1">{todo.description}</p>
+                            {editingTodoId === todo.id ? (
+                              <div className="space-y-2">
+                                <input
+                                  type="text"
+                                  value={editValues?.title || ''}
+                                  onChange={(e) => setEditValues(v => ({ ...(v as any), title: e.target.value }))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                  required
+                                />
+                                <textarea
+                                  value={editValues?.description || ''}
+                                  onChange={(e) => setEditValues(v => ({ ...(v as any), description: e.target.value }))}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                  rows={2}
+                                />
+                              </div>
+                            ) : (
+                              <>
+                                <h5 className="font-medium text-gray-900">{todo.title}</h5>
+                                {todo.description && (
+                                  <p className="text-sm text-gray-600 mt-1">{todo.description}</p>
+                                )}
+                              </>
                             )}
                             <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                               <span className="capitalize">{todo.priority} priority</span>
@@ -408,6 +490,9 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                                   {isOverdue(todo.due_date) && ' (Overdue)'}
                                 </span>
                               )}
+                              {todo.assigned_to ? (
+                                <span>Assigned: {todo.assigned_to}</span>
+                              ) : null}
                               {/* Tags */}
                               {tagsByTodoId[todo.id]?.length ? (
                                 <span className="flex flex-wrap gap-1">
@@ -417,6 +502,55 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                                 </span>
                               ) : null}
                             </div>
+                            {editingTodoId === todo.id && (
+                              <div className="mt-2 flex gap-2 items-center">
+                                <select
+                                  value={editValues?.priority || todo.priority}
+                                  onChange={(e) => setEditValues(v => ({ ...(v as any), priority: e.target.value as TodoItem['priority'] }))}
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                >
+                                  <option value="low">Low</option>
+                                  <option value="medium">Medium</option>
+                                  <option value="high">High</option>
+                                </select>
+                                <input
+                                  type="date"
+                                  value={editValues?.due_date || (todo.due_date || '')}
+                                  onChange={(e) => setEditValues(v => ({ ...(v as any), due_date: e.target.value }))}
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                />
+                                <Button
+                                  variant="earth"
+                                  size="sm"
+                                  onClick={async () => {
+                                    if (!editValues) return;
+                                    try {
+                                      const payload = {
+                                        title: editValues.title.trim(),
+                                        description: editValues.description.trim() || null,
+                                        priority: editValues.priority,
+                                        due_date: editValues.due_date || null
+                                      };
+                                      await api.put(`/api/events/${eventId}/todos/${todo.id}`, payload);
+                                      setTodos(prev => {
+                                        const next = prev.map(t => t.id === todo.id ? { ...t, ...payload, updated_at: new Date().toISOString() } : t);
+                                        persistTodosCache(next);
+                                        return next;
+                                      });
+                                      setEditingTodoId(null);
+                                      setEditValues(null);
+                                      showSuccess('Task updated');
+                                    } catch (error) {
+                                      log.error('update_todo_error', { error, eventId, todoId: todo.id });
+                                      showError('Failed to update task', 'Todo Error');
+                                    }
+                                  }}
+                                >
+                                  Save
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => { setEditingTodoId(null); setEditValues(null); }}>Cancel</Button>
+                              </div>
+                            )}
                             {/* Tag editor */}
                             {isOrganizer && (
                               <div className="mt-2 flex items-center gap-2">
@@ -472,6 +606,15 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                               </svg>
                             </button>
                           )}
+                          <button
+                            className="text-xs text-brand-700 hover:text-brand-900"
+                            onClick={() => {
+                              setEditingTodoId(todo.id);
+                              setEditValues({ title: todo.title, description: todo.description || '', priority: todo.priority, due_date: todo.due_date || '' });
+                            }}
+                          >
+                            Edit
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -481,10 +624,21 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
             )}
 
             {/* Completed Tasks */}
-            {completedTodos.length > 0 && (
+            {filteredCompleted.length > 0 && (
               <div className="space-y-2 mt-4">
-                <h4 className="text-sm font-medium text-gray-700">Completed ({completedTodos.length})</h4>
-                {completedTodos.map((todo) => (
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-700">Completed ({filteredCompleted.length})</h4>
+                  {isOrganizer && (
+                    <Button variant="outline" size="sm" onClick={async () => {
+                      if (!confirm('Clear all completed tasks?')) return;
+                      for (const t of filteredCompleted) {
+                        await handleDeleteTodo(t.id);
+                      }
+                      showSuccess('Completed tasks cleared');
+                    }}>Clear completed</Button>
+                  )}
+                </div>
+                {filteredCompleted.map((todo) => (
                   <div key={todo.id} className="p-3 rounded-lg border border-green-200 bg-green-50">
                     <div className="flex items-start gap-3">
                       <input
@@ -492,6 +646,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                         checked={true}
                         onChange={() => handleToggleComplete(todo.id, todo.is_completed)}
                         className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                        aria-label={`Mark ${todo.title} as incomplete`}
                       />
                       <div className="flex-1">
                         <div className="flex items-start justify-between">

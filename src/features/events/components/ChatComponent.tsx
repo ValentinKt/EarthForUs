@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { api } from '../../../shared/utils/api';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
@@ -27,14 +27,15 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const cacheKey = useMemo(() => `earthforus:event:${eventId}:messagesCache`, [eventId]);
   const { error: showError, success: showSuccess } = useToast();
   const log = logger.withContext('ChatComponent');
 
   // WebSocket connection for real-time messages
-  const { isConnected, sendMessage: sendWebSocketMessage } = useWebSocket(
-    `ws://localhost:3001`, // WebSocket server URL - adjust based on your setup
-    {
+  const handlers = useMemo(() => ({
       onMessage: (wsMessage: WebSocketMessage) => {
         if (wsMessage.type === 'chat_message' && wsMessage.data.event_id === eventId) {
           // Add new message to the list
@@ -54,30 +55,43 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
           timestamp: new Date().toISOString(),
           eventId
         };
-        sendWebSocketMessage(joinMessage);
+        wsSend(joinMessage);
       },
       onClose: () => {
         log.warn('websocket_disconnected', { eventId });
         showError('Disconnected from real-time chat', 'Connection');
       },
-      onError: (error) => {
+      onError: (error: Event) => {
         log.error('websocket_error', { error, eventId });
         showError('Chat connection error', 'Connection');
       }
-    }
+  }), [eventId, log, showSuccess, showError]);
+
+  const { isConnected, sendMessage: wsSend, manager } = useWebSocket(
+    `ws://localhost:3001`,
+    handlers
   );
 
   // Fetch messages on component mount
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached) as ChatMessage[];
+        if (Array.isArray(parsed)) {
+          setMessages(parsed);
+          setIsLoading(false);
+        }
+      }
+    } catch {}
     fetchMessages();
-    // Set up polling as fallback if WebSocket disconnects
     const interval = setInterval(() => {
       if (!isConnected) {
         fetchMessages();
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [eventId, isConnected]);
+  }, [eventId, isConnected, cacheKey]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -87,7 +101,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
   const fetchMessages = async () => {
     try {
       const data = await api.get<ChatMessage[]>(`/api/events/${eventId}/messages`);
-      setMessages(data || []);
+      const next = data || [];
+      setMessages(next);
+      try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch {}
       log.info('messages_fetched', { count: data?.length || 0, eventId });
     } catch (error) {
       log.error('fetch_messages_error', { error, eventId });
@@ -102,6 +118,14 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const onScroll = useCallback(() => {
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    const threshold = 24;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+    setIsAtBottom(atBottom);
+  }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +146,11 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
       const sentMessage = await api.post<ChatMessage>(`/api/events/${eventId}/messages`, messageData);
       
       // Add the new message to the list
-      setMessages(prev => [...prev, sentMessage]);
+      setMessages(prev => {
+        const next = [...prev, sentMessage];
+        try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch {}
+        return next;
+      });
       
       // Send via WebSocket for real-time delivery to other users
       if (isConnected) {
@@ -132,7 +160,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
           timestamp: new Date().toISOString(),
           eventId
         };
-        sendWebSocketMessage(wsMessage);
+        wsSend(wsMessage);
       }
       
       showSuccess('Message sent successfully');
@@ -156,6 +184,24 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
       minute: '2-digit' 
     });
   };
+
+  const formatMessageDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleDateString();
+  };
+
+  const withDateSeparators = useMemo(() => {
+    const rows: Array<ChatMessage | { __sep: string; key: string }> = [];
+    let lastDate = '';
+    for (const m of messages) {
+      const d = formatMessageDate(m.created_at);
+      if (d !== lastDate) {
+        rows.push({ __sep: d, key: `sep-${d}` });
+        lastDate = d;
+      }
+      rows.push(m);
+    }
+    return rows;
+  }, [messages]);
 
   if (isLoading) {
     return (
@@ -185,12 +231,17 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
             <span className="text-xs text-gray-500">
               {isConnected ? 'Connected' : 'Reconnecting...'}
             </span>
+            {!isConnected && (
+              <Button variant="outline" size="sm" onClick={() => manager?.connect(handlers)}>
+                Reconnect
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div ref={messagesContainerRef} onScroll={onScroll} className="flex-1 overflow-y-auto p-4 space-y-3" aria-live="polite">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
             <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,48 +250,69 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.user_id === currentUserId ? 'justify-end' : 'justify-start'}`}
-            >
+          withDateSeparators.map((row) => (
+            'id' in (row as any) ? (
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.user_id === currentUserId
-                    ? 'bg-brand-600 text-white'
-                    : message.is_system
-                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
+                key={(row as ChatMessage).id}
+                className={`flex ${((row as ChatMessage).user_id === currentUserId) ? 'justify-end' : 'justify-start'}`}
               >
-                {message.user_id !== currentUserId && !message.is_system && (
-                  <div className="text-xs font-medium mb-1">{message.user_name}</div>
-                )}
-                <div className="text-sm">{message.message}</div>
-                <div className={`text-xs mt-1 ${
-                  message.user_id === currentUserId ? 'text-brand-100' : 'text-gray-500'
-                }`}>
-                  {formatMessageTime(message.created_at)}
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    ((row as ChatMessage).user_id === currentUserId)
+                      ? 'bg-brand-600 text-white'
+                      : (row as ChatMessage).is_system
+                      ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                      : 'bg-gray-100 text-gray-900'
+                  }`}
+                >
+                  {((row as ChatMessage).user_id !== currentUserId) && !(row as ChatMessage).is_system && (
+                    <div className="text-xs font-medium mb-1">{(row as ChatMessage).user_name}</div>
+                  )}
+                  <div className="text-sm">{(row as ChatMessage).message}</div>
+                  <div className={`text-xs mt-1 ${
+                    ((row as ChatMessage).user_id === currentUserId) ? 'text-brand-100' : 'text-gray-500'
+                  }`}>
+                    {formatMessageTime((row as ChatMessage).created_at)}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div key={(row as any).key} className="flex justify-center">
+                <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
+                  {(row as any).__sep}
+                </span>
+              </div>
+            )
           ))
         )}
         <div ref={messagesEndRef} />
       </div>
 
+      {!isAtBottom && messages.length > 0 && (
+        <div className="px-4 py-2">
+          <Button variant="outline" size="sm" onClick={scrollToBottom} className="w-full">Jump to latest</Button>
+        </div>
+      )}
+
       {/* Message Input */}
       <form onSubmit={handleSendMessage} className="px-4 py-3 border-t border-gray-200">
-        <div className="flex gap-2">
-          <input
-            type="text"
+        <div className="flex gap-2 items-end">
+          <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                void handleSendMessage(new Event('submit') as any);
+              }
+            }}
             placeholder="Type your message..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
             disabled={isSending}
-            maxLength={500}
+            maxLength={1000}
+            rows={2}
           />
+          <div className="text-xs text-gray-500 mb-1">{newMessage.length}/1000</div>
           <Button
             type="submit"
             variant="earth"

@@ -207,6 +207,49 @@ EarthForUs/
 └── ERRORS_LOGS.md           # Error log (markdown)
 ```
 
+## Quick Reference
+
+Frontend Components
+
+| Area | Component | Path | Purpose |
+| --- | --- | --- | --- |
+| Landing | `LandingPage` | `src/features/landing/pages/LandingPage.tsx` | Entry hero and CTA navigation |
+| Events | `EventsPage` | `src/features/events/pages/EventsPage.tsx` | Browse and join events |
+| Events | `EventPage` | `src/features/events/pages/EventPage.tsx` | Event details with tabs |
+| Events | `CreateEventPage` | `src/features/events/pages/CreateEventPage.tsx` | Create event with validation and map |
+| Events | `EventMap` | `src/features/events/components/EventMap.tsx` | Map, geocoding, radius selection |
+| Events | `ChatComponent` | `src/features/events/components/ChatComponent.tsx` | Real‑time event chat UI |
+| Events | `TodoListComponent` | `src/features/events/components/TodoListComponent.tsx` | Event checklist UI |
+| Auth | `LoginPage` | `src/features/auth/pages/LoginPage.tsx` | Login form and validation |
+| Auth | `AuthProvider` | `src/features/auth/context/AuthContext.tsx` | Session state via localStorage |
+| Auth | `ProtectedRoute` | `src/features/auth/components/ProtectedRoute.tsx` | Route guard for authenticated pages |
+| Shared | `ToastProvider` | `src/shared/components/Toast.tsx` | Notifications and error reporting |
+| Shared | `ErrorBoundary` | `src/shared/components/ErrorBoundary.tsx` | Capture uncaught errors |
+| App | `Layout` | `src/app/layout/Layout.tsx` | App shell with header/footer |
+
+Backend Endpoints
+
+| Area | Method | Path | Handler |
+| --- | --- | --- | --- |
+| Health | `GET` | `/api/health` | `src/server/api/server.ts` |
+| Auth | `POST` | `/api/auth/signup` | `src/server/api/routes/auth.ts` |
+| Auth | `POST` | `/api/auth/login` | `src/server/api/routes/auth.ts` |
+| Events | `GET` | `/api/events` | `src/server/api/routes/events.ts` |
+| Events | `POST` | `/api/events` | `src/server/api/routes/events.ts` |
+| Events | `POST` | `/api/events/:id/join` | `src/server/api/routes/events.ts` |
+| Chat | `GET` | `/api/events/:eventId/messages` | `src/server/api/routes/chat.ts` |
+| Chat | `POST` | `/api/events/:eventId/messages` | `src/server/api/routes/chat.ts` |
+| Todos | `GET` | `/api/events/:eventId/todos` | `src/server/api/routes/todos.ts` |
+| Todos | `POST` | `/api/events/:eventId/todos` | `src/server/api/routes/todos.ts` |
+| Todos | `PUT` | `/api/events/:eventId/todos/:todoId` | `src/server/api/routes/todos.ts` |
+| Todos | `PATCH` | `/api/events/:eventId/todos/:todoId/complete` | `src/server/api/routes/todos.ts` |
+| Todos | `DELETE` | `/api/events/:eventId/todos/:todoId` | `src/server/api/routes/todos.ts` |
+| Users | `GET` | `/api/users/:id` | `src/server/api/routes/users.ts` |
+| Users | `PUT` | `/api/users/:id` | `src/server/api/routes/users.ts` |
+| Users | `PUT` | `/api/users/:id/password` | `src/server/api/routes/users.ts` |
+| Logs | `POST` | `/api/logs/error` | `src/server/api/routes/logs.ts` |
+| WebSocket | `WS` | `ws://localhost:3001` | `src/server/websocket/server.ts` (events: `join_event`, `chat_message`, `user_joined`, `user_left`, `system_message`) |
+
 ## API Summary
 
 Auth
