@@ -12,11 +12,11 @@ const log = logger.withContext('api/chat');
 // Get chat messages for an event
 router.get('/events/:eventId/messages', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const limit = Number(req.query.limit as string) || 50;
     const offset = Number(req.query.offset as string) || 0;
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -50,11 +50,11 @@ router.get('/events/:eventId/messages', async (req: Request, res: Response) => {
 // Send a chat message
 router.post('/events/:eventId/messages', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const { message } = req.body || {};
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId || typeof eventId !== 'string') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }

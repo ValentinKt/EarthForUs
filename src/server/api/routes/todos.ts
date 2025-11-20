@@ -18,9 +18,9 @@ const log = logger.withContext('api/todos');
 // Get todo items for an event
 router.get('/events/:eventId/todos', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -64,11 +64,11 @@ router.get('/events/:eventId/todos', async (req: Request, res: Response) => {
 // Create a todo item
 router.post('/events/:eventId/todos', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const { title, description, priority, dueDate } = req.body || {};
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -142,11 +142,11 @@ router.post('/events/:eventId/todos', async (req: Request, res: Response) => {
 // Update a todo item
 router.put('/events/:eventId/todos/:todoId', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const todoId = Number(req.params.todoId);
     const { title, description, priority, dueDate } = req.body || {};
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -224,12 +224,12 @@ router.put('/events/:eventId/todos/:todoId', async (req: Request, res: Response)
 // Toggle todo item completion status
 router.patch('/events/:eventId/todos/:todoId/complete', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const todoId = Number(req.params.todoId);
     const { isCompleted } = req.body || {};
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -283,11 +283,11 @@ router.patch('/events/:eventId/todos/:todoId/complete', async (req: Request, res
 // Delete a todo item
 router.delete('/events/:eventId/todos/:todoId', async (req: Request, res: Response) => {
   try {
-    const eventId = Number(req.params.eventId);
+    const eventId = req.params.eventId;
     const todoId = Number(req.params.todoId);
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!Number.isFinite(eventId) || eventId <= 0) {
+    if (!eventId) {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }

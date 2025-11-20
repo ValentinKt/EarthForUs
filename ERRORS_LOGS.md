@@ -107,3 +107,15 @@ Stack: Error: Simulated error
     at [eval]:25:48
 Details: {"origin":"verification","id":123}
 ---
+[2025-11-20T08:35:05.101Z] Chat Error
+Failed to load chat messages
+Details: {"eventId":1,"code":"42P01","name":"DbError"}
+---
+[2025-11-20T08:36:02.656Z] Checklist Error
+Failed to load todo items
+Details: {"eventId":1,"code":"42P01","name":"DbError"}
+---
+[2025-11-20T08:36:21.846Z] Test Error
+{"message":"This is a test error","stack":null}
+Details: {"test":true}
+---
