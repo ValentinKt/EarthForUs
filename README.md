@@ -1,335 +1,277 @@
-# EarthForUs - Environmental Volunteering Platform
+# EarthForUs — Environmental Volunteering Platform
 
-EarthForUs is a modern web application that connects environmentally conscious individuals with local volunteering opportunities. The platform enables users to discover, create, and participate in environmental events while fostering community engagement.
+EarthForUs connects environmentally conscious people with local volunteering opportunities. Discover, create, and participate in events such as cleanups, plantings, and conservation activities.
 
-## 🌍 Project Overview
+## Overview
 
-EarthForUs is built as a full-stack React application with a Node.js/Express backend, designed for deployment on Hostinger shared hosting. The platform features event management, user profiles, interactive maps, and comprehensive authentication systems.
+- Full‑stack app: React frontend + Node/Express API + PostgreSQL
+- Realtime chat via WebSocket
+- Interactive maps (Leaflet) for event location and radius selection
+- Robust error logging and diagnostics to `ERRORS_LOGS.md`
 
-## 🚀 Features
+## Features
 
-### Core Functionality
-- **User Authentication**: Secure login/signup with email verification, password reset, and protected routes
-- **Event Management**: Create, edit, delete, and manage environmental events with rich media support
-- **Interactive Maps**: Location-based event discovery with Leaflet integration, radius search, and geolocation
-- **User Profiles**: Personal dashboards with event participation tracking, achievement badges, and activity history
-- **Event Registration**: RSVP system with attendance tracking and participant limits
-- **Search & Filtering**: Advanced search with filters for event type, location, date, and difficulty level
-- **Real-time Notifications**: Email notifications for event updates, registrations, and reminders
-- **Responsive Design**: Mobile-first approach with modern UI/UX optimized for all devices
+### Events
+- Create, list, and join environmental events.
+- Pages: `EventsPage`, `EventPage`, `CreateEventPage`.
 
-### Detailed Features
-- **Event Categories**: Organized by type (cleanup, planting, education, conservation, recycling)
-- **Event Scheduling**: Recurring events, multi-day events, and flexible time slots
-- **Media Gallery**: Photo and video uploads for events with automatic optimization
-- **Volunteer Coordination**: Team formation, role assignments, and communication tools
-- **Impact Tracking**: Environmental impact metrics (trees planted, waste collected, CO2 saved)
-- **Social Sharing**: Share events on social media with custom graphics and tracking
-- **Review System**: Rate and review events with moderation and verification
-- **Calendar Integration**: Export events to Google Calendar, iCal, and Outlook
-- **Offline Support**: Progressive Web App with offline event browsing
-- **Multi-language Support**: Interface available in multiple languages
-- **Accessibility**: WCAG 2.1 compliant with screen reader support
-- **Data Export**: Export participation records and impact reports
-- **Analytics Dashboard**: Track platform usage and environmental impact statistics
-- **User Authentication**: Secure login/signup with protected routes
-- **Event Management**: Create, discover, and manage environmental events
-- **Interactive Maps**: Location-based event discovery with Leaflet integration
-- **User Profiles**: Personal dashboards with event participation tracking
-- **Responsive Design**: Mobile-Web-APP approach with modern UI/UX
+Frontend
+- Event creation form with inline validation: title (≤200 chars), valid dates, end after start, capacity > 0.
+- Map-assisted location selection with draggable marker and radius slider.
+- Duplicate-prevention UX with clear error messages if same title + start time exists.
+- Join flow with loading state, idempotent behavior (handles already registered), and success toasts.
+- Detail page tabbed UI: About, Updates, Checklist, Chat, Map; list fallback used if detail endpoint unavailable.
 
-### Technical Features
-- **TypeScript**: Full type safety across frontend and backend
-- **Modern React**: Hooks, context, and functional components
-- **Security**: Comprehensive validation and security checks
-- **Logging**: Structured logging system for debugging and monitoring
-- **Deployment Ready**: Automated deployment scripts for Hostinger
+Backend
+- `GET /api/events` lists events, auto-falling back to legacy columns (`start`/`end`) when `start_time`/`end_time` are missing.
+- `POST /api/events` enforces required fields, sanitizes optional text, validates capacity, and requires `organizer_id`.
+- Duplicate prevention via title (case-insensitive) + exact start time, using transactional checks.
+- `POST /api/events/:id/join` registers users while preventing duplicates and respecting capacity; returns `already_registered` when applicable.
+- Cross-schema insert strategy with SAVEPOINT retries to support modern/legacy schemas, optional `date`/`category`, and organizer typing.
 
-## 🛠️ Technology Stack
+### Event Todo Checklist
+- Per‑event task list with priorities and due dates.
 
-### Frontend
-- **React 18** - Modern UI framework with hooks and concurrent features
-- **TypeScript** - Type-safe JavaScript for better development experience
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework for modern styling, uqing version 4.0.0
-- **React Router v6** - Client-side routing with nested routes
-- **Leaflet** - Interactive maps for location-based features
-- **React Hook Form** - Efficient form handling and validation
+Frontend
+- Create/edit tasks with validation: title required (≤200 chars), optional description (≤1000 chars), priority one of `low|medium|high`.
+- Due date input with runtime validation and helpful messages.
+- Progress indicator and completion rate; toggle complete/uncomplete with instant UI updates.
+- Delete guarded by ownership UI hints; creator-only deletion pathway.
 
-### Backend
-- **Node.js** - JavaScript runtime for server-side development
-- **Express.js** - Web application framework for REST APIs
-- **TypeScript** - Type-safe backend development
-- **PostgreSQL** - Relational database for data persistence
-- **JWT** - JSON Web Tokens for secure authentication
-- **CORS** - Cross-origin resource sharing configuration
-- **Helmet** - Security middleware for HTTP headers
+Backend
+- `GET /api/events/:eventId/todos` returns items with creator/completer names via JOINs, sorted by priority, due date, and creation.
+- `POST /api/events/:eventId/todos` validates payload and inserts with `created_by` attribution.
+- `PUT /api/events/:eventId/todos/:todoId` updates core fields and stamps `updated_at`.
+- `PATCH /api/events/:eventId/todos/:todoId/complete` flips `is_completed` and sets `completed_by`/`completed_at` accordingly.
+- `DELETE /api/events/:eventId/todos/:todoId` requires creator ownership and returns 404 if not found/not owner.
+- Trigger maintains `updated_at` consistency on updates.
 
-### Development Tools
-- **ESLint** - Code linting for consistent code quality
-- **Prettier** - Code formatting for clean, readable code
-- **Git** - Version control with comprehensive commit history
-- **NPM Scripts** - Automated build and deployment processes
+### Event Chat
+- Real‑time chat for each event with REST persistence and WebSocket broadcasting.
 
-## 📋 Prerequisites
+Frontend
+- Message list with auto‑scroll, optimistic send, and connection status indicator.
+- WebSocket join on connect; rejoin with exponential backoff when disconnected.
+- Background polling fallback to keep messages fresh when socket is down.
+- Input constrained and debounced; friendly errors on send failures.
 
-Before running the project, ensure you have:
+Backend
+- `GET /api/events/:eventId/messages` returns paginated messages with user identity.
+- `POST /api/events/:eventId/messages` requires auth, validates non‑empty message, enforces length (≤1000 chars), and persists.
+- WebSocket server manages: `join_event`, `leave_event`, `chat_message`, `user_joined`, `user_left`, `system_message` with scoped broadcast per event.
+- Defensive checks for invalid event IDs and unauthorized send attempts, with structured logs and error persistence when failures occur.
 
-- **Node.js** (v18 or higher)
-- **npm** (v8 or higher)
-- **Git** for version control
-- **PostgreSQL** (for local development)
-- **Hostinger Account** (for deployment)
+### Interactive Map
+- Leaflet map for selecting event location and radius.
 
-## 🏃‍♂️ Running the Project Locally
+Frontend
+- Geocoding via Nominatim with clear error feedback and loading states.
+- Draggable marker, click‑to‑set location, and radius slider with real‑time area/km calculations.
+- Lat/lng inputs with clamping: latitude (−90..90), longitude (−180..180).
+- Accessible labels, live status, and tile error handling; defaults to a sensible city center when no coords.
 
-### 1. Clone the Repository
-```bash
-git clone <your-repository-url>
-cd EarthForUs
-```
+Backend
+- Currently UI‑driven; map fields are captured in create payload but not yet stored server‑side.
 
-### 2. Install Dependencies
+### Authentication (Minimal)
+- Basic account creation and login; client‑side session state.
+
+Frontend
+- `LoginPage` with validation, optional test credential hints, and remember‑me.
+- `AuthProvider` stores normalized user in `localStorage` and exposes `login/logout`.
+- `ProtectedRoute` redirects unauthenticated users to login with original path preserved.
+
+Backend
+- `POST /api/auth/signup` checks uniqueness, hashes password, and returns normalized user profile.
+- `POST /api/auth/login` validates credentials and logs invalid attempts; returns normalized user profile.
+- Session/token issuance is deferred; client maintains lightweight user state.
+
+### Error Logging & Diagnostics
+- Centralized, failure‑resistant error logging across client and server.
+
+Frontend
+- Toast `.error()` auto‑reports UI errors with context.
+- `ErrorBoundary` captures uncaught render errors and posts them to the server.
+- API client reports exceptions with method and URL context.
+
+Backend
+- Markdown persistence to `ERRORS_LOGS.md` with `[timestamp] Type`, message, optional stack, and details.
+- Thread‑safe write queue prevents race conditions; logging is isolated to avoid secondary failures.
+- `/api/logs/error` endpoint accepts structured client reports for unified logging.
+- Global Express error handler persists unhandled exceptions with route context.
+
+### Users & Settings
+- Manage profile and security settings.
+
+Frontend
+- Settings page supports secure password change with strength indicator, inline validation, and show/hide controls.
+- Profile fields update with helpful error messages and success toasts.
+
+Backend
+- `GET /api/users/:id` returns basic profile.
+- `PUT /api/users/:id` updates `first_name`/`last_name` with length and emptiness checks.
+- `PUT /api/users/:id/password` verifies current password, enforces min length for new password, and stores a new hash.
+
+## Technology Stack
+
+Frontend
+- React 19, React Router 7
+- Vite 7, TypeScript
+- Tailwind CSS 4
+- Leaflet + React‑Leaflet
+
+Backend
+- Node.js, Express 5
+- `ws` for WebSocket
+- PostgreSQL via `pg`
+- TypeScript
+
+Tooling
+- ESLint, TypeScript ESLint
+- Vite preview, `tsx` for dev scripts
+
+## Setup
+
+Prerequisites
+- Node.js 18+
+- npm 8+
+- PostgreSQL (local or Docker)
+
+Install
 ```bash
 npm install
 ```
 
-### 3. Set Up Environment Variables
+Environment
 ```bash
-# Copy environment template
-cp .env.example .env.development
-
-# Edit .env.development with your local configuration
-```
-
-### 4. Configure Database (Optional for Frontend Development)
-```bash
-# Set up PostgreSQL database
-# Update DATABASE_URL in .env.development
-```
-
-### 5. Run Development Server
-```bash
-# Start frontend development server
-npm run dev
-
-# Application will be available at: http://localhost:5173
-```
-
-### 6. Run Backend Server (If Using Full Stack)
-```bash
-# Start backend development server
-npm run dev:server
-
-# API will be available at: http://localhost:3000/api
-```
-
-## 📦 Available Commands
-
-### Development Commands
-```bash
-npm run dev          # Start frontend development server
-npm run dev:server   # Start backend development server
-npm run build        # Build production frontend
-npm run build:server # Build production backend
-npm run preview      # Preview production build locally
-```
-
-### Code Quality Commands
-```bash
-npm run lint         # Run ESLint for code quality
-npm run lint:fix     # Fix ESLint issues automatically
-npm run type-check   # Run TypeScript type checking
-```
-
-### Deployment Commands
-```bash
-npm run deploy:dev   # Prepare development deployment
-npm run deploy:prod  # Prepare production deployment with security checks
-```
-
-## 🚀 Deployment to Hostinger
-
-EarthForUs includes an automated deployment system with comprehensive security validation for production deployments.
-
-### Development Deployment
-```bash
-# Prepare development build
-npm run deploy:dev
-
-# Upload contents of 'dist' folder to Hostinger
-# Set environment variables in Hostinger control panel
-```
-
-### Production Deployment
-```bash
-# Prepare production build with security validation
-npm run deploy:prod
-
-# Upload contents of 'dist' folder to Hostinger
-# Set production environment variables
-```
-
-### Hostinger Environment Variables
-Configure these in your Hostinger control panel under "Environment Variables":
-
-```bash
-# Required Variables
-VITE_API_BASE=https://your-api-domain.com/api
+# Client
+VITE_API_BASE=http://localhost:3001/api
 VITE_LOG_LEVEL=info
-VITE_ENVIRONMENT=production
 
-# Optional Variables
-VITE_ENABLE_DEBUG=false
-VITE_ALLOW_CONSOLE_LOGS=false
+# Server
+API_PORT=3001
 ```
 
-### Deployment Features
-- **Automated Build Process**: Creates optimized production builds
-- **Security Validation**: Comprehensive checks for production deployments
-- **Environment-Specific Configs**: Separate development and production settings
-- **SPA Routing Support**: Includes `.htaccess` for proper routing
-- **Deployment Manifest**: Generates deployment information
+Start
+```bash
+# Frontend
+npm run dev  # http://localhost:5173
 
-## 📁 Project Structure
+# Backend API (port overridable)
+API_PORT=3001 npm run api:start  # http://localhost:3001
+```
+
+Database (optional for local API)
+```bash
+# Start Postgres via Docker Compose
+npm run db:up
+
+# Apply migrations
+npm run db:migrate
+
+# Stop DB
+npm run db:down
+```
+
+## Scripts
+
+Development
+- `npm run dev` — start Vite dev server
+- `npm run api:start` — start Express API
+
+Build & Preview
+- `npm run build` — typecheck + build frontend
+- `npm run preview` — preview production build
+
+Database
+- `npm run db:up` — docker compose up
+- `npm run db:migrate` — run migrations
+- `npm run db:down` — docker compose down
+
+Deploy
+- `npm run deploy:dev` — development build and manifest
+- `npm run deploy:prod` — production build with security validation
+
+## Project Structure
 
 ```
 EarthForUs/
 ├── src/
-│   ├── components/       # Reusable React components
-│   ├── features/        # Feature-specific components
-│   ├── shared/          # Shared utilities and components
-│   ├── server/          # Backend API routes and logic
-│   └── types/           # TypeScript type definitions
-├── public/              # Static assets
-├── scripts/             # Deployment and build scripts
-├── dist/                # Production build output
-└── docs/                # Documentation and prototypes
+│   ├── features/            # Pages & feature components
+│   ├── shared/              # UI, hooks, utils, theme
+│   ├── server/              # Express API, DB, WebSocket
+│   └── app/                 # Layout and app shell
+├── scripts/                 # Deploy and maintenance scripts
+├── public/                  # Static assets
+├── dist/                    # Build output
+└── ERRORS_LOGS.md           # Error log (markdown)
 ```
 
-## 🔧 Configuration Files
+## API Summary
 
-### Vite Configuration (`vite.config.ts`)
-- Build optimization for Hostinger deployment
-- Path aliases for clean imports
-- Environment variable handling
+Auth
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
 
-### TypeScript Configuration
-- `tsconfig.json` - Base TypeScript configuration
-- `tsconfig.app.json` - Frontend-specific settings
-- `tsconfig.server.json` - Backend-specific settings
+Events
+- `GET /api/events`
+- `POST /api/events`
+- `POST /api/events/:id/join`
 
-### Environment Files
-- `.env.development` - Development environment variables
-- `.env.production` - Production environment variables
-- `.env.example` - Template for environment setup
+Chat
+- `GET /api/events/:eventId/messages`
+- `POST /api/events/:eventId/messages`
 
-## 🔒 Security Features
+Todos
+- `GET /api/events/:eventId/todos`
+- `POST /api/events/:eventId/todos`
+- `PUT /api/events/:eventId/todos/:todoId`
+- `PATCH /api/events/:eventId/todos/:todoId/complete`
+- `DELETE /api/events/:eventId/todos/:todoId`
 
-### Authentication
-- JWT-based authentication with secure token handling
-- Protected routes with automatic redirects
-- Session management and token refresh
+Diagnostics
+- `POST /api/logs/error`
 
-### Production Security
-- HTTPS enforcement for API endpoints
-- Test credential removal validation
-- Debug mode disabled in production
-- Console log scanning and warnings
-- Environment-specific security rules
+## Deployment
 
-### Data Protection
-- Environment variables for sensitive configuration
-- Secure password handling
-- CORS configuration for API security
+Hostinger (static hosting) workflow is automated via `scripts/deploy.js`.
 
-## 🗺️ Interactive Maps
-
-The application uses Leaflet for interactive maps:
-- Event location visualization
-- Radius-based search areas
-- Responsive map components
-- Geocoding for address-to-coordinate conversion
-
-## 📝 Logging System
-
-Comprehensive logging throughout the application:
-- Structured logging with timestamps
-- Environment-specific log levels
-- Error tracking and debugging support
-- API request/response logging
-
-## 🧪 Testing
-
-### Manual Testing
-- Authentication flow testing
-- Event creation and management
-- Map functionality verification
-- Responsive design testing
-
-### Deployment Testing
-- Local build verification
-- Environment variable validation
-- Security check validation
-- Hostinger deployment testing
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Build Failures**
-- Check TypeScript errors: `npm run type-check`
-- Verify environment variables are set
-- Ensure all dependencies are installed
-
-**Deployment Issues**
-- Verify `.htaccess` file is uploaded
-- Check environment variables in Hostinger
-- Ensure API endpoints are accessible
-
-**Map Loading Issues**
-- Verify Leaflet CSS is imported
-- Check for CORS issues with map tiles
-- Ensure proper map container sizing
-
-### Debug Mode
-Enable debug logging by setting:
+Development
 ```bash
-VITE_LOG_LEVEL=debug
-VITE_ENABLE_DEBUG=true
+npm run deploy:dev
+# Upload dist/ to Hostinger
 ```
 
-## 🤝 Contributing
+Production
+```bash
+npm run deploy:prod
+# Upload dist/, configure environment, verify API
+```
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and test thoroughly
-4. Commit with descriptive messages
-5. Push to your fork and create a pull request
+Recommended client env (Hostinger)
+```bash
+VITE_API_BASE=https://your-api-domain.com/api
+VITE_LOG_LEVEL=info
+```
 
-## 📄 License
+## Troubleshooting
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Build
+- Run `npm run build` to surface type errors.
+- Ensure `VITE_API_BASE` points to the running API.
 
-## 🆘 Support
+API
+- Start with `API_PORT=3001 npm run api:start`.
+- Check server logs; errors are appended to `ERRORS_LOGS.md`.
 
-For support and questions:
-1. Check the troubleshooting section above
-2. Review the deployment documentation: [DEPLOYMENT.md](DEPLOYMENT.md)
-3. Check browser console for client-side errors
-4. Verify API connectivity and backend status
-5. Consult Hostinger documentation for hosting-specific issues
+Maps
+- Confirm network access to OpenStreetMap tiles.
+- Verify Leaflet CSS via CDN and map container sizing.
 
-## 🎯 Roadmap
+## License
 
-- [ ] Mobile application development
-- [ ] Advanced event filtering and search
-- [ ] Social features and user interactions
-- [ ] Admin dashboard for event management
-- [ ] Multi-language support
-- [ ] Push notifications
-- [ ] Event rating and review system
+MIT — see `LICENSE`.
 
 ---
 
-**EarthForUs** - Connecting people with the planet, one volunteer opportunity at a time 🌱
+EarthForUs — Connecting people with the planet 🌱
