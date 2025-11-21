@@ -11,7 +11,7 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     env: {
-      apiUrl: 'http://localhost:3002',
+      apiUrl: 'http://localhost:3001',
       testEmail: 'test@example.com',
       testPassword: 'test123',
     },

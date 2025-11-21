@@ -1,7 +1,7 @@
 import 'dotenv/config';
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
 import type { Request, Response } from 'express';
 import { createServer } from 'http';
 import authRouter from './routes/auth';
@@ -34,7 +34,7 @@ app.use('/api', logsRouter);
 // Create WebSocket server for real-time chat
 createWebSocketServer(server);
 
-app.use(async (err: unknown, req: Request, res: Response) => {
+app.use(async (err: unknown, req: Request, res: Response, next: any) => {
   await errorLogger.logError('Server Error', err, { route: req.originalUrl });
   res.status(500).json({ error: 'Internal server error' });
 });

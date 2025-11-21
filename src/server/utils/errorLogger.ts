@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const LOG_FILE = '/Users/valentin/Documents/trae_projects/EarthForUs/ERRORS_LOGS.md';
 
@@ -40,7 +40,12 @@ function formatMarkdownEntry(input: {
   lines.push(input.message);
   if (input.stack) lines.push(`Stack: ${input.stack}`);
   if (input.context && Object.keys(input.context).length > 0) {
-    lines.push(`Details: ${sanitize(input.context)}`);
+    try {
+      const contextStr = JSON.stringify(input.context, null, 2);
+      lines.push(`Details: ${contextStr}`);
+    } catch {
+      lines.push(`Details: ${String(input.context)}`);
+    }
   }
   lines.push('---');
   return lines.join('\n') + '\n';

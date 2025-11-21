@@ -13,7 +13,7 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 };
 
 const log = logger.withContext('ApiClient');
-const BASE = 'http://localhost:3002';
+const BASE = 'http://localhost:3001';
 
 function buildUrl(path: string) {
   if (!path.startsWith('http')) return `${BASE}${path}`;

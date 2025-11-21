@@ -10,7 +10,7 @@ const globalAny = global as any;
 globalAny.import = { 
   meta: { 
     env: {
-      VITE_API_BASE: 'http://localhost:3002',
+      VITE_API_BASE: 'http://localhost:3001',
       VITE_LOG_LEVEL: 'debug',
       VITE_TEST_USER_EMAIL: 'test@example.com',
       VITE_TEST_USER_PASSWORD: 'test123',
@@ -22,7 +22,10 @@ globalAny.import = {
 
 // Mock WebSocket
 class MockWebSocket {
-  constructor(public url: string) {}
+  url: string;
+  constructor(url: string) {
+    this.url = url;
+  }
   send = jest.fn();
   close = jest.fn();
   addEventListener = jest.fn();

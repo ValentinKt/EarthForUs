@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { withTransaction, pool } from '../../db/pool';
-import { createEventTx, listEvents, listEventsLegacy, existsDuplicateEvent } from '../../db/queries/events';
+import { createEventTx, listEvents, listEventsLegacy, existsDuplicateEvent, getEventById } from '../../db/queries/events';
 import { registerTx } from '../../db/queries/registrations';
 import { mapPgError } from '../../db/errors';
 import { logger } from '../../../shared/utils/logger';
@@ -85,6 +85,67 @@ router.post('/', async (req: Request, res: Response) => {
   } catch (err) {
     const mapped = mapPgError(err);
     log.error('create_event_error', mapped);
+    return res.status(500).json({ error: mapped.message, code: mapped.code });
+  }
+});
+
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const eventIdRaw = req.params.id;
+    const eventId: string | number = (() => {
+      const n = Number(eventIdRaw);
+      return Number.isFinite(n) && n > 0 ? n : eventIdRaw;
+    })();
+    if (!eventIdRaw) {
+      log.warn('get_event_invalid_id', { id: eventIdRaw });
+      return res.status(400).json({ error: 'Invalid event id' });
+    }
+    
+    log.info('get_event_request', { eventId });
+    
+    // Try modern columns first; fall back to legacy on unknown column errors
+    let result;
+    try {
+      result = await pool.query(getEventById, [eventId]);
+    } catch (err: any) {
+      const msg = String(err?.message || '');
+      if (err?.code === '42703') {
+        // Handle missing columns by trying different schema variations
+        if (msg.includes('start_time') || msg.includes('end_time')) {
+          // Legacy schema with start/end columns
+          const legacyQuery = {
+            name: 'get-event-by-id-legacy',
+            text: `SELECT id, title, description, location, start AS start_time, "end" AS end_time, capacity, created_at
+                   FROM events WHERE id = $1`,
+          };
+          result = await pool.query(legacyQuery, [eventId]);
+        } else if (msg.includes('capacity')) {
+          // Modern schema without capacity column
+          const noCapacityQuery = {
+            name: 'get-event-by-id-no-capacity',
+            text: `SELECT id, title, description, location, start_time, end_time, created_at
+                   FROM events WHERE id = $1`,
+          };
+          result = await pool.query(noCapacityQuery, [eventId]);
+        } else {
+          throw err;
+        }
+      } else {
+        throw err;
+      }
+    }
+    
+    if (!result.rows || result.rows.length === 0) {
+      log.warn('get_event_not_found', { eventId });
+      return res.status(404).json({ error: 'Event not found' });
+    }
+    
+    log.info('get_event_success', { eventId });
+    return res.json({ event: result.rows[0] });
+  } catch (err) {
+    const mapped = mapPgError(err);
+    log.error('get_event_error', { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack, timestamp: new Date().toISOString() });
+    await errorLogger.logError('Event Error', err, { message: mapped.message, code: mapped.code, name: mapped.name, stack: mapped.stack });
     return res.status(500).json({ error: mapped.message, code: mapped.code });
   }
 });

@@ -60,7 +60,7 @@ describe('API Utility', () => {
       const result = await request('/test', { method: 'POST', body: mockBody });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test',
+        'http://localhost:3001/test',
         expect.objectContaining({
           method: 'POST',
           headers: expect.any(Headers),
@@ -121,7 +121,7 @@ describe('API Utility', () => {
       const result = await request('/test', { method: 'POST', body: mockFormData });
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test',
+        'http://localhost:3001/test',
         expect.objectContaining({
           method: 'POST',
           body: mockFormData,
@@ -165,7 +165,7 @@ describe('API Utility', () => {
       const result = await api.get('/test');
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test',
+        'http://localhost:3001/test',
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockResponse);
@@ -186,7 +186,7 @@ describe('API Utility', () => {
       const result = await api.post('/test', mockBody);
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test',
+        'http://localhost:3001/test',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify(mockBody),
@@ -210,7 +210,7 @@ describe('API Utility', () => {
       const result = await api.put('/test/1', mockBody);
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test/1',
+        'http://localhost:3001/test/1',
         expect.objectContaining({
           method: 'PUT',
           body: JSON.stringify(mockBody),
@@ -232,7 +232,7 @@ describe('API Utility', () => {
       const result = await api.del('/test/1');
       
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3002/test/1',
+        'http://localhost:3001/test/1',
         expect.objectContaining({ method: 'DELETE' })
       );
       expect(result).toBeUndefined();
