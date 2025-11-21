@@ -99,29 +99,29 @@ const LoginPage: React.FC = () => {
               </svg>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             Welcome back
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Sign in to your EarthForUs account
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 p-6 sm:p-8">
           {hasTestCreds && (
-            <div className="mb-6 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm">
-              <p className="font-semibold text-brand-700">Test credentials</p>
-              <div className="mt-2 space-y-1 text-gray-800">
+            <div className="mb-6 rounded-lg border border-brand-200 bg-brand-50 dark:border-brand-700 dark:bg-brand-900/30 p-4 text-sm">
+              <p className="font-semibold text-brand-700 dark:text-brand-300">Test credentials</p>
+              <div className="mt-2 space-y-1 text-gray-800 dark:text-gray-200">
                 <div><span className="font-medium">Email:</span> {testEmail}</div>
                 <div><span className="font-medium">Password:</span> {testPassword}</div>
               </div>
-              <p className="mt-2 text-xs text-gray-600">Use for local testing only.</p>
+              <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">Use for local testing only.</p>
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email address
               </label>
               <input
@@ -139,13 +139,13 @@ const LoginPage: React.FC = () => {
                 aria-errormessage={errors.email ? 'login-email-error' : undefined}
               />
               {errors.email && (
-                <p id="login-email-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.email}</p>
+                <p id="login-email-error" className="mt-1 text-sm text-red-600 dark:text-red-400" aria-live="polite">{errors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <input
@@ -163,7 +163,7 @@ const LoginPage: React.FC = () => {
                 aria-errormessage={errors.password ? 'login-password-error' : undefined}
               />
               {errors.password && (
-                <p id="login-password-error" className="mt-1 text-sm text-red-600" aria-live="polite">{errors.password}</p>
+                <p id="login-password-error" className="mt-1 text-sm text-red-600 dark:text-red-400" aria-live="polite">{errors.password}</p>
               )}
             </div>
 
@@ -178,7 +178,7 @@ const LoginPage: React.FC = () => {
                   onChange={handleInputChange}
                   className="ui-checkbox"
                 />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   Remember me
                 </label>
               </div>

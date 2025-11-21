@@ -12,9 +12,9 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return (
       <div className="content-wrapper">
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <h1 className="text-2xl font-bold mb-2">My Profile</h1>
-          <p className="text-gray-600">You need to be signed in to view your profile.</p>
+        <div className="ui-card text-center">
+          <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">My Profile</h1>
+          <p className="text-gray-600 dark:text-gray-300">You need to be signed in to view your profile.</p>
           <div className="mt-4">
             <Button variant="primary" onClick={() => navigate('/login')}>Sign In</Button>
           </div>
@@ -27,14 +27,14 @@ const ProfilePage: React.FC = () => {
     <div className="content-wrapper">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold tracking-tight mb-6">My Profile</h1>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="ui-card">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-brand-600 text-white flex items-center justify-center text-xl font-semibold">
               {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
             </div>
             <div>
-              <p className="text-lg font-semibold">{user.firstName} {user.lastName}</p>
-              <p className="text-gray-600">{user.email}</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{user.firstName} {user.lastName}</p>
+              <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
             </div>
           </div>
 

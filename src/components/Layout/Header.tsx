@@ -46,12 +46,12 @@ const Header: React.FC = () => {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="md">
                     Sign In
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button variant="primary" size="sm">
+                  <Button variant="primary" size="md">
                     Get Started
                   </Button>
                 </Link>

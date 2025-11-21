@@ -20,9 +20,9 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   const colorClasses = {
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    gray: 'text-gray-600'
+    blue: 'text-blue-600 dark:text-blue-400',
+    green: 'text-green-600 dark:text-green-400',
+    gray: 'text-gray-600 dark:text-gray-400'
   };
 
   return (

@@ -10,9 +10,9 @@ const LEVELS: Record<LogLevel, number> = {
 
 // Enhanced environment detection for deployment context
 function getEnvironmentContext(): { environment: string; isProduction: boolean; isDevelopment: boolean } {
-  const nodeEnv = (typeof process !== 'undefined' && process.env?.NODE_ENV) || 
-                 process.env.MODE || 
-                 'development';
+  const nodeEnv = typeof process !== 'undefined'
+    ? (process.env?.NODE_ENV || (process.env as unknown as Record<string, string | undefined>)?.MODE || 'development')
+    : 'development';
   
   const environment = nodeEnv.toUpperCase();
   const isProduction = environment === 'PRODUCTION' || environment === 'PROD';
@@ -28,10 +28,11 @@ function now() {
 }
 
 function getDefaultLevel(): LogLevel {
-  const fromEnv = process.env.VITE_LOG_LEVEL as LogLevel | undefined;
+  const fromEnv = typeof process !== 'undefined' ? (process.env?.VITE_LOG_LEVEL as LogLevel | undefined) : undefined;
   const { isProduction } = getEnvironmentContext();
-  const hasLocalStorage = typeof (globalThis as any).localStorage !== 'undefined';
-  const fromStorage = hasLocalStorage ? (((globalThis as any).localStorage.getItem('EFU_DEBUG') === 'true') ? 'debug' : undefined) : undefined;
+  const globalWithStorage = globalThis as unknown as { localStorage?: Storage };
+  const hasLocalStorage = typeof globalWithStorage.localStorage !== 'undefined';
+  const fromStorage = hasLocalStorage ? ((globalWithStorage.localStorage?.getItem('EFU_DEBUG') === 'true') ? 'debug' : undefined) : undefined;
   if (fromStorage) return fromStorage as LogLevel;
   if (fromEnv && LEVELS[fromEnv] !== undefined) return fromEnv;
   return isProduction ? 'warn' : 'debug';
@@ -72,9 +73,10 @@ export const logger = {
     return currentLevel;
   },
   enableDebug(enable = true) {
-    const hasLocalStorage = typeof (globalThis as any).localStorage !== 'undefined';
+    const globalWithStorage = globalThis as unknown as { localStorage?: Storage };
+    const hasLocalStorage = typeof globalWithStorage.localStorage !== 'undefined';
     if (hasLocalStorage) {
-      (globalThis as any).localStorage.setItem('EFU_DEBUG', enable ? 'true' : 'false');
+      globalWithStorage.localStorage?.setItem('EFU_DEBUG', enable ? 'true' : 'false');
     }
     currentLevel = enable ? 'debug' : 'warn';
     const { environment } = getEnvironmentContext();

@@ -54,20 +54,20 @@ const HomePage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl font-bold tracking-tight mb-6">Why EarthForUs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-4">🌱</div>
-            <h3 className="font-semibold mb-1">Meaningful Work</h3>
-            <p className="text-gray-600">Find events that align with your values—make real-world impact.</p>
+          <div className="ui-card">
+            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 flex items-center justify-center mb-4">🌱</div>
+            <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">Meaningful Work</h3>
+            <p className="text-gray-600 dark:text-gray-400">Find events that align with your values—make real-world impact.</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-4">🤝</div>
-            <h3 className="font-semibold mb-1">Community First</h3>
-            <p className="text-gray-600">Connect with organizers and volunteers in your area.</p>
+          <div className="ui-card">
+            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 flex items-center justify-center mb-4">🤝</div>
+            <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">Community First</h3>
+            <p className="text-gray-600 dark:text-gray-400">Connect with organizers and volunteers in your area.</p>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center mb-4">📅</div>
-            <h3 className="font-semibold mb-1">Easy Scheduling</h3>
-            <p className="text-gray-600">Browse and join events with a simple, clean interface.</p>
+          <div className="ui-card">
+            <div className="w-12 h-12 rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 flex items-center justify-center mb-4">📅</div>
+            <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">Easy Scheduling</h3>
+            <p className="text-gray-600 dark:text-gray-400">Browse and join events with a simple, clean interface.</p>
           </div>
         </div>
       </section>

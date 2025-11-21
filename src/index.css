@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "./shared/theme/padding.css";
 @import "./shared/theme/typography.css";
@@ -262,3 +263,16 @@ html.dark img.theme-image, html.dark video.theme-media, html.dark canvas.theme-m
   box-shadow: 0 0 0 1px #1F2937; /* subtle edge for dark surfaces */
   filter: contrast(1.02);
 }
+
+.ui-card {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 var(--shadow-color), 0 1px 2px -1px var(--shadow-color);
+  padding: var(--space-lg);
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.ui-card.compact { padding: var(--space-base); }
+.ui-card.spacious { padding: var(--space-xl); }

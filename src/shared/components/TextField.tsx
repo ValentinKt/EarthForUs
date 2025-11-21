@@ -40,11 +40,11 @@ export default function TextField({
     <div className={`mb-4 ${className || ''}`}>
       {label ? (
         <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          {label} {required ? <span className="text-red-600">*</span> : null}
+          {label} {required ? <span className="text-red-600 dark:text-red-400">*</span> : null}
         </label>
       ) : null}
       {description ? (
-        <p id={descId} className="mt-1 text-xs text-gray-500">{description}</p>
+        <p id={descId} className="mt-1 text-xs text-gray-500 dark:text-gray-400">{description}</p>
       ) : null}
       <input
         id={inputId}
@@ -62,7 +62,7 @@ export default function TextField({
         className={`ui-input mt-1`}
       />
       {error ? (
-        <p id={errId} className="mt-2 text-sm text-red-600" aria-live="polite">{error}</p>
+        <p id={errId} className="mt-2 text-sm text-red-600 dark:text-red-400" aria-live="polite">{error}</p>
       ) : null}
     </div>
   );

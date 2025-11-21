@@ -111,20 +111,20 @@ const SignupPage: React.FC = () => {
               </svg>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             Join EarthForUs
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Create your account and start making a difference
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 sm:p-8">
+        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Name Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   First name
                 </label>
                 <input
@@ -147,7 +147,7 @@ const SignupPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Last name
                 </label>
                 <input
@@ -172,7 +172,7 @@ const SignupPage: React.FC = () => {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email address
               </label>
               <input
@@ -196,7 +196,7 @@ const SignupPage: React.FC = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <input
@@ -223,7 +223,7 @@ const SignupPage: React.FC = () => {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirm password
               </label>
               <input
@@ -256,7 +256,7 @@ const SignupPage: React.FC = () => {
                   onChange={handleInputChange}
                   className={`ui-checkbox mt-1 ${errors.agreeToTerms ? 'border-red-500' : ''}`}
                 />
-                <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   I agree to the{' '}
                   <Link to="/terms" className="text-brand-600 hover:text-brand-500">
                     Terms of Service
@@ -268,7 +268,7 @@ const SignupPage: React.FC = () => {
                 </label>
               </div>
               {errors.agreeToTerms && (
-                <p className="mt-1 text-sm text-red-600">{errors.agreeToTerms}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.agreeToTerms}</p>
               )}
             </div>
 

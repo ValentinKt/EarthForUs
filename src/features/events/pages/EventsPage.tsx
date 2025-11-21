@@ -86,8 +86,8 @@ const EventsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Discover Events</h1>
-          <p className="text-gray-600">Find and join local environmental initiatives.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Discover Events</h1>
+          <p className="text-gray-600 dark:text-gray-400">Find and join local environmental initiatives.</p>
         </div>
         <Link to="/events/create">
           <Button variant="primary">Create Event</Button>
@@ -98,14 +98,14 @@ const EventsPage: React.FC = () => {
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[0,1,2].map(i => (
-            <div key={i} className="h-40 rounded-xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+            <div key={i} className="h-40 ui-card animate-pulse" />
           ))}
         </div>
       )}
 
       {/* Error */}
       {!isLoading && error && (
-        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900 p-4 text-red-700 dark:text-red-300">
+        <div className="ui-card compact border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-300">
           <div className="flex items-center justify-between">
             <span>{error}</span>
             <Button variant="earth" onClick={() => window.location.reload()}>Retry</Button>
@@ -115,7 +115,7 @@ const EventsPage: React.FC = () => {
 
       {/* Empty */}
       {!isLoading && !error && events.length === 0 && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 text-center">
+        <div className="ui-card text-center spacious">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No upcoming events</h3>
           <p className="text-gray-600 dark:text-gray-300 mb-4">Be the first to create one for your community.</p>
           <Link to="/events/create">
@@ -128,10 +128,10 @@ const EventsPage: React.FC = () => {
       {!isLoading && !error && events.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map(ev => (
-            <div key={ev.id} className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm">
+            <div key={ev.id} className="ui-card">
               <div className="flex items-start justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{ev.title}</h3>
-                <span className="text-xs text-brand-700 bg-brand-100 px-2 py-1 rounded">{new Date(ev.start_time).toLocaleDateString()}</span>
+                <span className="text-xs text-brand-700 bg-brand-100 px-2 py-1 rounded dark:text-brand-300 dark:bg-brand-900/30">{new Date(ev.start_time).toLocaleDateString()}</span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{ev.location || 'Location TBA'}</p>
               <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">

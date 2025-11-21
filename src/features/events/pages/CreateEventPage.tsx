@@ -271,7 +271,7 @@ const CreateEventPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={decrementCapacity}
-                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700"
+                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700 dark:border-brand-500 dark:hover:bg-brand-900/30 dark:text-brand-300"
                   aria-label="Decrease capacity"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" /></svg>
@@ -287,7 +287,7 @@ const CreateEventPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={incrementCapacity}
-                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700"
+                  className="inline-flex items-center justify-center h-14 w-14 rounded-xl border border-brand-300 hover:bg-brand-50 text-brand-700 dark:border-brand-500 dark:hover:bg-brand-900/30 dark:text-brand-300"
                   aria-label="Increase capacity"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14M5 12h14" /></svg>
@@ -318,9 +318,9 @@ const CreateEventPage: React.FC = () => {
               {tools.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {tools.map((t, i) => (
-                    <span key={`${t}-${i}`} className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 rounded-full px-3 py-1 text-sm">
+                    <span key={`${t}-${i}`} className="inline-flex items-center gap-2 bg-brand-100 text-brand-700 rounded-full px-3 py-1 text-sm dark:bg-brand-900/30 dark:text-brand-300">
                       {t}
-                      <button type="button" onClick={() => removeTool(i)} className="text-brand-700/80 hover:text-brand-900">
+                      <button type="button" onClick={() => removeTool(i)} className="text-brand-700/80 hover:text-brand-900 dark:text-brand-300/80 dark:hover:text-brand-100">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                       </button>
                     </span>
@@ -331,9 +331,9 @@ const CreateEventPage: React.FC = () => {
           </div>
         </section>
 
-        {error && <p className="text-red-600 text-sm" aria-live="polite">{error}</p>}
+        {error && <p className="text-red-600 dark:text-red-400 text-sm" aria-live="polite">{error}</p>}
         {successBanner && (
-          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-green-700">
+          <div className="mt-4 rounded-lg border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900 p-3 text-green-700 dark:text-green-300">
             Event created successfully. Redirecting...
           </div>
         )}

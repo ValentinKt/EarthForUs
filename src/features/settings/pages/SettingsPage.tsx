@@ -85,8 +85,9 @@ const SettingsPage: React.FC = () => {
       login({ id: updated.id, email: updated.email, firstName: updated.first_name, lastName: updated.last_name });
       toast.success('Profile updated');
       setProfileStatus('Profile updated successfully');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to update profile');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to update profile';
+      toast.error(message);
       setProfileStatus('Failed to update profile');
     } finally {
       setSavingProfile(false);
@@ -149,8 +150,9 @@ const SettingsPage: React.FC = () => {
       setPwTouched({ current: false, new: false, confirm: false });
       setPasswordErrors({});
       toast.success('Password updated');
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to update password');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to update password';
+      toast.error(message);
     } finally {
       setSavingPassword(false);
     }
@@ -159,9 +161,9 @@ const SettingsPage: React.FC = () => {
   if (!user) {
     return (
       <div className="content-wrapper">
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <h1 className="text-2xl font-bold mb-2">Account Settings</h1>
-          <p className="text-gray-600">You need to be signed in to edit your profile.</p>
+        <div className="ui-card text-center">
+          <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Account Settings</h1>
+          <p className="text-gray-600 dark:text-gray-300">You need to be signed in to edit your profile.</p>
         </div>
       </div>
     );
@@ -170,18 +172,18 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="content-wrapper">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold tracking-tight mb-6">Account Settings</h1>
-        <p className="text-sm text-gray-600 mb-4">Manage your personal information and security. Press Enter to submit forms.</p>
+        <h1 className="text-2xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100">Account Settings</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Manage your personal information and security. Press Enter to submit forms.</p>
 
         {/* Profile card */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="ui-card">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Profile</h2>
-              <p className="text-sm text-gray-600">Update your name and view email</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Profile</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Update your name and view email</p>
             </div>
             {profileDirty ? (
-              <span className="inline-flex items-center rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-xs font-medium">Unsaved changes</span>
+              <span className="inline-flex items-center rounded-full bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 px-3 py-1 text-xs font-medium">Unsaved changes</span>
             ) : null}
           </div>
 
@@ -229,13 +231,13 @@ const SettingsPage: React.FC = () => {
 
         {/* Password card */}
         {/* Appearance card */}
-        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+        <div className="ui-card mt-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 id="appearance-heading" className="text-lg font-semibold">Appearance</h2>
+              <h2 id="appearance-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-100">Appearance</h2>
               <p id="appearance-help" className="text-sm text-gray-600 dark:text-gray-300">Choose your theme preference for the app.</p>
             </div>
-            <span className="inline-flex items-center rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-xs font-medium">
+            <span className="inline-flex items-center rounded-full bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 px-3 py-1 text-xs font-medium">
               {resolvedTheme === 'dark' ? 'Dark' : 'Light'}{theme === 'system' ? ' (System)' : ''}
             </span>
           </div>
@@ -243,7 +245,7 @@ const SettingsPage: React.FC = () => {
           <fieldset className="mt-4" aria-labelledby="appearance-heading" aria-describedby="appearance-help">
             <legend className="sr-only">Theme</legend>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <label htmlFor="theme-light" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+              <label htmlFor="theme-light" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:border-brand-400 dark:hover:border-brand-500">
                 <input
                   id="theme-light"
                   type="radio"
@@ -253,9 +255,9 @@ const SettingsPage: React.FC = () => {
                   onChange={() => setTheme('light')}
                   aria-describedby="appearance-help"
                 />
-                <span className="text-sm font-medium">Light</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Light</span>
               </label>
-              <label htmlFor="theme-dark" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+              <label htmlFor="theme-dark" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:border-brand-400 dark:hover:border-brand-500">
                 <input
                   id="theme-dark"
                   type="radio"
@@ -265,9 +267,9 @@ const SettingsPage: React.FC = () => {
                   onChange={() => setTheme('dark')}
                   aria-describedby="appearance-help"
                 />
-                <span className="text-sm font-medium">Dark</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Dark</span>
               </label>
-              <label htmlFor="theme-system" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+              <label htmlFor="theme-system" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 hover:border-brand-400 dark:hover:border-brand-500">
                 <input
                   id="theme-system"
                   type="radio"
@@ -277,15 +279,15 @@ const SettingsPage: React.FC = () => {
                   onChange={() => setTheme('system')}
                   aria-describedby="appearance-help"
                 />
-                <span className="text-sm font-medium">System</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">System</span>
               </label>
             </div>
           </fieldset>
         </div>
 
         {/* Password card */}
-        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
-          <h2 id="security-heading" className="text-lg font-semibold">Security</h2>
+        <div className="ui-card mt-6">
+          <h2 id="security-heading" className="text-lg font-semibold text-gray-900 dark:text-gray-100">Security</h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">Change your password</p>
           <form onSubmit={savePassword} aria-labelledby="security-heading">
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -321,7 +323,7 @@ const SettingsPage: React.FC = () => {
                     {showNew ? 'Hide' : 'Show'}
                   </Button>
                   {newPassword && (
-                    <span className={`text-xs font-medium ${passwordStrength === 'strong' ? 'text-green-700' : passwordStrength === 'medium' ? 'text-yellow-700' : 'text-red-700'}`}>Strength: {passwordStrength}</span>
+                    <span className={`text-xs font-medium ${passwordStrength === 'strong' ? 'text-green-700 dark:text-green-400' : passwordStrength === 'medium' ? 'text-yellow-700 dark:text-yellow-400' : 'text-red-700 dark:text-red-400'}`}>Strength: {passwordStrength}</span>
                   )}
                 </div>
               </div>
