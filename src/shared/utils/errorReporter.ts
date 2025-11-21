@@ -1,7 +1,7 @@
 import { logger } from './logger';
 
 const log = logger.withContext('ErrorReporter');
-const BASE = String(((import.meta as unknown as { env?: Record<string, unknown> })?.env?.VITE_API_BASE) || '');
+const BASE = String((typeof process !== 'undefined' && process.env?.VITE_API_BASE) || '');
 
 function buildUrl(path: string) {
   return path.startsWith('http') ? path : `${BASE}${path}`;
@@ -16,11 +16,23 @@ function getContext(extra?: Record<string, unknown>) {
 }
 
 export async function report(error: unknown, type = 'Client Error', extra?: Record<string, unknown>) {
-  const message = error instanceof Error
-    ? error.message
-    : typeof error === 'string'
-      ? error
-      : String(error);
+  let message: string;
+  
+  if (error instanceof Error) {
+    message = error.message;
+  } else if (typeof error === 'string') {
+    message = error;
+  } else if (typeof error === 'object' && error !== null) {
+    // Handle objects properly - try to extract meaningful information
+    try {
+      message = JSON.stringify(error, null, 2);
+    } catch {
+      message = String(error);
+    }
+  } else {
+    message = String(error);
+  }
+  
   const stack = error instanceof Error && typeof error.stack === 'string' ? error.stack : null;
   const payload = {
     type,

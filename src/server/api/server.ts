@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import express from 'express';
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
 import type { Request, Response } from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
 import { createServer } from 'http';
 import authRouter from './routes/auth';
 import eventsRouter from './routes/events';
@@ -34,16 +34,30 @@ app.use('/api', logsRouter);
 // Create WebSocket server for real-time chat
 createWebSocketServer(server);
 
-// Global error handler to persist unhandled errors
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use(async (err: unknown, req: Request, res: Response, _next: any) => {
+app.use(async (err: unknown, req: Request, res: Response) => {
   await errorLogger.logError('Server Error', err, { route: req.originalUrl });
   res.status(500).json({ error: 'Internal server error' });
 });
 
 const port = Number(process.env.API_PORT || 3001);
-server.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`[api] Server listening on http://localhost:${port}`);
+const onListen = (p: number) => {
+  console.log(`[api] Server listening on http://localhost:${p}`);
   console.log(`[websocket] WebSocket server started`);
+};
+
+server.on('error', (err: NodeJS.ErrnoException) => {
+  if (err && err.code === 'EADDRINUSE') {
+    const next = port + 1;
+    try {
+      server.listen(next, () => onListen(next));
+    } catch (e) {
+      void errorLogger.logError('Server Listen Error', e, null);
+      process.exit(1);
+    }
+  } else {
+    void errorLogger.logError('Server Listen Error', err, null);
+    process.exit(1);
+  }
 });
+
+server.listen(port, () => onListen(port));

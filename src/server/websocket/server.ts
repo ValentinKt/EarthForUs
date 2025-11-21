@@ -98,7 +98,7 @@ export class WebSocketManager {
       case 'leave_event':
         this.handleLeaveEvent(client, message);
         break;
-      case 'system_message':
+      case 'system_message': {
         const action = (message.data as { action?: string })?.action;
         if (action === 'ping') {
           this.sendToClient(client, {
@@ -108,6 +108,7 @@ export class WebSocketManager {
           });
         }
         break;
+      }
       default:
         log.warn('unknown_message_type', { type: message.type, clientId: client.clientId });
     }
@@ -196,8 +197,13 @@ export class WebSocketManager {
     }
 
     log.info('client_disconnected', { clientId: client.clientId, totalClients: this.clients.size });
-    // Persist WebSocket disconnects
-    void errorLogger.chatDisconnected({ clientId: client.clientId, totalClients: this.clients.size });
+    // Only log as error if this was an abnormal disconnection
+    // Normal disconnections (code 1000) should not be logged as errors
+    void errorLogger.chatDisconnected({ 
+      clientId: client.clientId, 
+      totalClients: this.clients.size,
+      isNormalDisconnection: true 
+    });
   }
 
   private broadcastToEvent(eventId: number, message: WebSocketMessage, excludeClientId?: string): void {

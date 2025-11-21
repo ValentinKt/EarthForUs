@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { report } from '../utils/errorReporter';
 
 type ToastVariant = 'success' | 'error' | 'info';

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LoginForm } from '../../../types';
 import Button from '../../../shared/ui/Button';
@@ -7,8 +8,8 @@ import { useAuth } from '../context/AuthContext';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const testEmail = (import.meta as any).env?.VITE_TEST_USER_EMAIL as string | undefined;
-  const testPassword = (import.meta as any).env?.VITE_TEST_USER_PASSWORD as string | undefined;
+  const testEmail = (typeof process !== 'undefined' && process.env?.VITE_TEST_USER_EMAIL) as string | undefined;
+  const testPassword = (typeof process !== 'undefined' && process.env?.VITE_TEST_USER_PASSWORD) as string | undefined;
   const hasTestCreds = !!(testEmail && testPassword);
   const [formData, setFormData] = useState<LoginForm>({
     email: '',

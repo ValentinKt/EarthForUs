@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { DropdownItem } from '../../types';
 import { useAuth } from '../../features/auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';

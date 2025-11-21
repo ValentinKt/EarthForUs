@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TextField from '../../../shared/components/TextField';
 import Button from '../../../shared/ui/Button';
 import { useAuth } from '../../auth/context/AuthContext';

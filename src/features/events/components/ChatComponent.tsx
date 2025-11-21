@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { api } from '../../../shared/utils/api';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
@@ -38,7 +39,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
   const handlers = useMemo(() => ({
       onMessage: (wsMessage: WebSocketMessage) => {
         if (wsMessage.type === 'chat_message' && wsMessage.data.event_id === eventId) {
-          // Add new message to the list
           setMessages(prev => [...prev, wsMessage.data]);
           scrollToBottom();
           log.info('real_time_message_received', { messageId: wsMessage.data.id, eventId });
@@ -47,15 +47,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
       onOpen: () => {
         log.info('websocket_connected', { eventId });
         showSuccess('Connected to real-time chat', 'Connection');
-        
-        // Join the event room when connected
-        const joinMessage: WebSocketMessage = {
-          type: 'join_event',
-          data: { eventId },
-          timestamp: new Date().toISOString(),
-          eventId
-        };
-        wsSend(joinMessage);
       },
       onClose: () => {
         log.warn('websocket_disconnected', { eventId });
@@ -67,12 +58,60 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
       }
   }), [eventId, log, showSuccess, showError]);
 
+  const apiBase = (typeof process !== 'undefined' && process.env?.VITE_API_BASE) || 'http://localhost:3001';
+  const wsUrl = apiBase.replace(/^http(s?):\/\//, 'ws$1://');
   const { isConnected, sendMessage: wsSend, manager } = useWebSocket(
-    `ws://localhost:3001`,
+    wsUrl,
     handlers
   );
 
+  useEffect(() => {
+    if (!isConnected) return;
+    const joinMessage: WebSocketMessage = {
+      type: 'join_event',
+      data: { eventId },
+      timestamp: new Date().toISOString(),
+      eventId
+    };
+    wsSend(joinMessage);
+  }, [isConnected, eventId, wsSend]);
+
   // Fetch messages on component mount
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const fetchMessages = useCallback(async () => {
+    try {
+      const data = await api.get<unknown>(`/api/events/${eventId}/messages`);
+      let next: ChatMessage[] = [];
+      if (Array.isArray(data)) {
+        next = data as ChatMessage[];
+      } else if (data && typeof data === 'object' && 'messages' in (data as Record<string, unknown>)) {
+        const raw = (data as { messages: Array<{ id: number; message: string; createdAt: string; user: { id: number; firstName?: string; lastName?: string } }> }).messages || [];
+        next = raw.map((row) => ({
+          id: row.id,
+          message: row.message,
+          created_at: row.createdAt,
+          user_id: row.user.id,
+          user_name: [row.user.firstName, row.user.lastName].filter(Boolean).join(' ') || 'User',
+          event_id: eventId
+        }));
+      }
+      setMessages(next);
+      try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch (err) { log.warn('cache_write_error', { err }); }
+      log.info('messages_fetched', { count: next.length, eventId });
+    } catch (error) {
+      log.error('fetch_messages_error', { error, eventId });
+      if (!isLoading) return;
+      showError('Failed to load chat messages', 'Chat Error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [eventId, cacheKey, isLoading, showError, log]);
+
   useEffect(() => {
     try {
       const cached = localStorage.getItem(cacheKey);
@@ -83,7 +122,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
           setIsLoading(false);
         }
       }
-    } catch {}
+    } catch (err) {
+      log.warn('cache_read_error', { err });
+    }
     fetchMessages();
     const interval = setInterval(() => {
       if (!isConnected) {
@@ -91,29 +132,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
       }
     }, 30000);
     return () => clearInterval(interval);
-  }, [eventId, isConnected, cacheKey]);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const fetchMessages = async () => {
-    try {
-      const data = await api.get<ChatMessage[]>(`/api/events/${eventId}/messages`);
-      const next = data || [];
-      setMessages(next);
-      try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch {}
-      log.info('messages_fetched', { count: data?.length || 0, eventId });
-    } catch (error) {
-      log.error('fetch_messages_error', { error, eventId });
-      // Don't show error toast for background polling
-      if (!isLoading) return;
-      showError('Failed to load chat messages', 'Chat Error');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [eventId, isConnected, cacheKey, fetchMessages, log]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -143,12 +162,26 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
         user_name: currentUserName || 'Anonymous User'
       };
 
-      const sentMessage = await api.post<ChatMessage>(`/api/events/${eventId}/messages`, messageData);
+      const sent = await api.post<unknown>(`/api/events/${eventId}/messages`, messageData);
+      let sentMessage: ChatMessage;
+      if (sent && typeof sent === 'object' && 'message' in (sent as Record<string, unknown>)) {
+        const m = (sent as { message: { id: number; message: string; createdAt: string } }).message;
+        sentMessage = {
+          id: m.id,
+          message: m.message,
+          created_at: m.createdAt,
+          user_id: currentUserId || 1,
+          user_name: currentUserName || 'Anonymous User',
+          event_id: eventId
+        };
+      } else {
+        sentMessage = sent as ChatMessage;
+      }
       
       // Add the new message to the list
       setMessages(prev => {
         const next = [...prev, sentMessage];
-        try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch {}
+        try { localStorage.setItem(cacheKey, JSON.stringify(next)); } catch (err) { log.warn('cache_write_error', { err }); }
         return next;
       });
       
@@ -189,8 +222,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
     return new Date(timestamp).toLocaleDateString();
   };
 
+  type ChatRow = ChatMessage | { __sep: string; key: string };
   const withDateSeparators = useMemo(() => {
-    const rows: Array<ChatMessage | { __sep: string; key: string }> = [];
+    const rows: ChatRow[] = [];
     let lastDate = '';
     for (const m of messages) {
       const d = formatMessageDate(m.created_at);
@@ -251,7 +285,16 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
           </div>
         ) : (
           withDateSeparators.map((row) => (
-            'id' in (row as any) ? (
+            '__sep' in row ? (
+              <div
+                key={(row as { __sep: string; key: string }).key}
+                className="flex justify-center"
+              >
+                <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
+                  {(row as { __sep: string; key: string }).__sep}
+                </span>
+              </div>
+            ) : (
               <div
                 key={(row as ChatMessage).id}
                 className={`flex ${((row as ChatMessage).user_id === currentUserId) ? 'justify-end' : 'justify-start'}`}
@@ -276,12 +319,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
                   </div>
                 </div>
               </div>
-            ) : (
-              <div key={(row as any).key} className="flex justify-center">
-                <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
-                  {(row as any).__sep}
-                </span>
-              </div>
             )
           ))
         )}
@@ -303,7 +340,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ eventId, currentUserId, c
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                void handleSendMessage(new Event('submit') as any);
+                void handleSendMessage(new Event('submit') as unknown as React.FormEvent);
               }
             }}
             placeholder="Type your message..."

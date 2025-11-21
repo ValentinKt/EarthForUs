@@ -36,7 +36,7 @@ class EnvironmentManager {
 
   private loadConfiguration(): EnvironmentConfig {
     const nodeEnv = (typeof process !== 'undefined' && process.env?.NODE_ENV) || 
-                   (import.meta as any)?.env?.MODE || 
+                   process.env.MODE || 
                    'development';
     
     const environment = nodeEnv.toUpperCase() === 'PRODUCTION' || nodeEnv.toUpperCase() === 'PROD' ? 'PROD' : 'DEV';
@@ -44,7 +44,7 @@ class EnvironmentManager {
     const isDevelopment = !isProduction;
 
     // Load Vite environment variables
-    const viteEnv = (import.meta as any)?.env || {};
+    const viteEnv = (typeof process !== 'undefined' && process.env) || {};
     
     return {
       environment,

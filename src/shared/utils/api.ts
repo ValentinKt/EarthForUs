@@ -13,7 +13,7 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 };
 
 const log = logger.withContext('ApiClient');
-const BASE = (import.meta as any)?.env?.VITE_API_BASE || '';
+const BASE = 'http://localhost:3002';
 
 function buildUrl(path: string) {
   if (!path.startsWith('http')) return `${BASE}${path}`;
@@ -23,16 +23,15 @@ function buildUrl(path: string) {
 function normalizeInit(init: RequestOptions = {}): RequestInit {
   const headers = new Headers(init.headers || {});
   headers.set('Accept', 'application/json');
-  // If body is plain object and no content-type set, set JSON
-  const body = (init as any).body;
+  const body = init.body;
+  let nextBody: BodyInit | null | undefined = body as BodyInit | null | undefined;
   if (body && !(body instanceof FormData)) {
     const hasCt = !!headers.get('Content-Type');
     if (!hasCt) headers.set('Content-Type', 'application/json');
-    if (typeof body !== 'string') {
-      (init as any).body = JSON.stringify(body);
-    }
+    nextBody = typeof body === 'string' ? body : JSON.stringify(body);
   }
-  return { ...init, headers } as RequestInit;
+  const next: RequestInit = { ...init, headers, body: nextBody };
+  return next;
 }
 
 async function parseBody<T>(res: Response, forceJson = false): Promise<T | undefined> {
@@ -40,9 +39,21 @@ async function parseBody<T>(res: Response, forceJson = false): Promise<T | undef
   const ct = res.headers.get('content-type') || '';
   const isJson = forceJson || ct.includes('application/json');
   try {
-    return isJson ? await res.json() : ((await res.text()) as unknown as T);
+    if (isJson) {
+      return await res.json();
+    }
+    const txt = await res.text();
+    const trimmed = txt.trim();
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        return JSON.parse(trimmed) as T;
+      } catch (err) {
+        log.debug('text_json_parse_failed', { error: err });
+      }
+    }
+    return txt as unknown as T;
   } catch (e) {
-    log.warn('parse_failed', { status: res.status, contentType: ct });
+    log.warn('parse_failed', { status: res.status, contentType: ct, error: e });
     return undefined;
   }
 }
@@ -59,11 +70,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     const body = await parseBody<T>(res, !!options.json);
     if (res.ok) {
       log.info('success', { status: res.status });
-      return (body as T);
+      return body as T;
     }
     const err: ApiError = { status: res.status, body };
     log.error('failure', err);
-    throw Object.assign(new Error((body as any)?.error || 'Request failed'), err);
+    const msg = typeof body === 'object' && body !== null && 'error' in (body as Record<string, unknown>)
+      ? String((body as Record<string, unknown>).error)
+      : 'Request failed';
+    throw Object.assign(new Error(msg), err);
   } catch (e) {
     log.error('exception', { message: (e as Error)?.message });
     report(e, 'API Error', { method, url });

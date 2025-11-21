@@ -1,0 +1,103 @@
+// Environment Configuration Manager
+// Handles environment-specific settings for deployment
+
+import { logger } from './logger';
+
+export interface EnvironmentConfig {
+  environment: 'PROD' | 'DEV';
+  isProduction: boolean;
+  isDevelopment: boolean;
+  apiBase: string;
+  logLevel: string;
+  enableDebug: boolean;
+  showErrorDetails: boolean;
+  security: {
+    enableTestCredentials: boolean;
+    enableDetailedErrors: boolean;
+    validateHttps: boolean;
+  };
+}
+
+class EnvironmentManager {
+  private static instance: EnvironmentManager;
+  private config: EnvironmentConfig;
+
+  private constructor() {
+    this.config = this.loadConfiguration();
+    logger.info(`Environment configured: ${this.config.environment}`, undefined, 'EnvironmentManager');
+  }
+
+  static getInstance(): EnvironmentManager {
+    if (!EnvironmentManager.instance) {
+      EnvironmentManager.instance = new EnvironmentManager();
+    }
+    return EnvironmentManager.instance;
+  }
+
+  private loadConfiguration(): EnvironmentConfig {
+    const nodeEnv = (typeof process !== 'undefined' && process.env?.NODE_ENV) || 
+                   process.env.MODE || 
+                   'development';
+    
+    const environment = nodeEnv.toUpperCase() === 'PRODUCTION' || nodeEnv.toUpperCase() === 'PROD' ? 'PROD' : 'DEV';
+    const isProduction = environment === 'PROD';
+    const isDevelopment = !isProduction;
+
+    // Load Vite environment variables
+    const viteEnv = (import.meta as any)?.env || {};
+    
+    return {
+      environment,
+      isProduction,
+      isDevelopment,
+      apiBase: viteEnv.VITE_API_BASE || 'http://localhost:3001',
+      logLevel: viteEnv.VITE_LOG_LEVEL || (isProduction ? 'warn' : 'debug'),
+      enableDebug: viteEnv.VITE_ENABLE_DEBUG === 'true' || isDevelopment,
+      showErrorDetails: viteEnv.VITE_SHOW_ERROR_DETAILS === 'true' || isDevelopment,
+      security: {
+        enableTestCredentials: !isProduction,
+        enableDetailedErrors: isDevelopment,
+        validateHttps: isProduction
+      }
+    };
+  }
+
+  getConfig(): EnvironmentConfig {
+    return { ...this.config };
+  }
+
+  isProduction(): boolean {
+    return this.config.isProduction;
+  }
+
+  isDevelopment(): boolean {
+    return this.config.isDevelopment;
+  }
+
+  validateEnvironment(): void {
+    const { isProduction, apiBase, security } = this.config;
+    
+    logger.info('Validating environment configuration...', undefined, 'EnvironmentManager');
+
+    if (isProduction) {
+      // Production validations
+      if (apiBase.includes('localhost')) {
+        logger.error('Production API cannot use localhost', undefined, 'EnvironmentManager');
+        throw new Error('Invalid production configuration');
+      }
+
+      if (!apiBase.startsWith('https://') && security.validateHttps) {
+        logger.warn('Production API should use HTTPS', undefined, 'EnvironmentManager');
+      }
+    }
+
+    logger.info('Environment validation completed', undefined, 'EnvironmentManager');
+  }
+
+  getEnvironmentBadge(): string {
+    return this.config.isProduction ? '🔴 PRODUCTION' : '🟢 DEVELOPMENT';
+  }
+}
+
+export const environmentManager = EnvironmentManager.getInstance();
+export const getEnvironmentConfig = () => environmentManager.getConfig();

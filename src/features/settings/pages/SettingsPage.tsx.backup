@@ -1,0 +1,356 @@
+import * as React
+import { useEffect, useMemo, useState } from 'react';
+import TextField from '../../../shared/components/TextField';
+import Button from '../../../shared/ui/Button';
+import { useAuth } from '../../auth/context/AuthContext';
+import { useToast } from '../../../shared/components/Toast';
+import { api } from '../../../shared/utils/api';
+import { logger } from '../../../shared/utils/logger';
+import { useTheme } from '../../../shared/theme/ThemeContext';
+
+const SettingsPage: React.FC = () => {
+  const { user, login } = useAuth();
+  const toast = useToast();
+  const log = logger.withContext('SettingsPage');
+  const { theme, resolvedTheme, setTheme } = useTheme();
+
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string }>({});
+  const [touched, setTouched] = useState<{ firstName: boolean; lastName: boolean }>({ firstName: false, lastName: false });
+  const [profileStatus, setProfileStatus] = useState<string>('');
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<{ currentPassword?: string; newPassword?: string; confirmPassword?: string }>({});
+  const [pwTouched, setPwTouched] = useState<{ current: boolean; new: boolean; confirm: boolean }>({ current: false, new: false, confirm: false });
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | ''>('');
+
+  useEffect(() => {
+    setFirstName(user?.firstName || '');
+    setLastName(user?.lastName || '');
+  }, [user?.firstName, user?.lastName]);
+
+  const profileDirty = useMemo(() => {
+    return (user?.firstName ?? '') !== firstName || (user?.lastName ?? '') !== lastName;
+  }, [user?.firstName, user?.lastName, firstName, lastName]);
+
+  const validateProfile = () => {
+    const next: { firstName?: string; lastName?: string } = {};
+    const f = firstName.trim();
+    const l = lastName.trim();
+    if (!f) next.firstName = 'First name is required';
+    else if (f.length > 100) next.firstName = 'First name is too long';
+    if (!l) next.lastName = 'Last name is required';
+    else if (l.length > 100) next.lastName = 'Last name is too long';
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  useEffect(() => {
+    // Real-time validation after touch
+    const next: { firstName?: string; lastName?: string } = {};
+    const f = firstName.trim();
+    const l = lastName.trim();
+    if (touched.firstName) {
+      if (!f) next.firstName = 'First name is required';
+      else if (f.length > 100) next.firstName = 'First name is too long';
+    }
+    if (touched.lastName) {
+      if (!l) next.lastName = 'Last name is required';
+      else if (l.length > 100) next.lastName = 'Last name is too long';
+    }
+    setErrors(next);
+  }, [firstName, lastName, touched.firstName, touched.lastName]);
+
+  const saveProfile = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!user) return;
+    if (!validateProfile()) return;
+    try {
+      setSavingProfile(true);
+      setProfileStatus('Saving profile changes…');
+      log.info('save_profile');
+      const res = await api.put<{ user: { id: number; email: string; first_name: string; last_name: string } }>(`/api/users/${user.id}`, {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+      const updated = res.user;
+      login({ id: updated.id, email: updated.email, firstName: updated.first_name, lastName: updated.last_name });
+      toast.success('Profile updated');
+      setProfileStatus('Profile updated successfully');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update profile');
+      setProfileStatus('Failed to update profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const computeStrength = (pwd: string): 'weak' | 'medium' | 'strong' | '' => {
+    if (!pwd) return '';
+    const length = pwd.length >= 12;
+    const hasNum = /\d/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+    const score = [length, hasNum, hasLower, hasUpper, hasSpecial].filter(Boolean).length;
+    if (score >= 4) return 'strong';
+    if (score >= 3) return 'medium';
+    return 'weak';
+  };
+
+  const validatePassword = () => {
+    const next: { currentPassword?: string; newPassword?: string; confirmPassword?: string } = {};
+    if (!currentPassword) next.currentPassword = 'Current password is required';
+    if (!newPassword) next.newPassword = 'New password is required';
+    else if (newPassword.length < 8) next.newPassword = 'Use at least 8 characters';
+    if (!confirmPassword) next.confirmPassword = 'Please confirm your new password';
+    else if (newPassword !== confirmPassword) next.confirmPassword = 'Passwords do not match';
+    setPasswordErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  useEffect(() => {
+    // Real-time password validation and strength
+    setPasswordStrength(computeStrength(newPassword));
+    const next: { currentPassword?: string; newPassword?: string; confirmPassword?: string } = {};
+    if (pwTouched.new) {
+      if (!newPassword) next.newPassword = 'New password is required';
+      else if (newPassword.length < 8) next.newPassword = 'Use at least 8 characters';
+    }
+    if (pwTouched.confirm) {
+      if (!confirmPassword) next.confirmPassword = 'Please confirm your new password';
+      else if (newPassword !== confirmPassword) next.confirmPassword = 'Passwords do not match';
+    }
+    setPasswordErrors(prev => ({ ...prev, ...next }));
+  }, [newPassword, confirmPassword, pwTouched.new, pwTouched.confirm]);
+
+  const savePassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!user) return;
+    if (!validatePassword()) return;
+    try {
+      setSavingPassword(true);
+      log.info('save_password');
+      await api.put(`/api/users/${user.id}/password`, {
+        oldPassword: currentPassword,
+        newPassword,
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPwTouched({ current: false, new: false, confirm: false });
+      setPasswordErrors({});
+      toast.success('Password updated');
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update password');
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="content-wrapper">
+        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+          <h1 className="text-2xl font-bold mb-2">Account Settings</h1>
+          <p className="text-gray-600">You need to be signed in to edit your profile.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="content-wrapper">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold tracking-tight mb-6">Account Settings</h1>
+        <p className="text-sm text-gray-600 mb-4">Manage your personal information and security. Press Enter to submit forms.</p>
+
+        {/* Profile card */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Profile</h2>
+              <p className="text-sm text-gray-600">Update your name and view email</p>
+            </div>
+            {profileDirty ? (
+              <span className="inline-flex items-center rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-xs font-medium">Unsaved changes</span>
+            ) : null}
+          </div>
+
+          <form onSubmit={saveProfile} aria-labelledby="profile-heading">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <TextField
+                name="firstName"
+                label="First name"
+                value={firstName}
+                onChange={(e) => { setFirstName(e.target.value); setTouched(prev => ({ ...prev, firstName: true })); }}
+                required
+                error={errors.firstName}
+                description="Your public display name"
+                autoComplete="given-name"
+              />
+              <TextField
+                name="lastName"
+                label="Last name"
+                value={lastName}
+                onChange={(e) => { setLastName(e.target.value); setTouched(prev => ({ ...prev, lastName: true })); }}
+                required
+                error={errors.lastName}
+                description="Your family name"
+                autoComplete="family-name"
+              />
+              <TextField
+                name="email"
+                label="Email"
+                value={user.email}
+                onChange={() => {}}
+                disabled
+                description="Email is managed through authentication"
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="mt-4 flex gap-3">
+              <Button variant="primary" type="submit" loading={savingProfile} aria-label="Save profile changes" disabled={!profileDirty || !!errors.firstName || !!errors.lastName}>Save Changes</Button>
+              <Button variant="outline" type="button" onClick={() => { setFirstName(user.firstName); setLastName(user.lastName); setErrors({}); setTouched({ firstName: false, lastName: false }); }} aria-label="Reset profile form">Reset</Button>
+            </div>
+
+            <div className="sr-only" aria-live="polite">{profileStatus}</div>
+          </form>
+        </div>
+
+        {/* Password card */}
+        {/* Appearance card */}
+        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 id="appearance-heading" className="text-lg font-semibold">Appearance</h2>
+              <p id="appearance-help" className="text-sm text-gray-600 dark:text-gray-300">Choose your theme preference for the app.</p>
+            </div>
+            <span className="inline-flex items-center rounded-full bg-teal-100 text-teal-800 px-3 py-1 text-xs font-medium">
+              {resolvedTheme === 'dark' ? 'Dark' : 'Light'}{theme === 'system' ? ' (System)' : ''}
+            </span>
+          </div>
+
+          <fieldset className="mt-4" aria-labelledby="appearance-heading" aria-describedby="appearance-help">
+            <legend className="sr-only">Theme</legend>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <label htmlFor="theme-light" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+                <input
+                  id="theme-light"
+                  type="radio"
+                  name="theme"
+                  className="ui-radio"
+                  checked={theme === 'light'}
+                  onChange={() => setTheme('light')}
+                  aria-describedby="appearance-help"
+                />
+                <span className="text-sm font-medium">Light</span>
+              </label>
+              <label htmlFor="theme-dark" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+                <input
+                  id="theme-dark"
+                  type="radio"
+                  name="theme"
+                  className="ui-radio"
+                  checked={theme === 'dark'}
+                  onChange={() => setTheme('dark')}
+                  aria-describedby="appearance-help"
+                />
+                <span className="text-sm font-medium">Dark</span>
+              </label>
+              <label htmlFor="theme-system" className="flex items-center gap-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:border-brand-400">
+                <input
+                  id="theme-system"
+                  type="radio"
+                  name="theme"
+                  className="ui-radio"
+                  checked={theme === 'system'}
+                  onChange={() => setTheme('system')}
+                  aria-describedby="appearance-help"
+                />
+                <span className="text-sm font-medium">System</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        {/* Password card */}
+        <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <h2 id="security-heading" className="text-lg font-semibold">Security</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Change your password</p>
+          <form onSubmit={savePassword} aria-labelledby="security-heading">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <TextField
+                  name="currentPassword"
+                  label="Current password"
+                  type={showCurrent ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => { setCurrentPassword(e.target.value); setPwTouched(prev => ({ ...prev, current: true })); }}
+                  required
+                  error={pwTouched.current ? passwordErrors.currentPassword : undefined}
+                />
+                <div className="mt-1 text-right">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle current password visibility" onClick={() => setShowCurrent(s => !s)}>
+                    {showCurrent ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <TextField
+                  name="newPassword"
+                  label="New password"
+                  type={showNew ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPwTouched(prev => ({ ...prev, new: true })); }}
+                  required
+                  error={pwTouched.new ? passwordErrors.newPassword : undefined}
+                  description="Use 8+ characters with a mix of letters, numbers, symbols"
+                />
+                <div className="mt-1 flex items-center justify-between">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle new password visibility" onClick={() => setShowNew(s => !s)}>
+                    {showNew ? 'Hide' : 'Show'}
+                  </Button>
+                  {newPassword && (
+                    <span className={`text-xs font-medium ${passwordStrength === 'strong' ? 'text-green-700' : passwordStrength === 'medium' ? 'text-yellow-700' : 'text-red-700'}`}>Strength: {passwordStrength}</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <TextField
+                  name="confirmPassword"
+                  label="Confirm new password"
+                  type={showConfirm ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setPwTouched(prev => ({ ...prev, confirm: true })); }}
+                  required
+                  error={pwTouched.confirm ? passwordErrors.confirmPassword : undefined}
+                />
+                <div className="mt-1 text-right">
+                  <Button variant="ghost" size="sm" type="button" aria-label="Toggle confirm password visibility" onClick={() => setShowConfirm(s => !s)}>
+                    {showConfirm ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <Button variant="earth" type="submit" loading={savingPassword} aria-label="Update password" disabled={!!passwordErrors.currentPassword || !!passwordErrors.newPassword || !!passwordErrors.confirmPassword}>Update Password</Button>
+              <Button variant="outline" type="button" aria-label="Clear password fields" onClick={() => { setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordErrors({}); setPwTouched({ current: false, new: false, confirm: false }); }}>Clear</Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SettingsPage;

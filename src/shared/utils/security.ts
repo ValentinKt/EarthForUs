@@ -68,23 +68,23 @@ export class SecurityValidator {
   }
 
   private validateHTTPS(): boolean {
-    const apiBase = (import.meta as any)?.env?.VITE_API_BASE || '';
+    const apiBase = process.env.VITE_API_BASE || '';
     return !apiBase.includes('localhost') && apiBase.startsWith('https://');
   }
 
   private validateTestCredentials(): boolean {
-    const testEmail = (import.meta as any)?.env?.VITE_TEST_USER_EMAIL;
-    const testPassword = (import.meta as any)?.env?.VITE_TEST_USER_PASSWORD;
+    const testEmail = process.env.VITE_TEST_USER_EMAIL;
+    const testPassword = process.env.VITE_TEST_USER_PASSWORD;
     return !(testEmail && testPassword);
   }
 
   private validateDebugMode(): boolean {
-    const debugMode = (import.meta as any)?.env?.VITE_ENABLE_DEBUG;
+    const debugMode = process.env.VITE_ENABLE_DEBUG;
     return debugMode !== 'true';
   }
 
   private validateAPIBaseURL(): boolean {
-    const apiBase = (import.meta as any)?.env?.VITE_API_BASE;
+    const apiBase = process.env.VITE_API_BASE;
     return apiBase && apiBase.length > 0 && !apiBase.includes('undefined');
   }
 
@@ -109,7 +109,7 @@ export class SecurityValidator {
         const fs = require('fs');
         const path = require('path');
         const url = require('url');
-        const __filename = url.fileURLToPath(import.meta.url);
+        const __filename = 'security.ts';
         const __dirname = path.dirname(__filename);
         const distPath = path.join(__dirname, '../../../dist');
         

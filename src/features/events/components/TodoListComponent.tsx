@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { api } from '../../../shared/utils/api';
 import { logger } from '../../../shared/utils/logger';
 import { useToast } from '../../../shared/components/Toast';
@@ -56,30 +57,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
   const todosCacheKey = useMemo(() => `earthforus:event:${eventId}:todosCache`, [eventId]);
   const tagsCacheKey = useMemo(() => `earthforus:event:${eventId}:tagsCache`, [eventId]);
 
-  useEffect(() => {
-    // Load cached todos and tags first for faster UX
-    try {
-      const cached = localStorage.getItem(todosCacheKey);
-      if (cached) {
-        const parsed = JSON.parse(cached) as TodoItem[];
-        if (Array.isArray(parsed)) {
-          setTodos(parsed);
-          setIsLoading(false);
-        }
-      }
-      const cachedTags = localStorage.getItem(tagsCacheKey);
-      if (cachedTags) {
-        const parsedTags = JSON.parse(cachedTags) as Record<number, string[]>;
-        if (parsedTags && typeof parsedTags === 'object') {
-          setTagsByTodoId(parsedTags);
-        }
-      }
-    } catch (err) {
-      log.warn('local_cache_read_error', { err });
-    }
-
-    fetchTodos();
-  }, [eventId, todosCacheKey, tagsCacheKey]);
+  
 
   const persistTodosCache = useCallback((nextTodos: TodoItem[]) => {
     // Debounce localStorage writes
@@ -103,20 +81,62 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
     }
   }, [tagsCacheKey, log]);
 
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     try {
-      const data = await api.get<TodoItem[]>(`/api/events/${eventId}/todos`);
-      const nextTodos = data || [];
+      const data = await api.get<unknown>(`/api/events/${eventId}/todos`);
+      let nextTodos: TodoItem[] = [];
+      if (Array.isArray(data)) {
+        nextTodos = data as TodoItem[];
+      } else if (data && typeof data === 'object' && 'todos' in (data as Record<string, unknown>)) {
+        const raw = (data as { todos: Array<{ id: number; title: string; description?: string | null; priority: 'low' | 'medium' | 'high'; dueDate?: string | null; isCompleted: boolean; createdAt: string; updatedAt: string; createdBy?: { id: number } }> }).todos || [];
+        nextTodos = raw.map((t) => ({
+          id: t.id,
+          event_id: eventId,
+          title: t.title,
+          description: t.description ?? null,
+          is_completed: !!t.isCompleted,
+          created_at: t.createdAt,
+          updated_at: t.updatedAt,
+          created_by: (t.createdBy?.id as number) ?? (currentUserId || 1),
+          assigned_to: null,
+          priority: t.priority,
+          due_date: t.dueDate ?? null
+        }));
+      }
       setTodos(nextTodos);
       persistTodosCache(nextTodos);
-      log.info('todos_fetched', { count: data?.length || 0, eventId });
+      log.info('todos_fetched', { count: nextTodos.length, eventId });
     } catch (error) {
       log.error('fetch_todos_error', { error, eventId });
       showError('Failed to load todo items', 'Todo Error');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [eventId, persistTodosCache, showError, log]);
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(todosCacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached) as TodoItem[];
+        if (Array.isArray(parsed)) {
+          setTodos(parsed);
+          setIsLoading(false);
+        }
+      }
+      const cachedTags = localStorage.getItem(tagsCacheKey);
+      if (cachedTags) {
+        const parsedTags = JSON.parse(cachedTags) as Record<number, string[]>;
+        if (parsedTags && typeof parsedTags === 'object') {
+          setTagsByTodoId(parsedTags);
+        }
+      }
+    } catch (err) {
+      log.warn('local_cache_read_error', { err });
+    }
+
+    fetchTodos();
+  }, [eventId, todosCacheKey, tagsCacheKey, fetchTodos, log]);
 
   const handleCreateTodo = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,7 +153,26 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
         created_by: currentUserId || 1
       };
 
-      const createdTodo = await api.post<TodoItem>(`/api/events/${eventId}/todos`, todoData);
+      const created = await api.post<unknown>(`/api/events/${eventId}/todos`, todoData);
+      let createdTodo: TodoItem;
+      if (created && typeof created === 'object' && 'todo' in (created as Record<string, unknown>)) {
+        const t = (created as { todo: { id: number; title: string; description?: string | null; priority: 'low' | 'medium' | 'high'; dueDate?: string | null; isCompleted: boolean; createdAt: string; updatedAt: string } }).todo;
+        createdTodo = {
+          id: t.id,
+          event_id: eventId,
+          title: t.title,
+          description: t.description ?? null,
+          is_completed: !!t.isCompleted,
+          created_at: t.createdAt,
+          updated_at: t.updatedAt,
+          created_by: currentUserId || 1,
+          assigned_to: null,
+          priority: t.priority,
+          due_date: t.dueDate ?? null
+        };
+      } else {
+        createdTodo = created as TodoItem;
+      }
       
       setTodos(prev => {
         const next = [...prev, createdTodo];
@@ -331,7 +370,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
             />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as 'priority' | 'due_date' | 'created_at')}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
               aria-label="Sort tasks"
             >
@@ -463,13 +502,13 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                                 <input
                                   type="text"
                                   value={editValues?.title || ''}
-                                  onChange={(e) => setEditValues(v => ({ ...(v as any), title: e.target.value }))}
+                                  onChange={(e) => setEditValues(v => v ? { ...v, title: e.target.value } : v)}
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                                   required
                                 />
                                 <textarea
                                   value={editValues?.description || ''}
-                                  onChange={(e) => setEditValues(v => ({ ...(v as any), description: e.target.value }))}
+                                  onChange={(e) => setEditValues(v => v ? { ...v, description: e.target.value } : v)}
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                                   rows={2}
                                 />
@@ -506,7 +545,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                               <div className="mt-2 flex gap-2 items-center">
                                 <select
                                   value={editValues?.priority || todo.priority}
-                                  onChange={(e) => setEditValues(v => ({ ...(v as any), priority: e.target.value as TodoItem['priority'] }))}
+                                  onChange={(e) => setEditValues(v => v ? { ...v, priority: e.target.value as TodoItem['priority'] } : v)}
                                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                                 >
                                   <option value="low">Low</option>
@@ -516,7 +555,7 @@ const TodoListComponent: React.FC<TodoListComponentProps> = ({
                                 <input
                                   type="date"
                                   value={editValues?.due_date || (todo.due_date || '')}
-                                  onChange={(e) => setEditValues(v => ({ ...(v as any), due_date: e.target.value }))}
+                                  onChange={(e) => setEditValues(v => v ? { ...v, due_date: e.target.value } : v)}
                                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                                 />
                                 <Button

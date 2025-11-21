@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 type TextFieldProps = {
   id?: string;
@@ -13,6 +13,7 @@ type TextFieldProps = {
   type?: string;
   disabled?: boolean;
   autoComplete?: string;
+  className?: string;
 };
 
 export default function TextField({
@@ -28,6 +29,7 @@ export default function TextField({
   type = 'text',
   disabled,
   autoComplete,
+  className,
 }: TextFieldProps) {
   const inputId = id || name;
   const descId = description ? `${inputId}-desc` : undefined;
@@ -35,7 +37,7 @@ export default function TextField({
   const describedBy = [descId, errId].filter(Boolean).join(' ') || undefined;
   const invalid = Boolean(error);
   return (
-    <div className="mb-4">
+    <div className={`mb-4 ${className || ''}`}>
       {label ? (
         <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label} {required ? <span className="text-red-600">*</span> : null}

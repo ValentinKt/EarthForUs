@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import * as React from 'react';
 import type { ReactNode } from 'react';
 import { logger } from '../../../shared/utils/logger';
 
@@ -16,11 +16,11 @@ interface AuthContextValue {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const log = logger.withContext('AuthProvider');
-  const [user, setUser] = useState<AuthUser | null>(() => {
+  const [user, setUser] = React.useState<AuthUser | null>(() => {
     try {
       const raw = localStorage.getItem('user');
       if (!raw) {
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handler = (e: StorageEvent) => {
       if (e.key === 'user') {
         try {
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('user');
   };
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({ user, isAuthenticated: !!user, login, logout }),
     [user]
   );
@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 };
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
+  const ctx = React.useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 };

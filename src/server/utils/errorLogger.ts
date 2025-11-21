@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 const LOG_FILE = '/Users/valentin/Documents/trae_projects/EarthForUs/ERRORS_LOGS.md';
 
@@ -91,7 +91,10 @@ export const errorLogger = {
     await this.log('Chat Error', 'Failed to load chat messages', { eventId, ...(details as object) });
   },
   async chatDisconnected(details?: unknown) {
-    await this.log('Connection', 'Disconnected from real-time chat', details);
+    const isNormalDisconnection = details && typeof details === 'object' && 'isNormalDisconnection' in details && details.isNormalDisconnection === true;
+    const message = isNormalDisconnection ? 'Disconnected from real-time chat' : 'Abnormal disconnection from real-time chat';
+    const type = isNormalDisconnection ? 'Connection' : 'Connection Error';
+    await this.log(type, message, details);
   },
   async checklistFailedToLoad(eventId: number, details?: unknown) {
     await this.log('Checklist Error', 'Failed to load todo items', { eventId, ...(details as object) });
