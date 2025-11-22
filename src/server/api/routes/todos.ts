@@ -20,7 +20,8 @@ router.get('/events/:eventId/todos', async (req: Request, res: Response) => {
   try {
     const eventId = req.params.eventId;
     
-    if (!eventId) {
+    // Validate event ID - reject '0' and empty values
+    if (!eventId || eventId === '0') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -68,7 +69,7 @@ router.post('/events/:eventId/todos', async (req: Request, res: Response) => {
     const { title, description, priority, dueDate } = req.body || {};
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!eventId) {
+    if (!eventId || eventId === '0') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -146,7 +147,7 @@ router.put('/events/:eventId/todos/:todoId', async (req: Request, res: Response)
     const todoId = Number(req.params.todoId);
     const { title, description, priority, dueDate } = req.body || {};
     
-    if (!eventId) {
+    if (!eventId || eventId === '0') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -229,7 +230,7 @@ router.patch('/events/:eventId/todos/:todoId/complete', async (req: Request, res
     const { isCompleted } = req.body || {};
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!eventId) {
+    if (!eventId || eventId === '0') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }
@@ -287,7 +288,7 @@ router.delete('/events/:eventId/todos/:todoId', async (req: Request, res: Respon
     const todoId = Number(req.params.todoId);
     const userId = (req as any).user?.id; // This would come from auth middleware
     
-    if (!eventId) {
+    if (!eventId || eventId === '0') {
       log.warn('invalid_event_id', { eventId: req.params.eventId });
       return res.status(400).json({ error: 'Invalid event ID' });
     }

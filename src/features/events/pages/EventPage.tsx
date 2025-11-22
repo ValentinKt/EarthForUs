@@ -207,17 +207,17 @@ const EventPage: React.FC = () => {
                 <p>No updates yet. Organizers can post plans and progress here.</p>
               </div>
             )}
-            {activeTab === 'checklist' && (
+            {activeTab === 'checklist' && event?.id && (
               <TodoListComponent 
-                eventId={event?.id || 0}
+                eventId={event.id}
                 currentUserId={1} // TODO: Get from auth context
                 currentUserName="Current User" // TODO: Get from auth context
                 isOrganizer={true} // TODO: Determine based on user role
               />
             )}
-            {activeTab === 'chat' && (
+            {activeTab === 'chat' && event?.id && (
               <ChatComponent 
-                eventId={event?.id || 0}
+                eventId={event.id}
                 currentUserId={1} // TODO: Get from auth context
                 currentUserName="Current User" // TODO: Get from auth context
               />
