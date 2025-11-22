@@ -85,7 +85,7 @@ export class SecurityValidator {
 
   private validateAPIBaseURL(): boolean {
     const apiBase = process.env.VITE_API_BASE;
-    return apiBase && apiBase.length > 0 && !apiBase.includes('undefined');
+    return !!apiBase && apiBase.length > 0 && !apiBase.includes('undefined');
   }
 
   private validateEnvironmentFile(): boolean {
@@ -108,7 +108,6 @@ export class SecurityValidator {
       if (typeof window === 'undefined') {
         const fs = require('fs');
         const path = require('path');
-        const url = require('url');
         const __filename = 'security.ts';
         const __dirname = path.dirname(__filename);
         const distPath = path.join(__dirname, '../../../dist');
