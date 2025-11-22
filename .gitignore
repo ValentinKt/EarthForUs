@@ -2,6 +2,7 @@ node_modules/
 dist/
 build/
 coverage/
+.data/
 .vercel/
 .DS_Store
 *.log
@@ -26,3 +27,4 @@ temp/
 logs/
 cypress/screenshots/
 cypress/videos/
+.pnpm-store/

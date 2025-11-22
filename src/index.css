@@ -20,6 +20,57 @@
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+/* Environmental Theme Enhancements */
+:root {
+  /* Earth-tone color palette */
+  --color-earth-50: #f7f5f3;
+  --color-earth-100: #e8e4dd;
+  --color-earth-200: #d1c9b8;
+  --color-earth-300: #b8a992;
+  --color-earth-400: #a08b6d;
+  --color-earth-500: #8b7355;
+  --color-earth-600: #6d5a42;
+  --color-earth-700: #524332;
+  --color-earth-800: #372e23;
+  --color-earth-900: #1f1a14;
+  
+  /* Forest green palette */
+  --color-forest-50: #f0f9f0;
+  --color-forest-100: #dcf2dc;
+  --color-forest-200: #b8e6b8;
+  --color-forest-300: #8dd68d;
+  --color-forest-400: #63c163;
+  --color-forest-500: #42a542;
+  --color-forest-600: #2d8a2d;
+  --color-forest-700: #1f6d1f;
+  --color-forest-800: #165116;
+  --color-forest-900: #0d350d;
+  
+  /* Ocean blue palette */
+  --color-ocean-50: #f0f9ff;
+  --color-ocean-100: #e0f2fe;
+  --color-ocean-200: #bae6fd;
+  --color-ocean-300: #7dd3fc;
+  --color-ocean-400: #38bdf8;
+  --color-ocean-500: #0ea5e9;
+  --color-ocean-600: #0284c7;
+  --color-ocean-700: #0369a1;
+  --color-ocean-800: #075985;
+  --color-ocean-900: #0c4a6e;
+  
+  /* Sunset orange palette */
+  --color-sunset-50: #fff7ed;
+  --color-sunset-100: #ffedd5;
+  --color-sunset-200: #fed7aa;
+  --color-sunset-300: #fdba74;
+  --color-sunset-400: #fb923c;
+  --color-sunset-500: #f97316;
+  --color-sunset-600: #ea580c;
+  --color-sunset-700: #c2410c;
+  --color-sunset-800: #9a3412;
+  --color-sunset-900: #7c2d12;
+}
+
 /* Theme CSS Variables (Light/Dark) */
 :root {
   color-scheme: light dark;
@@ -32,6 +83,15 @@
   --color-link-hover: var(--color-brand-700);
   --shadow-color: rgba(0,0,0,0.10);
   --focus-ring: rgba(20, 184, 166, 0.35);
+  
+  /* Environmental theme accents */
+  --color-accent-earth: var(--color-earth-500);
+  --color-accent-forest: var(--color-forest-500);
+  --color-accent-ocean: var(--color-ocean-500);
+  --color-accent-sunset: var(--color-sunset-500);
+  --color-accent-leaf: #22c55e;
+  --color-accent-soil: #a16207;
+  --color-accent-sky: #3b82f6;
 }
 
 html.dark {
@@ -44,6 +104,12 @@ html.dark {
   --color-link-hover: var(--color-brand-300);
   --shadow-color: rgba(0,0,0,0.70);
   --focus-ring: rgba(20, 184, 166, 0.35);
+  
+  /* Environmental theme accents for dark mode */
+  --color-accent-earth: var(--color-earth-400);
+  --color-accent-forest: var(--color-forest-400);
+  --color-accent-ocean: var(--color-ocean-400);
+  --color-accent-sunset: var(--color-sunset-400);
 }
 
 /* Base tweaks */
@@ -66,6 +132,46 @@ body { text-rendering: optimizeLegibility; }
 .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
 .overflow-hidden { overflow: hidden; }
 .pointer-events-none { pointer-events: none; }
+
+/* Environmental Animations */
+@keyframes leafFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(2deg); }
+  75% { transform: translateY(3px) rotate(-2deg); }
+}
+
+@keyframes waveFlow {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(10px); }
+}
+
+@keyframes earthPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.9; }
+}
+
+@keyframes sunrise {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-leaf-float {
+  animation: leafFloat 3s ease-in-out infinite;
+}
+
+.animate-wave-flow {
+  animation: waveFlow 4s ease-in-out infinite;
+}
+
+.animate-earth-pulse {
+  animation: earthPulse 2s ease-in-out infinite;
+}
+
+.animate-sunrise {
+  animation: sunrise 8s ease infinite;
+  background-size: 200% 200%;
+}
 
 /* Animations */
 @keyframes fadeIn {
@@ -93,6 +199,31 @@ html.theme-transition, html.theme-transition * {
 
 @media (prefers-reduced-motion: reduce) {
   html.theme-transition, html.theme-transition * { transition: none; }
+}
+
+/* Environmental Gradients */
+.bg-gradient-forest {
+  background-image: linear-gradient(135deg, var(--color-forest-500), var(--color-forest-700));
+}
+
+.bg-gradient-ocean {
+  background-image: linear-gradient(135deg, var(--color-ocean-400), var(--color-ocean-600));
+}
+
+.bg-gradient-earth {
+  background-image: linear-gradient(135deg, var(--color-earth-400), var(--color-earth-600));
+}
+
+.bg-gradient-sunset {
+  background-image: linear-gradient(135deg, var(--color-sunset-400), var(--color-sunset-600));
+}
+
+.bg-gradient-leaf {
+  background-image: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.bg-gradient-eco {
+  background-image: linear-gradient(135deg, var(--color-forest-500), var(--color-ocean-500), var(--color-earth-500));
 }
 
 /* Gradients */
@@ -240,6 +371,44 @@ html.dark .bg-gray-100 { background-color: #1F2937; /* gray-800 */ }
 html.dark .bg-gray-200 { background-color: #1F2937; /* gray-800 */ }
 html.dark .hover\:bg-gray-100:hover { background-color: #1F2937; /* gray-800 */ }
 html.dark .hover\:bg-gray-300:hover { background-color: #374151; /* gray-700 */ }
+
+/* Environmental utility classes */
+.text-earth { color: var(--color-earth-600); }
+.text-forest { color: var(--color-forest-600); }
+.text-ocean { color: var(--color-ocean-600); }
+.text-sunset { color: var(--color-sunset-600); }
+.text-leaf { color: var(--color-accent-leaf); }
+
+.bg-earth { background-color: var(--color-earth-100); }
+.bg-forest { background-color: var(--color-forest-100); }
+.bg-ocean { background-color: var(--color-ocean-100); }
+.bg-sunset { background-color: var(--color-sunset-100); }
+.bg-leaf { background-color: var(--color-accent-leaf); }
+
+.border-earth { border-color: var(--color-earth-300); }
+.border-forest { border-color: var(--color-forest-300); }
+.border-ocean { border-color: var(--color-ocean-300); }
+.border-sunset { border-color: var(--color-sunset-300); }
+.border-leaf { border-color: var(--color-accent-leaf); }
+
+/* Environmental card styles */
+.ui-card-earth {
+  background: linear-gradient(135deg, var(--color-earth-50), var(--color-earth-100));
+  border: 1px solid var(--color-earth-200);
+  box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1), 0 2px 4px -1px rgba(139, 115, 85, 0.06);
+}
+
+.ui-card-forest {
+  background: linear-gradient(135deg, var(--color-forest-50), var(--color-forest-100));
+  border: 1px solid var(--color-forest-200);
+  box-shadow: 0 4px 6px -1px rgba(66, 165, 66, 0.1), 0 2px 4px -1px rgba(66, 165, 66, 0.06);
+}
+
+.ui-card-ocean {
+  background: linear-gradient(135deg, var(--color-ocean-50), var(--color-ocean-100));
+  border: 1px solid var(--color-ocean-200);
+  box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.1), 0 2px 4px -1px rgba(14, 165, 233, 0.06);
+}
 
 /* Theme utility classes using CSS variables */
 .theme-bg { background-color: var(--color-bg); }

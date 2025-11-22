@@ -1,6 +1,4 @@
 // Simple test to verify EventsPage component can be imported and rendered
-import * as React from 'react';
-import { render } from '@testing-library/react';
 
 // Test basic import first
 describe('EventsPage Import Test', () => {

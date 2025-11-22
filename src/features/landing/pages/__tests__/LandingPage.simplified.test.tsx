@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // Create a simplified mock LandingPage component
 const MockLandingPage = () => {
   const [email, setEmail] = React.useState('');
-  const [showVideo, setShowVideo] = React.useState(false);
+  const [, setShowVideo] = React.useState(false);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

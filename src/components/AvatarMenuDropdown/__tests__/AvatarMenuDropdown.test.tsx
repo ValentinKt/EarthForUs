@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock useAuth and useNavigate
@@ -33,7 +32,7 @@ jest.mock('../../../shared/utils/logger', () => ({
 }));
 
 // Import component after mocks
-const AvatarMenuDropdown = require('../AvatarMenuDropdown').default;
+import AvatarMenuDropdown from '../AvatarMenuDropdown';
 
 const renderAvatarMenuDropdown = (props?: any) => {
   return render(

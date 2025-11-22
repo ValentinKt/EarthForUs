@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 // Create a simplified mock ChatWindow component
 const MockChatWindow = ({
@@ -70,9 +70,7 @@ const MockChatWindow = ({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString();
-  };
+  // formatDate function is available but not used in this test
 
   const isCurrentUser = (userId: number) => userId === currentUser.id;
 

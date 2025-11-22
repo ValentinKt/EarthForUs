@@ -1,8 +1,7 @@
-import * as React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 // Import component
-const LoadingSpinner = require('../LoadingSpinner').default;
+import LoadingSpinner from '../LoadingSpinner';
 
 describe('LoadingSpinner Component', () => {
   describe('Basic Rendering', () => {
@@ -28,36 +27,36 @@ describe('LoadingSpinner Component', () => {
     it('should render with default medium size', () => {
       render(<LoadingSpinner />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-6');
-      expect(svg?.className).toContain('h-6');
+      expect(svg?.getAttribute('class')).toMatch(/w-6/);
+      expect(svg?.getAttribute('class')).toMatch(/h-6/);
     });
 
     it('should render with small size', () => {
       render(<LoadingSpinner size="sm" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-4');
-      expect(svg?.className).toContain('h-4');
+      expect(svg?.getAttribute('class')).toMatch(/w-4/);
+      expect(svg?.getAttribute('class')).toMatch(/h-4/);
     });
 
     it('should render with medium size', () => {
       render(<LoadingSpinner size="md" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-6');
-      expect(svg?.className).toContain('h-6');
+      expect(svg?.getAttribute('class')).toMatch(/w-6/);
+      expect(svg?.getAttribute('class')).toMatch(/h-6/);
     });
 
     it('should render with large size', () => {
       render(<LoadingSpinner size="lg" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-8');
-      expect(svg?.className).toContain('h-8');
+      expect(svg?.getAttribute('class')).toMatch(/w-8/);
+      expect(svg?.getAttribute('class')).toMatch(/h-8/);
     });
 
     it('should render with extra large size', () => {
       render(<LoadingSpinner size="xl" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-12');
-      expect(svg?.className).toContain('h-12');
+      expect(svg?.getAttribute('class')).toMatch(/w-12/);
+      expect(svg?.getAttribute('class')).toMatch(/h-12/);
     });
   });
 
@@ -65,25 +64,25 @@ describe('LoadingSpinner Component', () => {
     it('should render with default blue color', () => {
       render(<LoadingSpinner />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('text-blue-600');
+      expect(svg?.getAttribute('class')).toMatch(/text-blue-600/);
     });
 
     it('should render with blue color', () => {
       render(<LoadingSpinner color="blue" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('text-blue-600');
+      expect(svg?.getAttribute('class')).toMatch(/text-blue-600/);
     });
 
     it('should render with green color', () => {
       render(<LoadingSpinner color="green" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('text-green-600');
+      expect(svg?.getAttribute('class')).toMatch(/text-green-600/);
     });
 
     it('should render with gray color', () => {
       render(<LoadingSpinner color="gray" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('text-gray-600');
+      expect(svg?.getAttribute('class')).toMatch(/text-gray-600/);
     });
   });
 
@@ -118,8 +117,8 @@ describe('LoadingSpinner Component', () => {
       const circle = document.querySelector('circle');
       const path = document.querySelector('path');
       
-      expect(circle?.className).toContain('opacity-25');
-      expect(path?.className).toContain('opacity-75');
+      expect(circle?.getAttribute('class')).toMatch(/opacity-25/);
+      expect(path?.getAttribute('class')).toMatch(/opacity-75/);
     });
   });
 
@@ -149,9 +148,9 @@ describe('LoadingSpinner Component', () => {
     it('should render with size and color combined', () => {
       render(<LoadingSpinner size="lg" color="green" />);
       const svg = document.querySelector('svg');
-      expect(svg?.className).toContain('w-8');
-      expect(svg?.className).toContain('h-8');
-      expect(svg?.className).toContain('text-green-600');
+      expect(svg?.getAttribute('class')).toMatch(/w-8/);
+      expect(svg?.getAttribute('class')).toMatch(/h-8/);
+      expect(svg?.getAttribute('class')).toMatch(/text-green-600/);
     });
 
     it('should render with size, color and className combined', () => {
@@ -160,9 +159,9 @@ describe('LoadingSpinner Component', () => {
       const svg = document.querySelector('svg');
       
       expect(container?.className).toContain('my-spinner');
-      expect(svg?.className).toContain('w-12');
-      expect(svg?.className).toContain('h-12');
-      expect(svg?.className).toContain('text-gray-600');
+      expect(svg?.getAttribute('class')).toMatch(/w-12/);
+      expect(svg?.getAttribute('class')).toMatch(/h-12/);
+      expect(svg?.getAttribute('class')).toMatch(/text-gray-600/);
     });
   });
 

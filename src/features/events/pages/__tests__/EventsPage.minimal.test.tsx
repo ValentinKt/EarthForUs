@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Create a minimal mock EventsPage component
 const MockEventsPage = () => {
   const [events, setEvents] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     // Simulate API call
@@ -398,9 +398,6 @@ describe('EventsPage Component - Minimal Test', () => {
 
   describe('Error Handling', () => {
     it('should handle Create Event button click', async () => {
-      // Use a mock function instead of modifying window.location
-      const mockNavigate = jest.fn();
-      
       renderEventsPage();
       
       await waitFor(() => {

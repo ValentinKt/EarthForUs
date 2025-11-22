@@ -1,4 +1,4 @@
-import * as React from 'react';
+// React import not needed for this test file
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import LoginPage from '../LoginPage';
@@ -264,7 +264,7 @@ describe('LoginPage Component', () => {
 
   describe('Navigation', () => {
     it('should navigate to signup page when sign up link is clicked', () => {
-      const { container } = render(
+      render(
         <MemoryRouter>
           <AuthProvider>
             <Routes>

@@ -9,8 +9,6 @@ const MockEventMap = ({
   onEventClick,
   onMapClick,
   showMarkers = true,
-  showClusters = false,
-  clusterThreshold = 10,
   className,
   height = '400px',
   width = '100%',
@@ -419,7 +417,7 @@ describe('EventMap Component - Simplified Test', () => {
     });
 
     it('should handle zoom in', () => {
-      const { container } = renderEventMap();
+      renderEventMap();
       
       const zoomInButton = screen.getByText('+');
       fireEvent.click(zoomInButton);
@@ -429,7 +427,7 @@ describe('EventMap Component - Simplified Test', () => {
     });
 
     it('should handle zoom out', () => {
-      const { container } = renderEventMap();
+      renderEventMap();
       
       const zoomOutButton = screen.getByText('-');
       fireEvent.click(zoomOutButton);

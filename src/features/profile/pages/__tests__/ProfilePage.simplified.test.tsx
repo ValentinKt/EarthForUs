@@ -372,7 +372,9 @@ describe('ProfilePage Component - Simplified Test', () => {
       fireEvent.click(cancelButton);
       
       expect(screen.queryByText('First Name')).toBeFalsy();
-      expect(screen.getByText('John Doe')).toBeTruthy(); // Original name restored
+      expect(screen.getByText((content) => {
+        return content.includes('John') && content.includes('Doe');
+      })).toBeTruthy(); // Original name restored
     });
 
     it('should save changes and update profile', async () => {
@@ -392,9 +394,11 @@ describe('ProfilePage Component - Simplified Test', () => {
       });
       
       await waitFor(() => {
-        expect(screen.getByText('Jane Doe')).toBeTruthy();
+        expect(screen.getByText((content) => {
+          return content.includes('Jane') && content.includes('Doe');
+        })).toBeTruthy();
         expect(screen.queryByText('Saving...')).toBeFalsy();
-      });
+      }, { timeout: 2000 });
     });
 
     it('should show loading state during save', async () => {

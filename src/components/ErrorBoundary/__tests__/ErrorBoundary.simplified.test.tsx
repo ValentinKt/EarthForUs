@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 // Create a simplified mock ErrorBoundary component
 class MockErrorBoundary extends React.Component<
@@ -138,7 +138,7 @@ describe('ErrorBoundary Component - Simplified Test', () => {
     it('should recover from error when retry is clicked', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       
-      const { getByText, rerender } = render(
+      const { getByText } = render(
         <MockErrorBoundary>
           <ThrowError shouldThrow={true} />
         </MockErrorBoundary>

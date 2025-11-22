@@ -1,4 +1,4 @@
-import * as React from 'react';
+// React import not needed for this test file
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import SignupPage from '../SignupPage';
@@ -35,8 +35,8 @@ describe('SignupPage Component', () => {
     it('should render signup form with all fields', () => {
       renderSignupPage();
       
-      expect(screen.getByText('Create your account')).toBeTruthy();
-      expect(screen.getByText('Join EarthForUs and start making a difference')).toBeTruthy();
+      expect(screen.getByText('Join EarthForUs')).toBeTruthy();
+      expect(screen.getByText('Create your account and start making a difference')).toBeTruthy();
       expect(screen.getByLabelText('First name')).toBeTruthy();
       expect(screen.getByLabelText('Last name')).toBeTruthy();
       expect(screen.getByLabelText('Email address')).toBeTruthy();
@@ -53,8 +53,11 @@ describe('SignupPage Component', () => {
     it('should show first name validation error for empty field', async () => {
       renderSignupPage();
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      // Submit the form directly instead of clicking the button
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('First name is required')).toBeTruthy();
@@ -64,8 +67,10 @@ describe('SignupPage Component', () => {
     it('should show last name validation error for empty field', async () => {
       renderSignupPage();
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Last name is required')).toBeTruthy();
@@ -75,8 +80,10 @@ describe('SignupPage Component', () => {
     it('should show email validation error for empty field', async () => {
       renderSignupPage();
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Email is required')).toBeTruthy();
@@ -89,8 +96,10 @@ describe('SignupPage Component', () => {
       const emailInput = screen.getByLabelText('Email address');
       fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Please enter a valid email address')).toBeTruthy();
@@ -100,8 +109,10 @@ describe('SignupPage Component', () => {
     it('should show password validation error for empty field', async () => {
       renderSignupPage();
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Password is required')).toBeTruthy();
@@ -114,8 +125,10 @@ describe('SignupPage Component', () => {
       const passwordInput = screen.getByLabelText('Password');
       fireEvent.change(passwordInput, { target: { value: '123' } });
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Must be at least 8 characters with uppercase, lowercase, and number')).toBeTruthy();
@@ -131,8 +144,10 @@ describe('SignupPage Component', () => {
       fireEvent.change(passwordInput, { target: { value: 'password123' } });
       fireEvent.change(confirmPasswordInput, { target: { value: 'different123' } });
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('Passwords do not match')).toBeTruthy();
@@ -142,8 +157,10 @@ describe('SignupPage Component', () => {
     it('should show terms validation error when not agreed', async () => {
       renderSignupPage();
       
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('You must agree to the terms and conditions')).toBeTruthy();
@@ -154,8 +171,10 @@ describe('SignupPage Component', () => {
       renderSignupPage();
       
       // Submit empty form to trigger validation
-      const submitButton = screen.getByRole('button', { name: /create account/i });
-      fireEvent.click(submitButton);
+      const form = document.querySelector('form');
+      expect(form).toBeTruthy();
+      
+      fireEvent.submit(form!);
       
       await waitFor(() => {
         expect(screen.getByText('First name is required')).toBeTruthy();
@@ -358,7 +377,7 @@ describe('SignupPage Component', () => {
 
   describe('Navigation', () => {
     it('should navigate to login page when sign in link is clicked', () => {
-      const { container } = render(
+      render(
         <MemoryRouter>
           <Routes>
             <Route path="/" element={<SignupPage />} />

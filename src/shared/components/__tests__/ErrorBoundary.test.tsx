@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ErrorBoundary from '../ErrorBoundary';
+import { logger } from '../../utils/logger';
+import { report } from '../../utils/errorReporter';
 
 // Mock logger and error reporter
 jest.mock('../../utils/logger', () => ({
@@ -21,8 +23,8 @@ describe('ErrorBoundary Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockLogger = require('../../utils/logger');
-    mockReporter = require('../../utils/errorReporter');
+    mockLogger = logger;
+    mockReporter = report;
   });
 
   const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
@@ -92,9 +94,9 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
       
-      expect(mockLogger.logger.withContext).toHaveBeenCalledWith('ErrorBoundary');
+      expect(mockLogger.withContext).toHaveBeenCalledWith('ErrorBoundary');
       // The error logging happens in componentDidCatch, which should be called
-      expect(mockReporter.report).toHaveBeenCalled();
+      expect(mockReporter).toHaveBeenCalled();
       
       consoleSpy.mockRestore();
     });
@@ -108,7 +110,7 @@ describe('ErrorBoundary Component', () => {
         </ErrorBoundary>
       );
       
-      expect(mockReporter.report).toHaveBeenCalledWith(
+      expect(mockReporter).toHaveBeenCalledWith(
         expect.any(Error),
         'Uncaught Error',
         expect.objectContaining({ errorInfo: expect.any(Object) })
@@ -311,7 +313,7 @@ describe('ErrorBoundary Component', () => {
       );
       
       expect(screen.getByText('Something went wrong')).toBeTruthy();
-      expect(mockReporter.report).toHaveBeenCalledWith(
+      expect(mockReporter).toHaveBeenCalledWith(
         expect.objectContaining({
           message: 'Custom error message',
           name: 'CustomError'
@@ -400,8 +402,8 @@ describe('ErrorBoundary Component', () => {
       );
       
       // componentDidCatch should be called, which calls logger and reporter
-      expect(mockLogger.logger.withContext).toHaveBeenCalledWith('ErrorBoundary');
-      expect(mockReporter.report).toHaveBeenCalled();
+      expect(mockLogger.withContext).toHaveBeenCalledWith('ErrorBoundary');
+      expect(mockReporter).toHaveBeenCalled();
       
       consoleSpy.mockRestore();
     });

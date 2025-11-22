@@ -426,7 +426,7 @@ describe('DateTimeField Component - Simplified Test', () => {
 
     it('should handle rapid value changes', () => {
       const handleChange = jest.fn();
-      const { container, rerender } = renderDateTimeField({ onChange: handleChange });
+      const { container } = renderDateTimeField({ onChange: handleChange });
       const input = container.querySelector('input') as HTMLInputElement;
       
       // Rapid changes

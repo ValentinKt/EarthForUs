@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 // Start with minimal mocking and add gradually
 jest.mock('../../../../shared/utils/api', () => ({
@@ -72,7 +72,7 @@ describe('EventsPage Component - Simplified', () => {
   });
 
   it('should show loading state initially', () => {
-    const { getByText } = render(<EventsPage />);
-    expect(getByText('Loading events...')).toBeTruthy();
+    const { getAllByTestId } = render(<EventsPage />);
+    expect(getAllByTestId('loading-skeleton')).toHaveLength(3);
   });
 });

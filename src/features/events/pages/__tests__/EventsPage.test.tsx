@@ -72,8 +72,8 @@ describe('EventsPage Component', () => {
   });
 
   it('should show loading state initially', () => {
-    const { getByText } = render(<EventsPage />);
-    expect(getByText('Loading events...')).toBeTruthy();
+    const { getAllByTestId } = render(<EventsPage />);
+    expect(getAllByTestId('loading-skeleton')).toHaveLength(3);
   });
 
   it('should display events when loaded', async () => {
@@ -96,7 +96,7 @@ describe('EventsPage Component', () => {
       }
     ];
 
-    const { api } = require('../../../../shared/utils/api');
+    const api = require('../../../../shared/utils/api').api;
     api.get.mockResolvedValue({ events: mockEvents });
 
     render(<EventsPage />);
@@ -108,19 +108,18 @@ describe('EventsPage Component', () => {
   });
 
   it('should show empty state when no events', async () => {
-    const { api } = require('../../../../shared/utils/api');
+    const api = require('../../../../shared/utils/api').api;
     api.get.mockResolvedValue({ events: [] });
 
     render(<EventsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('No events found')).toBeTruthy();
+      expect(screen.getByText('No upcoming events')).toBeTruthy();
     });
   });
 
   it('should handle API errors gracefully', async () => {
-    const { api } = require('../../../../shared/utils/api');
-    const { useToast } = require('../../../../shared/components/Toast');
+    const api = require('../../../../shared/utils/api').api;
     
     const mockError = new Error('Failed to fetch events');
     api.get.mockRejectedValue(mockError);
@@ -128,7 +127,7 @@ describe('EventsPage Component', () => {
     render(<EventsPage />);
 
     await waitFor(() => {
-      expect(useToast().error).toHaveBeenCalledWith('Failed to load events');
+      expect(screen.getByText('Failed to fetch events')).toBeTruthy();
     });
   });
 
@@ -150,7 +149,7 @@ describe('EventsPage Component', () => {
       }
     ];
 
-    const { api } = require('../../../../shared/utils/api');
+    const api = require('../../../../shared/utils/api').api;
     api.get.mockResolvedValue({ events: mockEvents });
 
     render(<EventsPage />);

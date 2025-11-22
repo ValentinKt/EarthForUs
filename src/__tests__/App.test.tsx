@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from '../App';
+import { report } from '../shared/utils/errorReporter';
+import { logger } from '../shared/utils/logger';
 
 // Mock all dependencies to isolate the App component
 jest.mock('react-router-dom', () => ({
@@ -212,7 +214,7 @@ describe('App Component', () => {
 
   it('should set up global error reporting', () => {
     const mockAddEventListener = jest.spyOn(window, 'addEventListener');
-    const mockReport = require('../shared/utils/errorReporter').report;
+    const mockReport = report;
     
     render(<App />);
     
@@ -252,7 +254,7 @@ describe('App Component', () => {
   });
 
   it('should log route changes', () => {
-    const mockLogger = require('../shared/utils/logger').logger.withContext();
+    const mockLogger = logger.withContext('app');
     
     render(<App />);
     

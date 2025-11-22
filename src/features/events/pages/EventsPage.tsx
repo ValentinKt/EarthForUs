@@ -86,11 +86,11 @@ const EventsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Discover Events</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white animate-leaf-float">Discover Events</h1>
           <p className="text-gray-600 dark:text-gray-400">Find and join local environmental initiatives.</p>
         </div>
         <Link to="/events/create">
-          <Button variant="primary">Create Event</Button>
+          <Button variant="forest">Create Event</Button>
         </Link>
       </div>
 
@@ -98,7 +98,7 @@ const EventsPage: React.FC = () => {
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[0,1,2].map(i => (
-            <div key={i} className="h-40 ui-card animate-pulse" />
+            <div key={i} data-testid="loading-skeleton" className="h-40 ui-card animate-pulse" />
           ))}
         </div>
       )}
@@ -115,11 +115,11 @@ const EventsPage: React.FC = () => {
 
       {/* Empty */}
       {!isLoading && !error && events.length === 0 && (
-        <div className="ui-card text-center spacious">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No upcoming events</h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Be the first to create one for your community.</p>
+        <div className="ui-card-forest text-center spacious animate-earth-pulse">
+          <h3 className="text-lg font-semibold text-forest-700 dark:text-forest-300 mb-2">No upcoming events</h3>
+          <p className="text-forest-600 dark:text-forest-400 mb-4">Be the first to create one for your community.</p>
           <Link to="/events/create">
-            <Button variant="primary">Create Event</Button>
+            <Button variant="forest">Create Event</Button>
           </Link>
         </div>
       )}
@@ -128,19 +128,19 @@ const EventsPage: React.FC = () => {
       {!isLoading && !error && events.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map(ev => (
-            <div key={ev.id} className="ui-card">
+            <div key={ev.id} className="ui-card-ocean hover:animate-earth-pulse transition-all duration-300 hover:shadow-lg">
               <div className="flex items-start justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{ev.title}</h3>
-                <span className="text-xs text-brand-700 bg-brand-100 px-2 py-1 rounded dark:text-brand-300 dark:bg-brand-900/30">{new Date(ev.start_time).toLocaleDateString()}</span>
+                <h3 className="text-lg font-semibold text-ocean-700 dark:text-ocean-300">{ev.title}</h3>
+                <span className="text-xs text-ocean-700 bg-ocean-100 px-2 py-1 rounded dark:text-ocean-300 dark:bg-ocean-900/30">{new Date(ev.start_time).toLocaleDateString()}</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{ev.location || 'Location TBA'}</p>
-              <div className="mt-3 text-sm text-gray-700 dark:text-gray-200">
+              <p className="text-sm text-ocean-600 dark:text-ocean-400 mt-1">{ev.location || 'Location TBA'}</p>
+              <div className="mt-3 text-sm text-ocean-700 dark:text-ocean-200">
                 <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>
+                  <svg className="w-4 h-4 text-ocean-500 dark:text-ocean-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3M3 11h18M5 19h14"/></svg>
                   <span>{new Date(ev.start_time).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                  <svg className="w-4 h-4 text-ocean-500 dark:text-ocean-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
                   <span>{new Date(ev.end_time).toLocaleString()}</span>
                 </div>
               </div>
@@ -148,7 +148,7 @@ const EventsPage: React.FC = () => {
                 <Link to={`/events/${ev.id}`}>
                   <Button variant="outline">Details</Button>
                 </Link>
-                <Button variant="earth" onClick={() => onJoin(ev.id)} disabled={joiningIds.has(ev.id) || joinedIds.has(ev.id)} loading={joiningIds.has(ev.id)}>{joinedIds.has(ev.id) ? 'Joined' : 'Join'}</Button>
+                <Button variant="forest" onClick={() => onJoin(ev.id)} disabled={joiningIds.has(ev.id) || joinedIds.has(ev.id)} loading={joiningIds.has(ev.id)}>{joinedIds.has(ev.id) ? 'Joined' : 'Join'}</Button>
               </div>
             </div>
           ))}

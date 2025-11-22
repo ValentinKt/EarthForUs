@@ -53,7 +53,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
 interface ButtonProps {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'earth' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'earth' | 'forest' | 'ocean' | 'sunset' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
@@ -83,7 +83,10 @@ const Button: React.FC<ButtonProps> = ({
   const variantClasses = {
     primary: 'bg-brand-600 hover:bg-brand-700 text-white',
     secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100',
-    earth: 'bg-green-600 hover:bg-green-700 text-white',
+    earth: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg',
+    forest: 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white',
+    ocean: 'bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white',
+    sunset: 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white',
     outline: 'border-2 border-brand-600 text-brand-600 hover:bg-brand-50 dark:border-brand-300 dark:text-brand-300 dark:hover:bg-brand-900/30',
     ghost: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
   };

@@ -1,5 +1,8 @@
-import * as React from 'react';
+// React import removed as it's not used
 import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from '../../../../shared/components/Toast';
+import { AuthProvider } from '../../../../features/auth/context/AuthContext';
 
 // Simple mock approach - just mock the API calls
 const mockGet = jest.fn();
@@ -24,18 +27,42 @@ describe('EventsPage Component - Simplified', () => {
   });
 
   it('should render without crashing', () => {
-    const { container } = render(<EventsPage />);
+    const { container } = render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
     expect(container).toBeTruthy();
   });
 
   it('should display the page title', () => {
-    render(<EventsPage />);
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
     expect(screen.getByText('Discover Events')).toBeTruthy();
   });
 
   it('should show loading state initially', () => {
-    render(<EventsPage />);
-    expect(screen.getByText('Loading events...')).toBeTruthy();
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    expect(screen.getAllByTestId('loading-skeleton')).toHaveLength(3);
   });
 
   it('should display events when loaded', async () => {
@@ -51,7 +78,15 @@ describe('EventsPage Component - Simplified', () => {
     ];
 
     mockGet.mockResolvedValue({ events: mockEvents });
-    render(<EventsPage />);
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Community Cleanup')).toBeTruthy();
@@ -61,17 +96,33 @@ describe('EventsPage Component - Simplified', () => {
 
   it('should show empty state when no events', async () => {
     mockGet.mockResolvedValue({ events: [] });
-    render(<EventsPage />);
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
-      expect(screen.getByText('No events found')).toBeTruthy();
+      expect(screen.getByText('No upcoming events')).toBeTruthy();
     });
   });
 
   it('should handle API errors gracefully', async () => {
     const mockError = new Error('Network error');
     mockGet.mockRejectedValue(mockError);
-    render(<EventsPage />);
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <EventsPage />
+          </ToastProvider>
+        </AuthProvider>
+      </MemoryRouter>
+    );
 
     await waitFor(() => {
       // Should show error message or handle gracefully

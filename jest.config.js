@@ -5,14 +5,7 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: {
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        jsx: 'react-jsx',
-        moduleResolution: 'node',
-        target: 'es2020',
-        module: 'esnext',
-      },
+      tsconfig: './tsconfig.test.json',
     }],
   },
   moduleNameMapper: {
@@ -22,13 +15,6 @@ export default {
     '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     '^@server/(.*)$': '<rootDir>/src/server/$1',
     '^@types/(.*)$': '<rootDir>/src/types/$1',
-  },
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-      },
-    }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: [

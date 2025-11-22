@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { AuthProvider } from '../../../features/auth/context/AuthContext';
 
 // Mock AvatarMenuDropdown
 jest.mock('../../AvatarMenuDropdown/AvatarMenuDropdown', () => {
@@ -35,9 +35,11 @@ describe('Header Component - Working Version', () => {
 
   const renderHeader = () => {
     return render(
-      <MemoryRouter>
-        <Header />
-      </MemoryRouter>
+      <AuthProvider>
+        <MemoryRouter>
+          <Header />
+        </MemoryRouter>
+      </AuthProvider>
     );
   };
 

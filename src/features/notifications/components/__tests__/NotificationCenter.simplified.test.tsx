@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 // Create a simplified mock NotificationCenter component
 const MockNotificationCenter = ({
@@ -198,7 +198,7 @@ const MockNotificationCenter = ({
               </div>
             ) : (
               <>
-                {notifications.map((notification) => (
+                {notifications.slice(0, maxVisible).map((notification) => (
                   <div
                     key={notification.id}
                     className={`${getTypeClasses(notification.type)} ${

@@ -1,8 +1,7 @@
-import * as React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 // Import component
-const LoadingSpinner = require('../LoadingSpinner').default;
+import LoadingSpinner from '../LoadingSpinner';
 
 describe('LoadingSpinner Component', () => {
   describe('Basic Rendering', () => {

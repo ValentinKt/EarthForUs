@@ -96,7 +96,8 @@ describe('EventsPage Component - Working Version', () => {
 
   it('should show loading state initially', () => {
     renderEventsPage();
-    expect(screen.getByText('Loading events...')).toBeTruthy();
+    // Should show skeleton loading cards instead of text
+    expect(screen.getAllByTestId('loading-skeleton')).toHaveLength(3);
   });
 
   it('should display events when loaded', async () => {
@@ -125,15 +126,15 @@ describe('EventsPage Component - Working Version', () => {
     renderEventsPage();
 
     await waitFor(() => {
-      expect(screen.getByText('No events found')).toBeTruthy();
-      expect(screen.getByText('Be the first to create one!')).toBeTruthy();
+      expect(screen.getByText('No upcoming events')).toBeTruthy();
+      expect(screen.getByText('Be the first to create one for your community.')).toBeTruthy();
     });
   });
 
   it('should show Create Event button', () => {
     renderEventsPage();
     expect(screen.getByText('Create Event')).toBeTruthy();
-    expect(screen.getByTestId('button-earth')).toBeTruthy();
+    expect(screen.getByTestId('button-forest')).toBeTruthy();
   });
 
   it('should handle API errors gracefully', async () => {

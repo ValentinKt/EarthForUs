@@ -1,4 +1,4 @@
-import * as React from 'react';
+// React import not needed for this test file
 import { render } from '@testing-library/react';
 import { AuthProvider, useAuth, type AuthUser } from '../AuthContext';
 

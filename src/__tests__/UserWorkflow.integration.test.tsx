@@ -10,7 +10,7 @@ const MockApp = () => {
 
   // Mock API functions
   const mockApi = {
-    login: async (email: string, password: string) => {
+    login: async (email: string, _password: string) => {
       return {
         user: {
           id: '1',
@@ -60,7 +60,7 @@ const MockApp = () => {
         }
       ];
     },
-    joinEvent: async (eventId: string) => {
+    joinEvent: async (_eventId: string) => {
       return { success: true, message: 'Successfully joined event' };
     },
     createEvent: async (eventData: any) => {
@@ -528,7 +528,7 @@ describe('User Workflow Integration Test', () => {
 
   describe('Complete User Journey', () => {
     it('should handle user registration flow', async () => {
-      const { container } = renderApp();
+      renderApp();
       
       // Start at landing page
       expect(screen.getByText('Connect, Volunteer, and')).toBeTruthy();

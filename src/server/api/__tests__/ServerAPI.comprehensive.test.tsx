@@ -1,11 +1,8 @@
-import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-
 // Mock server API endpoints
 const mockServerApi = {
   // Auth endpoints
   auth: {
-    login: async (email: string, password: string) => {
+    login: async (email: string, _password: string) => {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -62,7 +59,7 @@ const mockServerApi = {
   
   // Events endpoints
   events: {
-    getEvents: async (filters = {}) => {
+    getEvents: async (_filters = {}) => {
       await new Promise(resolve => setTimeout(resolve, 200));
       
       const mockEvents = [
@@ -219,7 +216,7 @@ const mockServerApi = {
       };
     },
     
-    getUserEvents: async (userId: string) => {
+    getUserEvents: async (_userId: string) => {
       await new Promise(resolve => setTimeout(resolve, 180));
       
       return {
@@ -591,7 +588,7 @@ describe('Server API Endpoints - Comprehensive Test', () => {
       try {
         throw networkError;
       } catch (error) {
-        expect(error.message).toBe('Network error');
+        expect((error as Error).message).toBe('Network error');
       }
     });
 
@@ -604,7 +601,7 @@ describe('Server API Endpoints - Comprehensive Test', () => {
           setTimeout(() => reject(timeoutError), 100);
         });
       } catch (error) {
-        expect(error.message).toBe('Request timeout');
+        expect((error as Error).message).toBe('Request timeout');
       }
     });
 
@@ -614,7 +611,7 @@ describe('Server API Endpoints - Comprehensive Test', () => {
       try {
         throw serverError;
       } catch (error) {
-        expect(error.message).toBe('Internal server error');
+        expect((error as Error).message).toBe('Internal server error');
       }
     });
   });

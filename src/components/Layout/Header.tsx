@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AvatarMenuDropdown from '../AvatarMenuDropdown/AvatarMenuDropdown';
 import Button from '../../shared/ui/Button';
+import { useAuth } from '../../features/auth/context/AuthContext';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAuthenticated] = useState(false); // This will come from auth context
+  const { user } = useAuth();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -41,7 +42,7 @@ const Header: React.FC = () => {
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
+            {user ? (
               <AvatarMenuDropdown />
             ) : (
               <div className="flex items-center space-x-3">
@@ -88,7 +89,7 @@ const Header: React.FC = () => {
               <Link to="/contact" className="nav-link px-3 py-2">
                 Contact
               </Link>
-              {!isAuthenticated && (
+              {!user && (
                 <div className="flex flex-col space-y-2 px-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <Link to="/login">
                     <Button variant="ghost" size="sm" fullWidth>

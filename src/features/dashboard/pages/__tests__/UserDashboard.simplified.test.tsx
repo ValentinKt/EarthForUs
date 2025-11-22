@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Create a simplified mock UserDashboard component
 const MockUserDashboard = () => {
-  const [dashboardData, setDashboardData] = React.useState({
+  const [dashboardData] = React.useState({
     user: {
       name: 'John Doe',
       avatar: 'https://example.com/avatar.jpg',
@@ -63,12 +63,7 @@ const MockUserDashboard = () => {
     ]
   });
 
-  const [loading, setLoading] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState('overview');
-
-  const handleTabChange = (tab: string) => {
-    setSelectedTab(tab);
-  };
+  // const [, setSelectedTab] = React.useState('overview'); // Removed unused variable
 
   const handleViewEvent = (eventId: string) => {
     window.location.href = `/events/${eventId}`;
@@ -376,7 +371,7 @@ describe('UserDashboard Component - Simplified Test', () => {
     it('should display activity dates and times', () => {
       renderUserDashboard();
       // Check for dates (actual format may vary)
-      const dateElements = screen.getAllByText((content, element) => {
+      const dateElements = screen.getAllByText((content) => {
         return content.includes('Mar') || content.includes('Feb');
       });
       expect(dateElements.length).toBeGreaterThan(0);
@@ -423,7 +418,7 @@ describe('UserDashboard Component - Simplified Test', () => {
     it('should handle empty upcoming events', () => {
       // Create component with no upcoming events
       const EmptyEventsDashboard = () => {
-        const [dashboardData] = React.useState({
+        const [_dashboardData] = React.useState({
           user: { name: 'John Doe', avatar: '', totalEvents: 0, upcomingEvents: 0, volunteerHours: 0 },
           upcomingEvents: [],
           recentActivity: []
@@ -443,7 +438,7 @@ describe('UserDashboard Component - Simplified Test', () => {
     it('should handle empty recent activity', () => {
       // Create component with no recent activity
       const EmptyActivityDashboard = () => {
-        const [dashboardData] = React.useState({
+        const [_dashboardData] = React.useState({
           user: { name: 'John Doe', avatar: '', totalEvents: 0, upcomingEvents: 0, volunteerHours: 0 },
           upcomingEvents: [],
           recentActivity: []

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { StrictMode } from 'react';
 
 // Mock react-dom/client
@@ -10,6 +9,9 @@ const mockCreateRoot = jest.fn(() => ({
 jest.mock('react-dom/client', () => ({
   createRoot: mockCreateRoot
 }));
+
+// Import after mock is set up
+import { createRoot } from 'react-dom/client';
 
 describe('Main Entry Point', () => {
   let originalGetElementById: any;
@@ -35,7 +37,6 @@ describe('Main Entry Point', () => {
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      const { createRoot } = require('react-dom/client');
       const root = createRoot(rootElement);
       root.render(
         <StrictMode>
@@ -60,7 +61,6 @@ describe('Main Entry Point', () => {
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      const { createRoot } = require('react-dom/client');
       const root = createRoot(rootElement);
       root.render(
         <StrictMode>
@@ -79,7 +79,6 @@ describe('Main Entry Point', () => {
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      const { createRoot } = require('react-dom/client');
       const root = createRoot(rootElement);
       root.render(
         <StrictMode>
@@ -97,7 +96,6 @@ describe('Main Entry Point', () => {
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      const { createRoot } = require('react-dom/client');
       const root = createRoot(rootElement);
       root.render(
         <StrictMode>
@@ -116,7 +114,6 @@ describe('Main Entry Point', () => {
     
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      const { createRoot } = require('react-dom/client');
       const root = createRoot(rootElement);
       root.render(
         <StrictMode>

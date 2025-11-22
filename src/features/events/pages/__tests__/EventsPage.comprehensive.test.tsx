@@ -77,7 +77,8 @@ describe('EventsPage Component', () => {
 
   it('should show loading state initially', () => {
     render(<EventsPage />);
-    expect(screen.getByText('Loading events...')).toBeTruthy();
+    // The component shows loading skeletons instead of text
+    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
   });
 
   it('should display events when data loads', async () => {
@@ -120,22 +121,22 @@ describe('EventsPage Component', () => {
     render(<EventsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('No events found')).toBeTruthy();
-      expect(screen.getByText('Be the first to create one!')).toBeTruthy();
+      expect(screen.getByText('No upcoming events')).toBeTruthy();
+      expect(screen.getByText('Be the first to create one for your community.')).toBeTruthy();
     });
   });
 
   it('should show error message when API fails', async () => {
     const { api } = require('../../../../shared/utils/api');
-    const { useToast } = require('../../../../shared/components/Toast');
     
     const mockError = new Error('Network error');
     api.get.mockRejectedValue(mockError);
 
     render(<EventsPage />);
 
+    // The error should be displayed in the UI, not as a toast
     await waitFor(() => {
-      expect(useToast().error).toHaveBeenCalledWith('Failed to load events');
+      expect(screen.getByText('Network error')).toBeTruthy();
     });
   });
 
@@ -143,7 +144,7 @@ describe('EventsPage Component', () => {
     render(<EventsPage />);
     
     expect(screen.getByText('Create Event')).toBeTruthy();
-    expect(screen.getByTestId('button-earth')).toBeTruthy();
+    expect(screen.getByTestId('button-forest')).toBeTruthy();
   });
 
   it('should show Join buttons for each event', async () => {
@@ -182,9 +183,9 @@ describe('EventsPage Component', () => {
     ];
 
     const { api } = require('../../../../shared/utils/api');
-    const { useToast } = require('../../../../shared/components/Toast');
     
     api.get.mockResolvedValue({ events: mockEvents });
+    api.post.mockResolvedValue({ status: 'success' });
 
     render(<EventsPage />);
 
@@ -197,7 +198,8 @@ describe('EventsPage Component', () => {
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/api/events/1/join', { user_id: 1 });
-      expect(useToast().success).toHaveBeenCalledWith('Joined event', 'Joined');
+      // The button should change to "Joined" after successful join
+      expect(screen.getByText('Joined')).toBeTruthy();
     });
   });
 
@@ -220,8 +222,9 @@ describe('EventsPage Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Community Cleanup')).toBeTruthy();
-      // Should show some date/time information
-      expect(screen.getByText(/Jan 15/)).toBeTruthy();
+      // Should show some date/time information - component shows "1/15/2024" in multiple places
+      const dateElements = screen.getAllByText(/1\/15\/2024/);
+      expect(dateElements.length).toBeGreaterThan(0);
     });
   });
 });

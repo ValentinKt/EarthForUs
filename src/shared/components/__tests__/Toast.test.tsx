@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ToastProvider, useToast } from '../Toast';
+import { report } from '../../utils/errorReporter';
 
 // Mock error reporter
 jest.mock('../../utils/errorReporter', () => ({
@@ -177,7 +178,7 @@ describe('Toast Component', () => {
   describe('Error Reporting', () => {
     it('should report error when error toast is shown', () => {
       const { getByRole } = renderWithToastProvider(<TestComponent />);
-      const { report } = require('../../utils/errorReporter');
+      // Use the mocked report function
       
       fireEvent.click(getByRole('button', { name: /show error/i }));
       
@@ -190,7 +191,7 @@ describe('Toast Component', () => {
 
     it('should report error with custom title', () => {
       const { getByRole } = renderWithToastProvider(<TestComponent />);
-      const { report } = require('../../utils/errorReporter');
+      // Use the mocked report function
       
       fireEvent.click(getByRole('button', { name: /show custom/i }));
       

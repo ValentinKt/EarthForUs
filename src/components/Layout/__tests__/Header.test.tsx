@@ -1,6 +1,7 @@
-import * as React from 'react';
+// React import removed as it's not used
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { AuthProvider } from '../../../features/auth/context/AuthContext';
 
 // Mock AvatarMenuDropdown
 jest.mock('../../AvatarMenuDropdown/AvatarMenuDropdown', () => {
@@ -30,9 +31,11 @@ import Header from '../Header';
 
 const renderHeader = () => {
   return render(
-    <MemoryRouter>
-      <Header />
-    </MemoryRouter>
+    <AuthProvider>
+      <MemoryRouter>
+        <Header />
+      </MemoryRouter>
+    </AuthProvider>
   );
 };
 
@@ -72,14 +75,18 @@ describe('Header Component', () => {
     });
 
     it('should display avatar dropdown when authenticated', () => {
-      // Mock authenticated state
-      jest.spyOn(React, 'useState').mockReturnValueOnce([true, jest.fn()]);
+      // Mock authenticated state by mocking the AuthContext
+      jest.spyOn(require('../../../features/auth/context/AuthContext'), 'useAuth')
+        .mockReturnValue({ user: { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' } });
       
       renderHeader();
       
       expect(screen.queryByText('Sign In')).toBeFalsy();
       expect(screen.queryByText('Get Started')).toBeFalsy();
       expect(screen.getByTestId('avatar-dropdown')).toBeTruthy();
+      
+      // Restore the original implementation
+      jest.restoreAllMocks();
     });
   });
 
@@ -241,18 +248,24 @@ describe('Header Component', () => {
       expect(screen.getByText('Sign In')).toBeTruthy();
       expect(screen.getByText('Get Started')).toBeTruthy();
       
-      // Mock authenticated state
-      jest.spyOn(React, 'useState').mockReturnValueOnce([true, jest.fn()]);
+      // Mock authenticated state by mocking the AuthContext
+      jest.spyOn(require('../../../features/auth/context/AuthContext'), 'useAuth')
+        .mockReturnValue({ user: { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@example.com' } });
       
       // Re-render with authenticated state
       rerender(
-        <MemoryRouter>
-          <Header />
-        </MemoryRouter>
+        <AuthProvider>
+          <MemoryRouter>
+            <Header />
+          </MemoryRouter>
+        </AuthProvider>
       );
       
       // Should now show avatar dropdown
       expect(screen.getByTestId('avatar-dropdown')).toBeTruthy();
+      
+      // Restore the original implementation
+      jest.restoreAllMocks();
     });
 
     it('should render with all props correctly', () => {
